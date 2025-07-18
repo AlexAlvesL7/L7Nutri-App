@@ -1,0 +1,12 @@
+Google Gemini AI configurado com sucesso!
+MODO DESENVOLVIMENTO: Usando SQLite local
+=== SETUP MYSQL HOSTINGER ===
+Credenciais:
+  Usuario: u419790683_l7nutri_alex
+  Host: 127.0.0.1
+  Banco: u419790683_l7nutri_novo
+
+TESTANDO CONEXAO COM MYSQL...
+ERRO DE CONEXAO: (2003, "Can't connect to MySQL server on '127.0.0.1' ([WinError 10061] Nenhuma conexÒo p¶de ser feita porque a mßquina de destino as recusou ativamente)")
+
+ERRO de conexao!

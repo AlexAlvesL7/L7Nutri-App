@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Demo - Sistema de Usuários | L7Nutri</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 1.1rem;
+        }
+
+        .user-demo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .user-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .user-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .user-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .user-card p {
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .btn-dashboard {
+            background: white;
+            color: #667eea;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-dashboard:hover {
+            background: #f7fafc;
+            transform: scale(1.05);
+        }
+
+        .info-section {
+            background: #f7fafc;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+
+        .info-section h2 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .feature-list {
+            list-style: none;
+        }
+
+        .feature-list li {
+            background: white;
+            margin-bottom: 15px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .feature-list li strong {
+            color: #667eea;
+        }
+
+        .security-badge {
+            background: #48bb78;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin: 10px 5px;
+        }
+
+        .tech-stack {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tech-badge {
+            background: #667eea;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Sistema de Usuários - L7Nutri</h1>
+            <p>Demonstração de como cada usuário acessa seus próprios dados</p>
+        </div>
+
+        <div class="user-demo">
+            <div class="user-card">
+                <h3>👤 Usuário Demo 1</h3>
+                <p>Maria Silva - Objetivo: Emagrecimento<br>
+                Registros: 45 refeições nos últimos 30 dias</p>
+                <a href="/dashboard-insights?id=1" class="btn-dashboard">
+                    Ver Meu Dashboard
+                </a>
+            </div>
+
+            <div class="user-card">
+                <h3>👤 Usuário Demo 2</h3>
+                <p>João Santos - Objetivo: Ganho de Massa<br>
+                Registros: 38 refeições nos últimos 30 dias</p>
+                <a href="/dashboard-insights?id=2" class="btn-dashboard">
+                    Ver Meu Dashboard
+                </a>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2>🔐 Como Funciona o Sistema de Segurança</h2>
+            
+            <ul class="feature-list">
+                <li>
+                    <strong>Isolamento de Dados:</strong> 
+                    Cada usuário vê apenas seus próprios registros alimentares e insights
+                </li>
+                <li>
+                    <strong>Autenticação JWT:</strong> 
+                    Sistema de tokens seguros para identificar usuários autenticados
+                </li>
+                <li>
+                    <strong>Queries Filtradas:</strong> 
+                    Todas as consultas ao banco são filtradas pelo ID do usuário
+                </li>
+                <li>
+                    <strong>IA Personalizada:</strong> 
+                    Insights gerados específicos para os padrões alimentares de cada usuário
+                </li>
+                <li>
+                    <strong>Demo Seguro:</strong> 
+                    Modo demonstração permite testar sem comprometer dados reais
+                </li>
+            </ul>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <div class="security-badge">🔒 Dados Criptografados</div>
+                <div class="security-badge">🛡️ JWT Authentication</div>
+                <div class="security-badge">👥 Multi-tenant</div>
+                <div class="security-badge">🔍 Auditoria</div>
+            </div>
+
+            <div class="tech-stack">
+                <div class="tech-badge">Flask</div>
+                <div class="tech-badge">SQLAlchemy</div>
+                <div class="tech-badge">JWT</div>
+                <div class="tech-badge">Google Gemini AI</div>
+                <div class="tech-badge">SQLite</div>
+                <div class="tech-badge">Bcrypt</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

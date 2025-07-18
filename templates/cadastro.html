@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📝 Cadastro | L7Nutri</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .signup-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 700px;
+        }
+
+        .brand-side {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 50px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .signup-side {
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .brand-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .brand-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        .benefit-list {
+            list-style: none;
+            text-align: left;
+        }
+
+        .benefit-list li {
+            margin-bottom: 15px;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .benefit-list li::before {
+            content: "🎯";
+            position: absolute;
+            left: 0;
+        }
+
+        .signup-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .signup-title {
+            font-size: 2rem;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .signup-subtitle {
+            color: #718096;
+            font-size: 1rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-input.error {
+            border-color: #e53e3e;
+        }
+
+        .form-help {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-top: 5px;
+        }
+
+        .form-error {
+            font-size: 0.8rem;
+            color: #e53e3e;
+            margin-top: 5px;
+        }
+
+        .signup-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 20px 0;
+        }
+
+        .signup-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .signup-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .login-link {
+            text-align: center;
+            color: #718096;
+            margin-top: 20px;
+        }
+
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .alert-error {
+            background: #fed7d7;
+            color: #c53030;
+            border: 1px solid #feb2b2;
+        }
+
+        .alert-success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .password-strength {
+            margin-top: 5px;
+        }
+
+        .strength-bar {
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .strength-fill {
+            height: 100%;
+            transition: all 0.3s ease;
+            width: 0%;
+        }
+
+        .strength-weak { background: #e53e3e; }
+        .strength-medium { background: #dd6b20; }
+        .strength-strong { background: #38a169; }
+
+        .strength-text {
+            font-size: 0.7rem;
+            margin-top: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .signup-container {
+                grid-template-columns: 1fr;
+                max-width: 500px;
+            }
+            
+            .brand-side {
+                display: none;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .signup-side {
+                padding: 30px 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <!-- Lado da Marca -->
+        <div class="brand-side">
+            <div class="logo">🥗</div>
+            <h1 class="brand-title">L7Nutri</h1>
+            <p class="brand-subtitle">Transforme sua relação com a alimentação</p>
+            
+            <ul class="benefit-list">
+                <li>Dashboard inteligente com IA</li>
+                <li>Análises nutricionais personalizadas</li>
+                <li>Acompanhamento em tempo real</li>
+                <li>Recomendações automáticas</li>
+                <li>Interface moderna e intuitiva</li>
+                <li>100% gratuito para começar</li>
+            </ul>
+        </div>
+
+        <!-- Lado do Cadastro -->
+        <div class="signup-side">
+            <div class="signup-header">
+                <h2 class="signup-title">Crie sua conta</h2>
+                <p class="signup-subtitle">Comece sua jornada nutricional hoje mesmo</p>
+            </div>
+
+            <!-- Alertas -->
+            <div id="alertContainer"></div>
+
+            <!-- Loading -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Criando sua conta...</p>
+            </div>
+
+            <!-- Formulário de Cadastro -->
+            <form id="signupForm">
+                <!-- Informações Básicas -->
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label" for="nome">Nome Completo</label>
+                        <input 
+                            type="text" 
+                            id="nome" 
+                            name="nome" 
+                            class="form-input" 
+                            placeholder="Digite seu nome completo"
+                            required
+                        >
+                        <div class="form-error" id="nomeError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            class="form-input" 
+                            placeholder="seu@email.com"
+                            required
+                        >
+                        <div class="form-error" id="emailError"></div>
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label class="form-label" for="senha">Senha</label>
+                    <input 
+                        type="password" 
+                        id="senha" 
+                        name="senha" 
+                        class="form-input" 
+                        placeholder="Mínimo 6 caracteres"
+                        required
+                        minlength="6"
+                    >
+                    <div class="password-strength">
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="strengthFill"></div>
+                        </div>
+                        <div class="strength-text" id="strengthText"></div>
+                    </div>
+                    <div class="form-error" id="senhaError"></div>
+                </div>
+
+                <!-- Informações Pessoais -->
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label" for="idade">Idade</label>
+                        <input 
+                            type="number" 
+                            id="idade" 
+                            name="idade" 
+                            class="form-input" 
+                            placeholder="Ex: 25"
+                            min="13"
+                            max="100"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="sexo">Sexo</label>
+                        <select id="sexo" name="sexo" class="form-select">
+                            <option value="">Selecione...</option>
+                            <option value="masculino">Masculino</option>
+                            <option value="feminino">Feminino</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label" for="peso">Peso (kg)</label>
+                        <input 
+                            type="number" 
+                            id="peso" 
+                            name="peso" 
+                            class="form-input" 
+                            placeholder="Ex: 70"
+                            min="30"
+                            max="300"
+                            step="0.1"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="altura">Altura (cm)</label>
+                        <input 
+                            type="number" 
+                            id="altura" 
+                            name="altura" 
+                            class="form-input" 
+                            placeholder="Ex: 170"
+                            min="100"
+                            max="250"
+                        >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="objetivo">Objetivo Principal</label>
+                    <select id="objetivo" name="objetivo" class="form-select">
+                        <option value="">Selecione seu objetivo...</option>
+                        <option value="emagrecimento">Emagrecimento</option>
+                        <option value="ganho_massa">Ganho de Massa Muscular</option>
+                        <option value="manutencao">Manutenção do Peso</option>
+                        <option value="saude">Melhorar Saúde Geral</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="signup-btn" id="signupBtn">
+                    🚀 Criar Minha Conta Gratuita
+                </button>
+            </form>
+
+            <div class="login-link">
+                Já tem uma conta? 
+                <a href="/login">Faça login aqui</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Estado da aplicação
+        let isLoading = false;
+
+        // Elementos do DOM
+        const signupForm = document.getElementById('signupForm');
+        const signupBtn = document.getElementById('signupBtn');
+        const loading = document.getElementById('loading');
+        const alertContainer = document.getElementById('alertContainer');
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar se já está logado
+            checkAuthStatus();
+            
+            // Submit do formulário
+            signupForm.addEventListener('submit', handleSignup);
+            
+            // Validação em tempo real
+            setupValidation();
+            
+            // Password strength
+            document.getElementById('senha').addEventListener('input', checkPasswordStrength);
+        });
+
+        // Verificar se usuário já está logado
+        function checkAuthStatus() {
+            const token = localStorage.getItem('auth_token');
+            if (token) {
+                showAlert('Você já está logado! Redirecionando...', 'success');
+                setTimeout(() => {
+                    window.location.href = '/diario-alimentar';
+                }, 1500);
+            }
+        }
+
+        // Configurar validação em tempo real
+        function setupValidation() {
+            const inputs = ['nome', 'email', 'senha'];
+            
+            inputs.forEach(inputId => {
+                const input = document.getElementById(inputId);
+                input.addEventListener('blur', () => validateField(inputId));
+                input.addEventListener('input', () => clearError(inputId));
+            });
+        }
+
+        // Validar campo individual
+        function validateField(fieldId) {
+            const input = document.getElementById(fieldId);
+            const value = input.value.trim();
+            const errorElement = document.getElementById(fieldId + 'Error');
+            
+            switch(fieldId) {
+                case 'nome':
+                    if (value.length < 2) {
+                        showFieldError(input, errorElement, 'Nome deve ter pelo menos 2 caracteres');
+                        return false;
+                    }
+                    break;
+                    
+                case 'email':
+                    if (!isValidEmail(value)) {
+                        showFieldError(input, errorElement, 'Email inválido');
+                        return false;
+                    }
+                    break;
+                    
+                case 'senha':
+                    if (value.length < 6) {
+                        showFieldError(input, errorElement, 'Senha deve ter pelo menos 6 caracteres');
+                        return false;
+                    }
+                    break;
+            }
+            
+            clearError(fieldId);
+            return true;
+        }
+
+        // Mostrar erro do campo
+        function showFieldError(input, errorElement, message) {
+            input.classList.add('error');
+            errorElement.textContent = message;
+        }
+
+        // Limpar erro do campo
+        function clearError(fieldId) {
+            const input = document.getElementById(fieldId);
+            const errorElement = document.getElementById(fieldId + 'Error');
+            input.classList.remove('error');
+            errorElement.textContent = '';
+        }
+
+        // Verificar força da senha
+        function checkPasswordStrength() {
+            const password = document.getElementById('senha').value;
+            const strengthFill = document.getElementById('strengthFill');
+            const strengthText = document.getElementById('strengthText');
+            
+            let strength = 0;
+            let text = '';
+            let className = '';
+            
+            if (password.length >= 6) strength += 1;
+            if (password.match(/[a-z]/)) strength += 1;
+            if (password.match(/[A-Z]/)) strength += 1;
+            if (password.match(/[0-9]/)) strength += 1;
+            if (password.match(/[^a-zA-Z0-9]/)) strength += 1;
+            
+            if (strength <= 2) {
+                text = 'Fraca';
+                className = 'strength-weak';
+                strengthFill.style.width = '33%';
+            } else if (strength <= 3) {
+                text = 'Média';
+                className = 'strength-medium';
+                strengthFill.style.width = '66%';
+            } else {
+                text = 'Forte';
+                className = 'strength-strong';
+                strengthFill.style.width = '100%';
+            }
+            
+            strengthFill.className = 'strength-fill ' + className;
+            strengthText.textContent = text;
+            strengthText.className = 'strength-text ' + className;
+        }
+
+        // Função principal de cadastro
+        async function handleSignup(e) {
+            e.preventDefault();
+            
+            if (isLoading) return;
+            
+            // Validar campos obrigatórios
+            const requiredFields = ['nome', 'email', 'senha'];
+            let isValid = true;
+            
+            requiredFields.forEach(fieldId => {
+                if (!validateField(fieldId)) {
+                    isValid = false;
+                }
+            });
+            
+            if (!isValid) {
+                showAlert('Por favor, corrija os erros antes de continuar.', 'error');
+                return;
+            }
+            
+            // Coletar dados do formulário
+            const formData = {
+                nome: document.getElementById('nome').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                senha: document.getElementById('senha').value,
+                idade: document.getElementById('idade').value || null,
+                sexo: document.getElementById('sexo').value || null,
+                peso: document.getElementById('peso').value || null,
+                altura: document.getElementById('altura').value || null,
+                objetivo: document.getElementById('objetivo').value || null
+            };
+            
+            await performSignup(formData);
+        }
+
+        // Executar cadastro
+        async function performSignup(formData) {
+            setLoading(true);
+            
+            try {
+                const response = await fetch('/api/usuarios/registrar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Cadastro bem-sucedido
+                    showAlert('Conta criada com sucesso! Fazendo login...', 'success');
+                    
+                    // Fazer login automático
+                    setTimeout(async () => {
+                        await autoLogin(formData.email, formData.senha);
+                    }, 1500);
+                    
+                } else {
+                    // Erro no cadastro
+                    showAlert(data.message || 'Erro ao criar conta. Tente novamente.', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Erro no cadastro:', error);
+                showAlert('Erro de conexão. Tente novamente.', 'error');
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // Login automático após cadastro
+        async function autoLogin(email, senha) {
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: email,
+                        password: senha
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.access_token) {
+                    localStorage.setItem('auth_token', data.access_token);
+                    localStorage.setItem('username', email);
+                    
+                    showAlert('Login automático realizado! Redirecionando...', 'success');
+                    
+                    setTimeout(() => {
+                        window.location.href = '/diario-alimentar';
+                    }, 1500);
+                }
+                
+            } catch (error) {
+                console.error('Erro no login automático:', error);
+                showAlert('Conta criada! Faça login manualmente.', 'success');
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 2000);
+            }
+        }
+
+        // Controlar estado de loading
+        function setLoading(state) {
+            isLoading = state;
+            
+            if (state) {
+                loading.style.display = 'block';
+                signupBtn.disabled = true;
+                signupBtn.textContent = 'Criando conta...';
+            } else {
+                loading.style.display = 'none';
+                signupBtn.disabled = false;
+                signupBtn.textContent = '🚀 Criar Minha Conta Gratuita';
+            }
+        }
+
+        // Mostrar alertas
+        function showAlert(message, type) {
+            alertContainer.innerHTML = `
+                <div class="alert alert-${type}">
+                    ${message}
+                </div>
+            `;
+            
+            // Remover após 5 segundos
+            setTimeout(() => {
+                alertContainer.innerHTML = '';
+            }, 5000);
+        }
+
+        // Função utilitária para validar email
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+    </script>
+</body>
+</html>

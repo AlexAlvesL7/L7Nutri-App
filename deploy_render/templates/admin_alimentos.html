@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Dashboard L7Nutri</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background-color: #f8f9fa; color: #333; }
+        .header { background-color: #343a40; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .header h1 { font-size: 24px; font-weight: 600; margin: 0; }
+        .nav-btn { background-color: #007bff; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; text-decoration: none; margin-left: 10px; }
+        .nav-btn:hover { background-color: #0056b3; }
+        .container { max-width: 900px; margin: 40px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        h1, h2 { color: #007bff; }
+        form { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #eee; }
+        form div { display: flex; flex-direction: column; }
+        label { font-weight: bold; margin-bottom: 5px; }
+        input { padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        button { grid-column: span 2; padding: 12px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .success-message { background-color: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🍎 L7Nutri - Gerenciar Alimentos</h1>
+        <div>
+            <a href="/admin/dashboard" class="nav-btn">🏠 Dashboard</a>
+            <a href="/admin/logout" class="nav-btn">🚪 Sair</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Painel de Controle de Alimentos</h1>
+
+        <h2>Adicionar Novo Alimento</h2>
+        <form action="/admin/adicionar_alimento" method="post">
+            <div>
+                <label for="nome">Nome do Alimento:</label>
+                <input type="text" id="nome" name="nome" required>
+            </div>
+            <div>
+                <label for="calorias">Calorias (por 100g):</label>
+                <input type="number" step="0.1" id="calorias" name="calorias" required>
+            </div>
+            <div>
+                <label for="proteinas">Proteínas (por 100g):</label>
+                <input type="number" step="0.1" id="proteinas" name="proteinas" required>
+            </div>
+            <div>
+                <label for="carboidratos">Carboidratos (por 100g):</label>
+                <input type="number" step="0.1" id="carboidratos" name="carboidratos" required>
+            </div>
+            <div>
+                <label for="gorduras">Gorduras (por 100g):</label>
+                <input type="number" step="0.1" id="gorduras" name="gorduras" required>
+            </div>
+            <button type="submit">Adicionar Alimento</button>
+        </form>
+
+        <h2>Alimentos Cadastrados</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Calorias</th>
+                    <th>Proteínas</th>
+                    <th>Carboidratos</th>
+                    <th>Gorduras</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for alimento in alimentos %}
+                <tr>
+                    <td>{{ alimento.id }}</td>
+                    <td>{{ alimento.nome }}</td>
+                    <td>{{ alimento.calorias }}</td>
+                    <td>{{ alimento.proteinas }}</td>
+                    <td>{{ alimento.carboidratos }}</td>
+                    <td>{{ alimento.gorduras }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6">Nenhum alimento cadastrado ainda.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏠 L7Nutri - Plataforma Nutricional Inteligente</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #2d3748;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .auth-bar {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .auth-btn {
+            background: rgba(255, 255, 255, 0.9);
+            color: #667eea;
+            border: 2px solid #667eea;
+            padding: 8px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            margin-left: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .auth-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .auth-btn.primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .auth-btn.primary:hover {
+            background: #5a67d8;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 40px 0;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-align: center;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+
+        .feature-description {
+            color: #718096;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .feature-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .feature-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .stats-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 20px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .demo-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .demo-title {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+
+        .demo-description {
+            color: #718096;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .demo-btn {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .demo-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            padding: 30px 0;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .header p {
+                font-size: 1.1rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Barra de Autenticação -->
+        <div class="auth-bar" id="authBar">
+            <a href="/login" class="auth-btn">🔐 Login</a>
+            <a href="/cadastro" class="auth-btn primary">🚀 Cadastro Grátis</a>
+        </div>
+
+        <!-- Header -->
+        <div class="header">
+            <h1>🥗 L7Nutri</h1>
+            <p>Sua jornada nutricional inteligente com análises de IA personalizadas</p>
+        </div>
+
+        <!-- Estatísticas -->
+        <div class="stats-section">
+            <h2 style="text-align: center; margin-bottom: 25px; color: #2d3748;">📊 Status da Plataforma</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">IA Funcional</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">Multi</div>
+                    <div class="stat-label">Usuários</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">Real-time</div>
+                    <div class="stat-label">Insights</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">Seguro</div>
+                    <div class="stat-label">JWT Auth</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Funcionalidades -->
+        <div class="features-grid">
+            <div class="feature-card">
+                <span class="feature-icon">📱</span>
+                <h3 class="feature-title">Diário Alimentar</h3>
+                <p class="feature-description">
+                    Registre suas refeições diárias de forma simples e intuitiva. 
+                    Acompanhe calorias, macronutrientes e evolução.
+                </p>
+                <a href="/diario-alimentar" class="feature-btn">Abrir Diário</a>
+            </div>
+
+            <div class="feature-card">
+                <span class="feature-icon">🧠</span>
+                <h3 class="feature-title">Dashboard de Insights</h3>
+                <p class="feature-description">
+                    Análises inteligentes dos seus padrões alimentares com IA avançada. 
+                    Receba recomendações personalizadas.
+                </p>
+                <a href="/dashboard-insights" class="feature-btn">Ver Insights</a>
+            </div>
+
+            <div class="feature-card">
+                <span class="feature-icon">👥</span>
+                <h3 class="feature-title">Sistema Multi-Usuário</h3>
+                <p class="feature-description">
+                    Cada usuário tem acesso seguro aos seus próprios dados. 
+                    Privacidade e isolamento garantidos.
+                </p>
+                <a href="/demo-usuarios" class="feature-btn">Ver Demo</a>
+            </div>
+
+            <div class="feature-card">
+                <span class="feature-icon">🔬</span>
+                <h3 class="feature-title">Diagnóstico Nutricional</h3>
+                <p class="feature-description">
+                    Calculadora inteligente de IMC, TMB e metas calóricas. 
+                    Recomendações de suplementos personalizadas.
+                </p>
+                <a href="/diagnostico" class="feature-btn">Fazer Diagnóstico</a>
+            </div>
+
+            <div class="feature-card">
+                <span class="feature-icon">🍎</span>
+                <h3 class="feature-title">Base de Alimentos</h3>
+                <p class="feature-description">
+                    Ampla base de dados de alimentos com informações nutricionais 
+                    completas e atualizadas.
+                </p>
+                <a href="/alimentos" class="feature-btn">Ver Alimentos</a>
+            </div>
+
+            <div class="feature-card">
+                <span class="feature-icon">⚡</span>
+                <h3 class="feature-title">API Completa</h3>
+                <p class="feature-description">
+                    API REST completa para integrações. 
+                    Autenticação JWT, documentação e endpoints organizados.
+                </p>
+                <a href="/api/teste" class="feature-btn">Testar API</a>
+            </div>
+        </div>
+
+        <!-- Seção Demo -->
+        <div class="demo-section">
+            <h2 class="demo-title">🚀 Experimente Agora</h2>
+            <p class="demo-description">
+                Teste todas as funcionalidades da plataforma com dados de demonstração. 
+                Veja como a IA analisa padrões alimentares e gera insights personalizados.
+            </p>
+            
+            <a href="/diario-alimentar" class="demo-btn">📱 Começar com Diário</a>
+            <a href="/dashboard-insights?id=1" class="demo-btn">🧠 Ver Insights IA</a>
+            <a href="/demo-usuarios" class="demo-btn">👥 Demo Multi-Usuário</a>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>© 2025 L7Nutri - Plataforma Nutricional Inteligente</p>
+            <p>Desenvolvido com Flask, SQLAlchemy, Google Gemini AI e muito ❤️</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthStatus();
+        });
+
+        function checkAuthStatus() {
+            const token = localStorage.getItem('auth_token');
+            const username = localStorage.getItem('username');
+            const authBar = document.getElementById('authBar');
+            
+            if (token && username) {
+                // Usuário logado - mostrar opções de usuário logado
+                authBar.innerHTML = `
+                    <span style="background: rgba(255, 255, 255, 0.9); padding: 8px 15px; border-radius: 20px; color: #2d3748; margin-right: 10px;">
+                        Olá, ${username}!
+                    </span>
+                    <a href="/diario-alimentar" class="auth-btn primary">📱 Meu Diário</a>
+                    <a href="/logout" class="auth-btn">👋 Sair</a>
+                `;
+            }
+            // Se não estiver logado, mantém os botões de login/cadastro
+        }
+    </script>
+</body>
+</html>

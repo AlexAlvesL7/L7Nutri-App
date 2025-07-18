@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔐 Login | L7Nutri</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            max-width: 900px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 600px;
+        }
+
+        .login-side {
+            padding: 50px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .brand-side {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 50px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .brand-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .brand-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        .feature-list {
+            list-style: none;
+            text-align: left;
+        }
+
+        .feature-list li {
+            margin-bottom: 15px;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .feature-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #48bb78;
+            font-weight: bold;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .login-title {
+            font-size: 2rem;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .login-subtitle {
+            color: #718096;
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 25px 0;
+            position: relative;
+            color: #718096;
+        }
+
+        .divider::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e2e8f0;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 15px;
+        }
+
+        .signup-link {
+            text-align: center;
+            color: #718096;
+        }
+
+        .signup-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+
+        .demo-section {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .demo-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .demo-btn {
+            background: #48bb78;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .demo-btn:hover {
+            background: #38a169;
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .alert-error {
+            background: #fed7d7;
+            color: #c53030;
+            border: 1px solid #feb2b2;
+        }
+
+        .alert-success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .login-container {
+                grid-template-columns: 1fr;
+                max-width: 400px;
+            }
+            
+            .brand-side {
+                display: none;
+            }
+            
+            .login-side {
+                padding: 30px 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <!-- Lado da Marca -->
+        <div class="brand-side">
+            <div class="logo">🥗</div>
+            <h1 class="brand-title">L7Nutri</h1>
+            <p class="brand-subtitle">Sua jornada nutricional inteligente</p>
+            
+            <ul class="feature-list">
+                <li>Dashboard com análises de IA</li>
+                <li>Diário alimentar inteligente</li>
+                <li>Insights personalizados</li>
+                <li>Acompanhamento em tempo real</li>
+                <li>Recomendações automáticas</li>
+            </ul>
+        </div>
+
+        <!-- Lado do Login -->
+        <div class="login-side">
+            <div class="login-header">
+                <h2 class="login-title">Bem-vindo de volta!</h2>
+                <p class="login-subtitle">Faça login para continuar sua jornada</p>
+            </div>
+
+            <!-- Seção Demo -->
+            <div class="demo-section">
+                <div class="demo-title">🎯 Quer testar primeiro?</div>
+                <button class="demo-btn" onclick="loginDemo('maria')">Demo Maria</button>
+                <button class="demo-btn" onclick="loginDemo('joao')">Demo João</button>
+                <button class="demo-btn" onclick="window.location.href='/'">Ver Funcionalidades</button>
+            </div>
+
+            <!-- Alertas -->
+            <div id="alertContainer"></div>
+
+            <!-- Loading -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Fazendo login...</p>
+            </div>
+
+            <!-- Formulário de Login -->
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="username">Usuário ou Email</label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        class="form-input" 
+                        placeholder="Digite seu usuário ou email"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">Senha</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        class="form-input" 
+                        placeholder="Digite sua senha"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="login-btn" id="loginBtn">
+                    🔐 Entrar
+                </button>
+            </form>
+
+            <div class="divider">
+                <span>ou</span>
+            </div>
+
+            <div class="signup-link">
+                Não tem uma conta? 
+                <a href="/cadastro">Cadastre-se gratuitamente</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Estado da aplicação
+        let isLoading = false;
+
+        // Elementos do DOM
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const loading = document.getElementById('loading');
+        const alertContainer = document.getElementById('alertContainer');
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar se já está logado
+            checkAuthStatus();
+            
+            // Submit do formulário
+            loginForm.addEventListener('submit', handleLogin);
+            
+            // Enter nos campos
+            document.getElementById('username').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    document.getElementById('password').focus();
+                }
+            });
+            
+            document.getElementById('password').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    handleLogin(e);
+                }
+            });
+        });
+
+        // Verificar se usuário já está logado
+        function checkAuthStatus() {
+            const token = localStorage.getItem('auth_token');
+            if (token) {
+                showAlert('Você já está logado! Redirecionando...', 'success');
+                setTimeout(() => {
+                    window.location.href = '/diario-alimentar';
+                }, 1500);
+            }
+        }
+
+        // Função principal de login
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            if (isLoading) return;
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                showAlert('Por favor, preencha todos os campos.', 'error');
+                return;
+            }
+            
+            await performLogin(username, password);
+        }
+
+        // Executar login
+        async function performLogin(username, password) {
+            setLoading(true);
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.access_token) {
+                    // Login bem-sucedido
+                    localStorage.setItem('auth_token', data.access_token);
+                    localStorage.setItem('username', username);
+                    
+                    showAlert('Login realizado com sucesso! Redirecionando...', 'success');
+                    
+                    setTimeout(() => {
+                        window.location.href = '/diario-alimentar';
+                    }, 1500);
+                    
+                } else {
+                    // Erro de login
+                    showAlert(data.message || 'Erro ao fazer login. Verifique suas credenciais.', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Erro no login:', error);
+                showAlert('Erro de conexão. Tente novamente.', 'error');
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // Login demo
+        async function loginDemo(tipo) {
+            let username, password;
+            
+            if (tipo === 'maria') {
+                username = 'maria_demo';
+                password = 'demo123';
+            } else if (tipo === 'joao') {
+                username = 'joao_demo';
+                password = 'demo123';
+            }
+            
+            // Preencher campos
+            document.getElementById('username').value = username;
+            document.getElementById('password').value = password;
+            
+            // Fazer login
+            await performLogin(username, password);
+        }
+
+        // Controlar estado de loading
+        function setLoading(state) {
+            isLoading = state;
+            
+            if (state) {
+                loading.style.display = 'block';
+                loginBtn.disabled = true;
+                loginBtn.textContent = 'Entrando...';
+            } else {
+                loading.style.display = 'none';
+                loginBtn.disabled = false;
+                loginBtn.textContent = '🔐 Entrar';
+            }
+        }
+
+        // Mostrar alertas
+        function showAlert(message, type) {
+            alertContainer.innerHTML = `
+                <div class="alert alert-${type}">
+                    ${message}
+                </div>
+            `;
+            
+            // Remover após 5 segundos
+            setTimeout(() => {
+                alertContainer.innerHTML = '';
+            }, 5000);
+        }
+
+        // Função utilitária para validar email
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+    </script>
+</body>
+</html>

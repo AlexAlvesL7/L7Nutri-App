@@ -1,0 +1,28 @@
+# === CONFIGURAÇÃO DE PRODUÇÃO HOSTINGER ===
+# Renomeie este arquivo para .env e configure as variáveis
+
+# === CONFIGURAÇÃO GERAL ===
+FLASK_ENV=production
+FLASK_DEBUG=False
+SECRET_KEY=sua_chave_secreta_super_forte_aqui_min_32_caracteres
+
+# === BANCO DE DADOS MYSQL (HOSTINGER) ===
+# Substitua pelos dados do seu painel de controle Hostinger
+DATABASE_URL=mysql+pymysql://usuario:senha@host:3306/nome_banco
+
+# Exemplo de configuração Hostinger:
+# DATABASE_URL=mysql+pymysql://u123456789_l7nutri:MinhaSenh@123@srv1234.hstgr.io:3306/u123456789_l7nutri
+
+# === GOOGLE GEMINI AI ===
+GEMINI_API_KEY=sua_chave_gemini_aqui
+
+# === JWT CONFIGURAÇÃO ===
+JWT_SECRET_KEY=sua_chave_jwt_super_secreta_min_32_caracteres
+JWT_ACCESS_TOKEN_EXPIRES=86400
+
+# === CONFIGURAÇÕES DE PRODUÇÃO ===
+# Número de workers do Gunicorn
+WEB_CONCURRENCY=2
+
+# Timeout do Gunicorn
+TIMEOUT=120

@@ -1,0 +1,15 @@
+# Ambientes Virtuais
+.venv/
+venv/
+env/
+__pycache__/
+
+# Arquivos de configuração local
+.env
+instance/
+
+# Arquivos de sistema
+.DS_Store
+
+# Logs
+*.log

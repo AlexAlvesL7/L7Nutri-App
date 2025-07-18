@@ -1,0 +1,5 @@
+Google Gemini AI configurado com sucesso!
+MODO PRODUCAO: Usando MySQL Hostinger
+Testando conexao MySQL...
+ERRO: (pymysql.err.OperationalError) (2003, "Can't connect to MySQL server on '1401@127.0.0.1' ([Errno 11003] getaddrinfo failed)")
+(Background on this error at: https://sqlalche.me/e/20/e3q8)

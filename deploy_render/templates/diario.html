@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>L7Nutri - Meu Diário</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background-color: #f8f9fa; color: #333; }
+        .container { max-width: 800px; margin: 20px auto; padding: 15px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { color: #007bff; margin: 0; }
+        .header p { color: #666; margin: 5px 0; }
+        .resumo-dia { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: center; margin-bottom: 20px; }
+        .resumo-dia h2 { margin: 0 0 15px 0; color: #007bff; }
+        .macros { display: flex; justify-content: space-around; text-align: center; }
+        .macro p { margin: 0; font-size: 14px; color: #666; }
+        .macro .valor { font-size: 20px; font-weight: bold; color: #333; }
+        .macro .meta { font-size: 14px; color: #666; }
+        .refeicao-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .refeicao-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .refeicao-header h3 { margin: 0; color: #333; }
+        .refeicao-header .btn-add { background-color: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background-color 0.2s; }
+        .refeicao-header .btn-add:hover { background-color: #218838; }
+        .lista-alimentos { list-style: none; padding: 0; margin-top: 15px; min-height: 40px; }
+        .lista-alimentos li { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+        .lista-alimentos li:last-child { border-bottom: none; }
+        .lista-alimentos .alimento-info { flex-grow: 1; }
+        .lista-alimentos .alimento-nome { font-weight: 500; }
+        .lista-alimentos .alimento-detalhes { font-size: 12px; color: #666; margin-top: 2px; }
+        .lista-alimentos .btn-remover { background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 12px; }
+        .lista-alimentos .btn-remover:hover { background: #c82333; }
+        .lista-vazia { color: #999; font-style: italic; text-align: center; padding: 20px; }
+        
+        /* Modal Styles */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
+        .modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 8px; }
+        .close-button { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .close-button:hover { color: #000; }
+        #input-busca-alimento { width: 100%; padding: 12px; font-size: 16px; margin-bottom: 10px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; }
+        .resultado-item { padding: 10px; border-bottom: 1px solid #ddd; cursor: pointer; transition: background-color 0.2s; }
+        .resultado-item:hover { background-color: #f1f1f1; }
+        #lista-resultados-busca { max-height: 300px; overflow-y: auto; }
+        
+        /* Progress bars for macros */
+        .progress-bar { width: 100%; height: 8px; background-color: #e9ecef; border-radius: 4px; margin-top: 5px; overflow: hidden; }
+        .progress-fill { height: 100%; background-color: #007bff; transition: width 0.3s ease; }
+        .progress-fill.over { background-color: #dc3545; }
+        
+        /* AI Suggestions Panel */
+        .ai-panel { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .ai-toggle-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 20px; border-radius: 25px; cursor: pointer; font-weight: bold; transition: all 0.3s ease; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-bottom: 10px; }
+        .ai-toggle-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+        .ai-content { display: none; margin-top: 15px; }
+        .ai-content.active { display: block; animation: slideDown 0.3s ease-out; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .ai-suggestion { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin-bottom: 10px; backdrop-filter: blur(10px); }
+        .ai-suggestion h4 { margin: 0 0 8px 0; font-size: 16px; }
+        .ai-suggestion p { margin: 0; font-size: 14px; line-height: 1.4; opacity: 0.9; }
+        .ai-loading { text-align: center; padding: 20px; }
+        .ai-loading .spinner { width: 30px; height: 30px; border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid white; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 10px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .ai-error { background: rgba(220, 53, 69, 0.2); color: #fff; padding: 15px; border-radius: 8px; text-align: center; }
+        .ai-retry-btn { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 16px; border-radius: 20px; cursor: pointer; margin-top: 10px; }
+        .ai-retry-btn:hover { background: rgba(255,255,255,0.3); }
+        
+        /* Navigation Bar */
+        .nav-bar {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+        .nav-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .nav-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .nav-link.insights {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation Bar -->
+        <div class="nav-bar">
+            <div>
+                <strong style="color: #667eea;">🍽️ L7Nutri</strong>
+            </div>
+            <div class="nav-links">
+                <a href="/dashboard-insights?id={{ request.args.get('id', '9185fb0a-a4ed-4345-9af4-e0e7698d3c83') }}" class="nav-link insights">🧠 Dashboard Insights</a>
+                <a href="/admin/dashboard" class="nav-link">⚙️ Admin</a>
+            </div>
+        </div>
+        
+        <div class="header">
+            <h1>🍽️ Meu Diário Alimentar</h1>
+            <p>Acompanhe suas refeições e atinja suas metas diárias</p>
+        </div>
+
+        <div class="resumo-dia">
+            <h2>📊 Resumo do Dia</h2>
+            <div class="macros">
+                <div class="macro">
+                    <p>Calorias</p>
+                    <div class="valor">
+                        <span id="total-calorias">0</span> / <span id="meta-calorias" class="meta">{{ metas.calorias }}</span> kcal
+                    </div>
+                    <div class="progress-bar">
+                        <div id="progress-calorias" class="progress-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div class="macro">
+                    <p>Proteínas</p>
+                    <div class="valor">
+                        <span id="total-proteinas">0</span> / <span id="meta-proteinas" class="meta">{{ metas.proteinas }}</span> g
+                    </div>
+                    <div class="progress-bar">
+                        <div id="progress-proteinas" class="progress-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div class="macro">
+                    <p>Carboidratos</p>
+                    <div class="valor">
+                        <span id="total-carboidratos">0</span> / <span id="meta-carboidratos" class="meta">{{ metas.carboidratos }}</span> g
+                    </div>
+                    <div class="progress-bar">
+                        <div id="progress-carboidratos" class="progress-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div class="macro">
+                    <p>Gorduras</p>
+                    <div class="valor">
+                        <span id="total-gorduras">0</span> / <span id="meta-gorduras" class="meta">{{ metas.gorduras }}</span> g
+                    </div>
+                    <div class="progress-bar">
+                        <div id="progress-gorduras" class="progress-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Painel de IA -->
+        <div class="ai-panel">
+            <button class="ai-toggle-btn" onclick="toggleAISuggestions()">
+                <span>🤖</span>
+                <span>Sugestões Inteligentes de IA</span>
+                <span id="ai-toggle-icon">▼</span>
+            </button>
+            <div class="ai-content" id="ai-content">
+                <div class="ai-loading" id="ai-loading">
+                    <div class="spinner"></div>
+                    <p>Analisando seu histórico alimentar...</p>
+                </div>
+                <div id="ai-suggestions" style="display: none;"></div>
+                <div class="ai-error" id="ai-error" style="display: none;">
+                    <p>Ops! Não conseguimos gerar sugestões no momento.</p>
+                    <button class="ai-retry-btn" onclick="loadAISuggestions()">Tentar novamente</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="refeicao-card">
+            <div class="refeicao-header">
+                <h3>🌅 Café da Manhã</h3>
+                <button class="btn-add" data-refeicao="cafe-da-manha">+ Adicionar Alimento</button>
+            </div>
+            <ul class="lista-alimentos" id="lista-cafe-da-manha">
+                <div class="lista-vazia">Nenhum alimento adicionado ainda</div>
+            </ul>
+        </div>
+        
+        <div class="refeicao-card">
+            <div class="refeicao-header">
+                <h3>🍽️ Almoço</h3>
+                <button class="btn-add" data-refeicao="almoco">+ Adicionar Alimento</button>
+            </div>
+            <ul class="lista-alimentos" id="lista-almoco">
+                <div class="lista-vazia">Nenhum alimento adicionado ainda</div>
+            </ul>
+        </div>
+
+        <div class="refeicao-card">
+            <div class="refeicao-header">
+                <h3>🍿 Lanche da Tarde</h3>
+                <button class="btn-add" data-refeicao="lanche">+ Adicionar Alimento</button>
+            </div>
+            <ul class="lista-alimentos" id="lista-lanche">
+                <div class="lista-vazia">Nenhum alimento adicionado ainda</div>
+            </ul>
+        </div>
+
+        <div class="refeicao-card">
+            <div class="refeicao-header">
+                <h3>🌙 Jantar</h3>
+                <button class="btn-add" data-refeicao="jantar">+ Adicionar Alimento</button>
+            </div>
+            <ul class="lista-alimentos" id="lista-jantar">
+                <div class="lista-vazia">Nenhum alimento adicionado ainda</div>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Modal de Busca de Alimentos -->
+    <div id="modal-busca-alimento" class="modal">
+        <div class="modal-content">
+            <span id="close-modal-button" class="close-button">&times;</span>
+            <h2>🔍 Buscar Alimento</h2>
+            <input type="text" id="input-busca-alimento" placeholder="Digite o nome do alimento (ex: arroz, frango, banana)...">
+            <div id="lista-resultados-busca"></div>
+        </div>
+    </div>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+    
+    // --- Variáveis Globais ---
+    const totais = { calorias: 0, proteinas: 0, carboidratos: 0, gorduras: 0 };
+    const metas = {
+        calorias: parseInt(document.getElementById('meta-calorias').textContent),
+        proteinas: parseInt(document.getElementById('meta-proteinas').textContent),
+        carboidratos: parseInt(document.getElementById('meta-carboidratos').textContent),
+        gorduras: parseInt(document.getElementById('meta-gorduras').textContent)
+    };
+    let refeicaoAtual = ''; // Para saber onde adicionar o alimento
+    let aiPanelOpen = false;
+    
+    // --- Funções de IA ---
+    window.toggleAISuggestions = function() {
+        const content = document.getElementById('ai-content');
+        const icon = document.getElementById('ai-toggle-icon');
+        
+        if (!aiPanelOpen) {
+            content.classList.add('active');
+            icon.textContent = '▲';
+            aiPanelOpen = true;
+            loadAISuggestions();
+        } else {
+            content.classList.remove('active');
+            icon.textContent = '▼';
+            aiPanelOpen = false;
+        }
+    };
+    
+    window.loadAISuggestions = async function() {
+        const loading = document.getElementById('ai-loading');
+        const suggestions = document.getElementById('ai-suggestions');
+        const error = document.getElementById('ai-error');
+        
+        // Mostrar loading
+        loading.style.display = 'block';
+        suggestions.style.display = 'none';
+        error.style.display = 'none';
+        
+        try {
+            // Detectar objetivo baseado no horário (demo)
+            const hour = new Date().getHours();
+            let objetivo = 'emagrecimento';
+            if (hour >= 6 && hour <= 10) objetivo = 'energia_matinal';
+            else if (hour >= 17 && hour <= 21) objetivo = 'recuperacao_pos_treino';
+            
+            const response = await fetch('/api/ia/sugestoes-inteligentes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ objetivo: objetivo })
+            });
+            
+            if (!response.ok) throw new Error('Erro na requisição');
+            
+            const data = await response.json();
+            
+            if (data.sucesso) {
+                displayAISuggestions(data);
+            } else {
+                throw new Error(data.erro || 'Erro desconhecido');
+            }
+            
+        } catch (err) {
+            console.error('Erro ao carregar sugestões de IA:', err);
+            loading.style.display = 'none';
+            error.style.display = 'block';
+        }
+    };
+    
+    function displayAISuggestions(data) {
+        const loading = document.getElementById('ai-loading');
+        const suggestions = document.getElementById('ai-suggestions');
+        const error = document.getElementById('ai-error');
+        
+        loading.style.display = 'none';
+        error.style.display = 'none';
+        suggestions.style.display = 'block';
+        
+        const contextoBrasil = {
+            'cafe-da-manha': 'Café da Manhã',
+            'almoco': 'Almoço', 
+            'jantar': 'Jantar',
+            'lanche': 'Lanche'
+        };
+        
+        const horarioAtual = data.horario_contexto || 'Agora';
+        const contexto = contextoBrasil[data.sugestao?.contexto] || horarioAtual;
+        
+        suggestions.innerHTML = `
+            <div class="ai-suggestion">
+                <h4>🍽️ Sugestão para ${contexto}</h4>
+                <p><strong>${data.sugestao?.alimento_sugerido || 'Alimento equilibrado'}</strong></p>
+                <p>${data.sugestao?.explicacao || 'Sugestão baseada em suas necessidades nutricionais.'}</p>
+            </div>
+            <div class="ai-suggestion">
+                <h4>💡 Dica Personalizada</h4>
+                <p>${data.sugestao?.dica_personalizada || 'Continue acompanhando sua alimentação para receber dicas mais precisas!'}</p>
+            </div>
+            <div class="ai-suggestion">
+                <h4>📊 Análise do Histórico</h4>
+                <p>Analisamos ${data.historico_analisado || 0} registros recentes. ${horarioAtual}</p>
+            </div>
+        `;
+    }
+
+    // --- Elementos do Modal de Busca ---
+    const modal = document.getElementById('modal-busca-alimento');
+    const closeButton = document.getElementById('close-modal-button');
+    const searchInput = document.getElementById('input-busca-alimento');
+    const resultsList = document.getElementById('lista-resultados-busca');
+
+    // --- Lógica para Abrir o Modal ---
+    document.querySelectorAll('.btn-add').forEach(button => {
+        button.addEventListener('click', function() {
+            refeicaoAtual = this.dataset.refeicao; // Salva qual refeição foi clicada
+            modal.style.display = 'block';
+            searchInput.value = ''; // Limpa a busca anterior
+            resultsList.innerHTML = ''; // Limpa os resultados anteriores
+            searchInput.focus(); // Coloca o cursor piscando na caixa de busca
+        });
+    });
+
+    // --- Lógica para Fechar o Modal ---
+    closeButton.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+
+    // Fechar modal clicando fora dele
+    window.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+
+    // --- A MÁGICA DA BUSCA EM TEMPO REAL ---
+    let searchTimeout;
+    searchInput.addEventListener('keyup', () => {
+        // Cancela a busca anterior se o usuário ainda está digitando
+        clearTimeout(searchTimeout);
+        const query = searchInput.value;
+
+        // Só busca se o usuário digitou pelo menos 2 letras
+        if (query.length < 2) {
+            resultsList.innerHTML = '';
+            return;
+        }
+
+        // Espera 300ms após o usuário parar de digitar para fazer a busca
+        searchTimeout = setTimeout(async () => {
+            resultsList.innerHTML = '<p style="padding: 10px; color: #666;">🔍 Buscando...</p>';
+            try {
+                // Faz a chamada à nossa API
+                const response = await fetch(`/api/alimentos/buscar?q=${encodeURIComponent(query)}`);
+                const alimentos = await response.json();
+
+                resultsList.innerHTML = ''; // Limpa a mensagem de "Buscando..."
+
+                if (alimentos.length > 0) {
+                    alimentos.forEach(alimento => {
+                        const item = document.createElement('div');
+                        item.className = 'resultado-item';
+                        item.innerHTML = `
+                            <strong>${alimento.nome}</strong><br>
+                            <small>
+                                🔥 ${alimento.calorias} kcal | 
+                                🥩 ${alimento.proteinas}g prot | 
+                                🍞 ${alimento.carboidratos}g carb | 
+                                🥑 ${alimento.gorduras}g gord
+                            </small>
+                        `;
+                        
+                        // Adiciona um evento de clique para selecionar o alimento
+                        item.addEventListener('click', () => {
+                            adicionarAlimentoNaRefeicao(alimento, `lista-${refeicaoAtual}`);
+                            modal.style.display = 'none'; // Fecha o modal
+                            
+                            // --- NOVA LÓGICA PARA SALVAR NO BANCO ---
+                            // Chamamos nossa nova função para fazer a mágica no backend
+                            salvarRegistroNoBackend(alimento, refeicaoAtual);
+                        });
+                        resultsList.appendChild(item);
+                    });
+                } else {
+                    resultsList.innerHTML = '<p style="padding: 10px; color: #666;">❌ Nenhum alimento encontrado.</p>';
+                }
+            } catch (error) {
+                console.error('Erro na busca:', error);
+                resultsList.innerHTML = '<p style="padding: 10px; color: #d32f2f;">⚠️ Erro na busca. Verifique se o servidor está rodando.</p>';
+            }
+        }, 300);
+    });
+
+    // --- FUNÇÕES PRINCIPAIS ---
+
+    // Função para adicionar o item na lista da refeição correta
+    function adicionarAlimentoNaRefeicao(alimento, listaId) {
+        const lista = document.getElementById(listaId);
+        
+        // Remove a mensagem de "lista vazia" se existir
+        const mensagemVazia = lista.querySelector('.lista-vazia');
+        if (mensagemVazia) {
+            mensagemVazia.remove();
+        }
+
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <div class="alimento-info">
+                <div class="alimento-nome">${alimento.nome}</div>
+                <div class="alimento-detalhes">
+                    🔥 ${alimento.calorias} kcal | 
+                    🥩 ${alimento.proteinas}g | 
+                    🍞 ${alimento.carboidratos}g | 
+                    🥑 ${alimento.gorduras}g
+                </div>
+            </div>
+            <button class="btn-remover">❌</button>
+        `;
+        
+        // Guarda os dados no próprio elemento para futuras exclusões
+        li.dataset.calorias = alimento.calorias;
+        li.dataset.proteinas = alimento.proteinas;
+        li.dataset.carboidratos = alimento.carboidratos;
+        li.dataset.gorduras = alimento.gorduras;
+
+        // Adiciona evento de clique ao botão de remoção
+        li.querySelector('.btn-remover').addEventListener('click', function() {
+            removerRegistroDoBackend(li);
+        });
+        
+        lista.appendChild(li);
+        atualizarTotais(alimento, 'adicionar'); // Atualiza os contadores
+    }
+
+    // Função para atualizar os totais no topo da página
+    function atualizarTotais(alimento, operacao = 'adicionar') {
+        const multiplicador = operacao === 'adicionar' ? 1 : -1;
+        
+        totais.calorias += alimento.calorias * multiplicador;
+        totais.proteinas += alimento.proteinas * multiplicador;
+        totais.carboidratos += alimento.carboidratos * multiplicador;
+        totais.gorduras += alimento.gorduras * multiplicador;
+
+        // Garante que os valores não fiquem negativos
+        Object.keys(totais).forEach(key => {
+            if (totais[key] < 0) totais[key] = 0;
+        });
+
+        // Atualiza os valores na tela
+        document.getElementById('total-calorias').innerText = Math.round(totais.calorias);
+        document.getElementById('total-proteinas').innerText = Math.round(totais.proteinas);
+        document.getElementById('total-carboidratos').innerText = Math.round(totais.carboidratos);
+        document.getElementById('total-gorduras').innerText = Math.round(totais.gorduras);
+
+        // Atualiza as barras de progresso
+        atualizarBarrasProgresso();
+    }
+
+    // Função para atualizar as barras de progresso
+    function atualizarBarrasProgresso() {
+        Object.keys(totais).forEach(macro => {
+            const progresso = (totais[macro] / metas[macro]) * 100;
+            const progressBar = document.getElementById(`progress-${macro}`);
+            
+            progressBar.style.width = Math.min(progresso, 100) + '%';
+            
+            // Muda a cor se ultrapassar a meta
+            if (progresso > 100) {
+                progressBar.classList.add('over');
+            } else {
+                progressBar.classList.remove('over');
+            }
+        });
+    }
+
+    // --- FUNÇÃO PARA REMOVER REGISTROS DO BACKEND ---
+    async function removerRegistroDoBackend(itemLi) {
+        const registroId = itemLi.dataset.registroId;
+        
+        // Captura os dados nutricionais antes da remoção para atualizar totais
+        const alimento = {
+            calorias: parseFloat(itemLi.dataset.calorias),
+            proteinas: parseFloat(itemLi.dataset.proteinas),
+            carboidratos: parseFloat(itemLi.dataset.carboidratos),
+            gorduras: parseFloat(itemLi.dataset.gorduras)
+        };
+
+        if (!registroId) {
+            console.warn('⚠️ Não foi possível encontrar o ID do registro para remover.');
+            // Remove apenas da tela se não conseguir encontrar o ID (fallback)
+            const lista = itemLi.parentElement;
+            itemLi.remove();
+            
+            // Se a lista ficar vazia, adiciona a mensagem
+            if (lista.children.length === 0) {
+                lista.innerHTML = '<div class="lista-vazia">Nenhum alimento adicionado ainda</div>';
+            }
+            
+            // Atualiza os totais mesmo no fallback
+            atualizarTotais(alimento, 'remover');
+            return;
+        }
+
+        console.log(`🗑️ Removendo registro ID: ${registroId}...`);
+        try {
+            const response = await fetch('/api/diario/remover', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ registro_id: parseInt(registroId) })
+            });
+
+            if (response.ok) {
+                const resultado = await response.json();
+                console.log('✅ Removido com sucesso do banco!', resultado);
+                
+                // Remove o item da tela
+                const lista = itemLi.parentElement;
+                itemLi.remove();
+                
+                // Se a lista ficar vazia, adiciona a mensagem
+                if (lista.children.length === 0) {
+                    lista.innerHTML = '<div class="lista-vazia">Nenhum alimento adicionado ainda</div>';
+                }
+                
+                // Atualiza os totais
+                atualizarTotais(alimento, 'remover');
+                
+            } else {
+                const resultado = await response.json();
+                console.error('❌ API retornou um erro ao remover:', resultado.erro);
+                alert('Não foi possível remover o item. Tente novamente.');
+            }
+        } catch (error) {
+            console.error('🔌 Erro de conexão ao remover:', error);
+            alert('Erro de conexão. Verifique se o servidor está rodando.');
+        }
+    }
+
+    // --- FUNÇÃO PARA SALVAR NO BACKEND ---
+    // Cria uma nova função async no script
+    async function salvarRegistroNoBackend(alimento, tipoRefeicao) {
+        console.log(`📡 Enviando para a API: ${alimento.nome} na refeição ${tipoRefeicao}...`);
+        try {
+            const response = await fetch('/api/diario/registrar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    alimento_id: alimento.id,
+                    tipo_refeicao: tipoRefeicao // ex: 'almoco'
+                })
+            });
+
+            const resultado = await response.json();
+
+            if (response.ok) {
+                console.log('✅ Salvo com sucesso no banco de dados!', resultado);
+                // AQUI ESTÁ A MUDANÇA:
+                // Precisamos encontrar o LI que acabamos de adicionar e dar a ele o ID do registro
+                // Isso é crucial para sabermos qual item apagar depois.
+                const ultimoItemAdicionado = document.querySelector(`#lista-${tipoRefeicao} li:last-child`);
+                if (ultimoItemAdicionado) {
+                    ultimoItemAdicionado.dataset.registroId = resultado.registro_id;
+                    console.log(`💾 ID ${resultado.registro_id} salvo no elemento para futuras exclusões`);
+                }
+            } else {
+                console.error('❌ API retornou um erro ao salvar:', resultado.erro);
+                // Mostra um feedback visual para o usuário
+                alert(`Erro ao salvar: ${resultado.erro}`);
+            }
+        } catch (error) {
+            console.error('🔌 Erro de conexão ao salvar no backend:', error);
+            // Mostra um feedback visual para o usuário
+            alert('Erro de conexão. Verifique se o servidor está rodando.');
+        }
+    }
+});
+    </script>
+</body>
+</html>

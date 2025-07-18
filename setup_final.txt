@@ -1,0 +1,17 @@
+CONFIGURACAO BANCO MYSQL HOSTINGER
+Credenciais atualizadas:
+  ò Usuario: u419790683_l7nutri_alex
+  ò Host: 127.0.0.1
+  ò Banco: u419790683_l7nutri_novo
+
+Traceback (most recent call last):
+  File "C:\Users\ALEX\OneDrive\┴rea de Trabalho\L7Nutri\app_nutricional\setup_mysql.py", line 101, in <module>
+    if testar_conexao():
+       ~~~~~~~~~~~~~~^^
+  File "C:\Users\ALEX\OneDrive\┴rea de Trabalho\L7Nutri\app_nutricional\setup_mysql.py", line 66, in testar_conexao
+    print("\U0001f50c TESTANDO CONEX├O COM MYSQL")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f50c' in position 0: character maps to <undefined>

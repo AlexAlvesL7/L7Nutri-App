@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👋 Logout | L7Nutri</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .logout-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 50px;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .logout-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .logout-title {
+            font-size: 2rem;
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+
+        .logout-message {
+            color: #718096;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #f7fafc;
+            color: #2d3748;
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .logout-status {
+            margin: 20px 0;
+            font-size: 0.9rem;
+            color: #48bb78;
+        }
+    </style>
+</head>
+<body>
+    <div class="logout-container">
+        <div class="logout-icon">👋</div>
+        <h1 class="logout-title">Logout Realizado</h1>
+        <p class="logout-message">
+            Você foi desconectado com sucesso da plataforma L7Nutri. 
+            Esperamos vê-lo novamente em breve!
+        </p>
+        
+        <div class="logout-status" id="logoutStatus">
+            Limpando dados da sessão...
+        </div>
+        
+        <div class="spinner" id="spinner"></div>
+        
+        <div class="action-buttons" id="actionButtons" style="display: none;">
+            <a href="/login" class="btn btn-primary">🔐 Fazer Login Novamente</a>
+            <a href="/" class="btn btn-secondary">🏠 Página Inicial</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            performLogout();
+        });
+
+        function performLogout() {
+            // Simular processo de logout
+            setTimeout(() => {
+                // Limpar dados do localStorage
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('username');
+                localStorage.removeItem('user_data');
+                
+                // Limpar sessionStorage
+                sessionStorage.clear();
+                
+                // Atualizar status
+                document.getElementById('logoutStatus').textContent = 'Dados limpos com sucesso!';
+                
+                // Esconder spinner e mostrar botões
+                setTimeout(() => {
+                    document.getElementById('spinner').style.display = 'none';
+                    document.getElementById('actionButtons').style.display = 'flex';
+                }, 1000);
+                
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L7Nutri - Diagnóstico Gratuito</title>
+    <style>
+        /* Seu CSS pode vir aqui ou em um arquivo separado */
+        body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; }
+        label { display: block; margin-top: 15px; font-weight: bold; }
+        input, select { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background-color: #28a745; color: white; border: none; font-size: 16px; cursor: pointer; margin-top: 20px; }
+        #resultado { border: 1px solid #ddd; padding: 15px; margin-top: 20px; display: none; } /* Começa escondido */
+        .suplemento-card { border: 1px solid #ddd; padding: 15px; margin-top: 20px; text-align: center; }
+        .botao-comprar { display: inline-block; padding: 12px 20px; background-color: #ffc107; color: #333; text-decoration: none; font-weight: bold; margin-top: 10px; }
+
+        /* CSS para o Modal de Busca de Alimentos */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
+        .modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 8px; }
+        .close-button { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .close-button:hover { color: #000; }
+        #input-busca-alimento { width: 100%; padding: 12px; font-size: 16px; margin-bottom: 10px; box-sizing: border-box; }
+        .resultado-item { padding: 10px; border-bottom: 1px solid #ddd; cursor: pointer; }
+        .resultado-item:hover { background-color: #f1f1f1; }
+        #lista-resultados-busca { max-height: 300px; overflow-y: auto; }
+        
+        /* Botão para testar o modal */
+        .btn-teste { background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 20px 0; }
+        .btn-teste:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+
+    <h1>Diagnóstico Nutricional Gratuito L7Nutri</h1>
+    
+    <form id="l7nutri-form">
+        <label for="peso">Seu Peso (kg):</label>
+        <input type="number" id="peso" placeholder="Ex: 75" required>
+
+        <label for="altura">Sua Altura (cm):</label>
+        <input type="number" id="altura" placeholder="Ex: 170" required>
+
+        <label for="idade">Sua Idade:</label>
+        <input type="number" id="idade" placeholder="Ex: 30" required>
+
+        <label for="sexo">Seu Sexo:</label>
+        <select id="sexo" required>
+            <option value="masculino">Masculino</option>
+            <option value="feminino">Feminino</option>
+        </select>
+
+        <label for="nivel_atividade">Seu Nível de Atividade:</label>
+        <select id="nivel_atividade" required>
+            <option value="1.2">Sedentário (pouco ou nenhum exercício)</option>
+            <option value="1.375">Levemente Ativo (exercício 1-3 dias/semana)</option>
+            <option value="1.55">Moderadamente Ativo (exercício 3-5 dias/semana)</option>
+            <option value="1.725">Muito Ativo (exercício 6-7 dias/semana)</option>
+        </select>
+
+        <label for="objetivo">Seu Principal Objetivo:</label>
+        <select id="objetivo" required>
+            <option value="emagrecimento">Emagrecimento</option>
+            <option value="ganhar">Ganho de Massa</option>
+            <option value="manter">Manter o Peso</option>
+        </select>
+        
+        <button type="submit">Gerar Minhas Dicas!</button>
+    </form>
+
+    <div id="resultado">
+        <h2>Seu Diagnóstico Personalizado:</h2>
+        <p id="resultado-texto"></p>
+        <div id="suplemento-container"></div>
+        <p id="call-to-action-texto"></p>
+    </div>
+
+    <!-- Seção de Teste do Modal de Busca de Alimentos -->
+    <hr style="margin: 40px 0;">
+    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px;">
+        <h2>🧪 Teste da Busca de Alimentos</h2>
+        <p>Esta é uma funcionalidade de teste para buscar alimentos no banco de dados:</p>
+        
+        <h3>Minha Refeição</h3>
+        <button id="btn-abrir-modal" class="btn-teste">+ Adicionar Alimento</button>
+        
+        <div id="alimentos-selecionados">
+            <p><em>Nenhum alimento selecionado ainda.</em></p>
+        </div>
+    </div>
+
+    <!-- Modal de Busca de Alimentos -->
+    <div id="modal-busca-alimento" class="modal">
+        <div class="modal-content">
+            <span id="close-modal-button" class="close-button">&times;</span>
+            <h2>Adicionar Alimento</h2>
+            <input type="text" id="input-busca-alimento" placeholder="Digite o nome do alimento (ex: arroz, frango, banana)...">
+            <div id="lista-resultados-busca">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Passo 1: Adicionar um "ouvinte" ao formulário
+        document.getElementById('l7nutri-form').addEventListener('submit', async function(event) {
+            // Previne o comportamento padrão do formulário (que é recarregar a página)
+            event.preventDefault();
+
+            // Pega a área de resultado e a exibe com uma mensagem de "carregando"
+            const resultadoDiv = document.getElementById('resultado');
+            resultadoDiv.style.display = 'block';
+            document.getElementById('resultado-texto').innerText = 'Analisando seu perfil e gerando suas dicas...';
+            document.getElementById('suplemento-container').innerHTML = ''; // Limpa o suplemento anterior
+            document.getElementById('call-to-action-texto').innerText = ''; // Limpa a CTA anterior
+
+
+            // Passo 2: Coletar os dados dos campos do formulário
+            const dadosParaEnviar = {
+                peso: document.getElementById('peso').value,
+                altura: document.getElementById('altura').value,
+                idade: document.getElementById('idade').value,
+                sexo: document.getElementById('sexo').value,
+                nivel_atividade: document.getElementById('nivel_atividade').value,
+                objetivo: document.getElementById('objetivo').value
+            };
+
+            // Passo 3: Enviar os dados para a nossa API Flask
+            try {
+                const response = await fetch('/api/diagnostico-publico', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dadosParaEnviar)
+                });
+
+                const data = await response.json();
+
+                // Passo 4: Exibir os resultados na tela
+                if (response.ok) {
+                    // Se a API respondeu com sucesso, mostramos os resultados
+                    const diagnostico = data.diagnostico;
+                    const plano = data.plano_exemplo_1_dia;
+                    
+                    const textoResultado = `
+                        <strong>IMC:</strong> ${diagnostico.imc}<br>
+                        <strong>Gasto Calórico Diário Estimado:</strong> ${diagnostico.gasto_calorico_diario_estimado} kcal<br>
+                        <strong>Meta Calórica Sugerida:</strong> ${diagnostico.meta_calorica_sugerida} kcal<br><br>
+                        <strong>Plano Exemplo:</strong><br>
+                        - Café da Manhã: ${plano.cafe_da_manha}<br>
+                        - Almoço: ${plano.almoco}<br>
+                        - Jantar: ${plano.jantar}
+                    `;
+                    document.getElementById('resultado-texto').innerHTML = textoResultado;
+
+                    // Mostra o suplemento, se existir
+                    if (data.suplemento_recomendado) {
+                        const sup = data.suplemento_recomendado;
+                        const suplementoHtml = `
+                            <div class="suplemento-card">
+                                <h3>Suplemento Recomendado para Você:</h3>
+                                <img src="${sup.imagem_url}" alt="${sup.nome}" width="150">
+                                <p><strong>${sup.nome}</strong></p>
+                                <a href="${sup.link_loja}" class="botao-comprar" target="_blank">Ver na Loja e Comprar</a>
+                            </div>
+                        `;
+                        document.getElementById('suplemento-container').innerHTML = suplementoHtml;
+                    }
+
+                    // Mostra o Call to Action
+                     document.getElementById('call-to-action-texto').innerText = data.call_to_action;
+
+                } else {
+                    // Se a API retornou um erro
+                    document.getElementById('resultado-texto').innerText = `Erro: ${data.erro || 'Não foi possível gerar seu diagnóstico.'}`;
+                }
+
+            } catch (error) {
+                // Se houve um erro de rede (API fora do ar, etc)
+                console.error('Erro de conexão:', error);
+                document.getElementById('resultado-texto').innerText = 'Erro de conexão. Verifique se o servidor local (python app.py) está rodando.';
+            }
+        });
+
+        // =============== CÓDIGO JAVASCRIPT PARA A MODAL DE BUSCA ===============
+        
+        // Garante que o script rode após o carregamento da página
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            // Pega os elementos da página que vamos usar
+            const modal = document.getElementById('modal-busca-alimento');
+            const openModalButton = document.getElementById('btn-abrir-modal');
+            const closeButton = document.getElementById('close-modal-button');
+            const searchInput = document.getElementById('input-busca-alimento');
+            const resultsList = document.getElementById('lista-resultados-busca');
+            const alimentosSelecionados = document.getElementById('alimentos-selecionados');
+            
+            let alimentosAdicionados = [];
+
+            // Evento para ABRIR o modal ao clicar no botão
+            openModalButton.addEventListener('click', () => {
+                modal.style.display = 'block';
+                searchInput.value = ''; // Limpa a busca anterior
+                resultsList.innerHTML = ''; // Limpa os resultados anteriores
+                searchInput.focus(); // Coloca o cursor piscando na caixa de busca
+            });
+
+            // Evento para FECHAR o modal
+            closeButton.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+
+            // Fechar modal clicando fora dele
+            window.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+
+            // A MÁGICA DA BUSCA EM TEMPO REAL
+            let searchTimeout;
+            searchInput.addEventListener('keyup', () => {
+                // Cancela a busca anterior se o usuário ainda está digitando
+                clearTimeout(searchTimeout);
+                const query = searchInput.value;
+
+                // Só busca se o usuário digitou pelo menos 2 letras
+                if (query.length < 2) {
+                    resultsList.innerHTML = '';
+                    return;
+                }
+
+                // Espera 300ms após o usuário parar de digitar para fazer a busca (evita sobrecarregar a API)
+                searchTimeout = setTimeout(async () => {
+                    resultsList.innerHTML = '<p style="padding: 10px; color: #666;">🔍 Buscando...</p>';
+                    try {
+                        // Faz a chamada à nossa API
+                        const response = await fetch(`/api/alimentos/buscar?q=${encodeURIComponent(query)}`);
+                        const alimentos = await response.json();
+
+                        resultsList.innerHTML = ''; // Limpa a mensagem de "Buscando..."
+
+                        if (alimentos.length > 0) {
+                            alimentos.forEach(alimento => {
+                                const item = document.createElement('div');
+                                item.className = 'resultado-item';
+                                item.innerHTML = `
+                                    <strong>${alimento.nome}</strong><br>
+                                    <small>
+                                        🔥 ${alimento.calorias} kcal | 
+                                        🥩 ${alimento.proteinas}g prot | 
+                                        🍞 ${alimento.carboidratos}g carb | 
+                                        🥑 ${alimento.gorduras}g gord
+                                    </small>
+                                `;
+                                
+                                // Adiciona um evento de clique para selecionar o alimento
+                                item.addEventListener('click', () => {
+                                    console.log('Alimento selecionado:', alimento);
+                                    
+                                    // Adiciona à lista de alimentos selecionados
+                                    alimentosAdicionados.push(alimento);
+                                    atualizarListaAlimentos();
+                                    
+                                    // Feedback visual
+                                    alert(`✅ ${alimento.nome} adicionado!`);
+                                    modal.style.display = 'none'; // Fecha o modal
+                                });
+                                resultsList.appendChild(item);
+                            });
+                        } else {
+                            resultsList.innerHTML = '<p style="padding: 10px; color: #666;">❌ Nenhum alimento encontrado.</p>';
+                        }
+                    } catch (error) {
+                        console.error('Erro na busca:', error);
+                        resultsList.innerHTML = '<p style="padding: 10px; color: #d32f2f;">⚠️ Erro na busca. Verifique se o servidor está rodando.</p>';
+                    }
+                }, 300);
+            });
+
+            // Função para atualizar a lista de alimentos selecionados
+            function atualizarListaAlimentos() {
+                if (alimentosAdicionados.length === 0) {
+                    alimentosSelecionados.innerHTML = '<p><em>Nenhum alimento selecionado ainda.</em></p>';
+                    return;
+                }
+
+                let html = '<h4>Alimentos Adicionados:</h4>';
+                let totalCalorias = 0;
+                let totalProteinas = 0;
+                let totalCarbs = 0;
+                let totalGorduras = 0;
+
+                alimentosAdicionados.forEach((alimento, index) => {
+                    html += `
+                        <div style="background: #f1f1f1; padding: 10px; margin: 5px 0; border-radius: 5px;">
+                            <strong>${alimento.nome}</strong> (100g)
+                            <br><small>
+                                🔥 ${alimento.calorias} kcal | 
+                                🥩 ${alimento.proteinas}g | 
+                                🍞 ${alimento.carboidratos}g | 
+                                🥑 ${alimento.gorduras}g
+                            </small>
+                            <button onclick="removerAlimento(${index})" style="float: right; background: #dc3545; color: white; border: none; padding: 2px 8px; border-radius: 3px; cursor: pointer;">❌</button>
+                        </div>
+                    `;
+                    
+                    totalCalorias += alimento.calorias;
+                    totalProteinas += alimento.proteinas;
+                    totalCarbs += alimento.carboidratos;
+                    totalGorduras += alimento.gorduras;
+                });
+
+                html += `
+                    <div style="background: #e3f2fd; padding: 15px; margin: 10px 0; border-radius: 5px; border-left: 4px solid #2196f3;">
+                        <strong>📊 Total da Refeição:</strong><br>
+                        🔥 ${totalCalorias.toFixed(1)} kcal | 
+                        🥩 ${totalProteinas.toFixed(1)}g prot | 
+                        🍞 ${totalCarbs.toFixed(1)}g carb | 
+                        🥑 ${totalGorduras.toFixed(1)}g gord
+                    </div>
+                `;
+
+                alimentosSelecionados.innerHTML = html;
+            }
+
+            // Função global para remover alimento
+            window.removerAlimento = function(index) {
+                alimentosAdicionados.splice(index, 1);
+                atualizarListaAlimentos();
+            };
+        });
+    </script>
+</body>
+</html>

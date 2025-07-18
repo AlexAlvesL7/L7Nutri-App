@@ -1,0 +1,4 @@
+# L7Nutri - Versão Ultra Estável
+Flask==2.3.3
+Werkzeug==2.3.7
+gunicorn==20.1.0
