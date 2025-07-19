@@ -1,8 +1,8 @@
-"""Initial migration
+"""Versão inicial completa do banco de dados
 
-Revision ID: e8676e89fb6c
+Revision ID: 6280d7d2a288
 Revises: 
-Create Date: 2025-07-15 10:22:44.604561
+Create Date: 2025-07-19 11:37:45.588023
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'e8676e89fb6c'
+revision = '6280d7d2a288'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -47,8 +47,18 @@ def upgrade():
     sa.Column('tipo_refeicao', sa.String(length=50), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('suplementos',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('nome', sa.String(length=100), nullable=False),
+    sa.Column('objetivo', sa.String(length=30), nullable=True),
+    sa.Column('link_loja', sa.String(length=255), nullable=True),
+    sa.Column('imagem_url', sa.String(length=255), nullable=True),
+    sa.PrimaryKeyConstraint('id')
+    )
     op.create_table('usuario',
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('nome', sa.String(length=150), nullable=False),
+    sa.Column('email', sa.String(length=150), nullable=False),
     sa.Column('username', sa.String(length=80), nullable=False),
     sa.Column('password', sa.String(length=120), nullable=False),
     sa.Column('idade', sa.Integer(), nullable=True),
@@ -58,6 +68,7 @@ def upgrade():
     sa.Column('nivel_atividade', sa.String(length=50), nullable=True),
     sa.Column('objetivo', sa.String(length=100), nullable=True),
     sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('email'),
     sa.UniqueConstraint('username')
     )
     op.create_table('alergia_usuario',
@@ -66,6 +77,20 @@ def upgrade():
     sa.Column('alergia_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['alergia_id'], ['alergia.id'], ),
     sa.ForeignKeyConstraint(['usuario_id'], ['usuario.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('perfis_nutricionais',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('peso', sa.Float(), nullable=True),
+    sa.Column('altura', sa.Integer(), nullable=True),
+    sa.Column('idade', sa.Integer(), nullable=True),
+    sa.Column('genero', sa.String(length=20), nullable=True),
+    sa.Column('nivel_atividade', sa.String(length=30), nullable=True),
+    sa.Column('objetivo', sa.String(length=30), nullable=True),
+    sa.Column('aceita_suplementos', sa.Boolean(), nullable=True),
+    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['user_id'], ['usuario.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('plano_sugestao',
@@ -122,8 +147,10 @@ def downgrade():
     op.drop_table('receita_alimento')
     op.drop_table('preferencia_usuario')
     op.drop_table('plano_sugestao')
+    op.drop_table('perfis_nutricionais')
     op.drop_table('alergia_usuario')
     op.drop_table('usuario')
+    op.drop_table('suplementos')
     op.drop_table('receita')
     op.drop_table('preferencia')
     op.drop_table('alimento')
