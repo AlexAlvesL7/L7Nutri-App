@@ -536,6 +536,78 @@ def login_usuario():
     else:
         return jsonify({'message': 'Nome de usuário ou senha incorretos!'}), 401
 
+# --- Rota para Atualizar Perfil do Usuário (Passo 2 do Onboarding) ---
+@app.route('/api/usuario/perfil', methods=['PUT'])
+@jwt_required()
+def atualizar_perfil_usuario():
+    """
+    Endpoint para atualização do perfil do usuário
+    Aceita: idade, genero, peso, altura
+    Retorna: JSON com mensagem de sucesso ou erro
+    """
+    # Obter ID do usuário logado através do token JWT
+    user_id = get_jwt_identity()
+    
+    # Extrair dados do JSON da requisição
+    data = request.get_json()
+    if not data:
+        return jsonify({'erro': 'Dados são obrigatórios!'}), 400
+    
+    # Validação dos dados de entrada
+    try:
+        idade = data.get('idade')
+        genero = data.get('genero')
+        peso = data.get('peso')
+        altura = data.get('altura')
+        
+        # Validação de dados numéricos positivos
+        if idade is not None:
+            idade = int(idade)
+            if idade <= 0 or idade > 120:
+                return jsonify({'erro': 'Idade deve ser um número positivo entre 1 e 120'}), 400
+        
+        if peso is not None:
+            peso = float(peso)
+            if peso <= 0 or peso > 500:
+                return jsonify({'erro': 'Peso deve ser um número positivo até 500kg'}), 400
+        
+        if altura is not None:
+            altura = float(altura)
+            if altura <= 0 or altura > 300:
+                return jsonify({'erro': 'Altura deve ser um número positivo até 300cm'}), 400
+        
+        if genero is not None and genero not in ['masculino', 'feminino']:
+            return jsonify({'erro': 'Gênero deve ser "masculino" ou "feminino"'}), 400
+            
+    except (ValueError, TypeError):
+        return jsonify({'erro': 'Dados de perfil inválidos'}), 400
+    
+    try:
+        # Buscar usuário no banco de dados
+        usuario = Usuario.query.get(int(user_id))
+        if not usuario:
+            return jsonify({'erro': 'Usuário não encontrado'}), 404
+        
+        # Atualizar campos do perfil
+        if idade is not None:
+            usuario.idade = idade
+        if genero is not None:
+            usuario.sexo = genero
+        if peso is not None:
+            usuario.peso = peso
+        if altura is not None:
+            usuario.altura = altura
+        
+        # Persistir alterações no banco de dados
+        db.session.commit()
+        
+        return jsonify({'mensagem': 'Perfil atualizado com sucesso'}), 200
+        
+    except Exception as e:
+        # Em caso de erro, desfaz a transação
+        db.session.rollback()
+        return jsonify({'erro': f'Erro ao atualizar perfil: {str(e)}'}), 500
+
 # Rota para registrar um novo usuário (exemplo)
 @app.route('/api/usuarios/registrar', methods=['POST'])
 def registrar_usuario_api():
@@ -1015,45 +1087,6 @@ def logout():
     Rota de logout - limpa sessão e redireciona
     """
     return render_template('logout.html')
-
-# ROTA DE DIAGNÓSTICO TEMPORÁRIA - REMOVER APÓS O TESTE
-@app.route('/api/debug/inspect-users/<secret_key>')
-def inspect_users(secret_key):
-    # Medida de segurança simples para não deixar o endpoint aberto ao público
-    if secret_key != 'NOSSA_CHAVE_SECRETA_123':
-        return jsonify({"erro": "Acesso negado"}), 403
-
-    try:
-        # Acessa o modelo Usuario e busca por todos os registros
-        usuarios = Usuario.query.all()
-        resultado = []
-        for usuario in usuarios:
-            resultado.append({
-                "id": usuario.id,
-                "nome": usuario.nome,
-                "email": usuario.email,
-                "username": usuario.username
-                # Propositalmente não exibimos o hash da senha
-            })
-        # Retorna a lista de usuários como uma resposta JSON
-        return jsonify(resultado)
-    except Exception as e:
-        # Se algo der errado, retorna o erro
-        return jsonify({"erro": str(e)}), 500
-
-# ROTA DE DIAGNÓSTICO DE AMBIENTE - LANTERNA PARA VARIÁVEIS DE AMBIENTE
-@app.route('/api/debug/inspect-env/<secret_key>')
-def inspect_env(secret_key):
-    # Use a mesma chave secreta da outra rota de debug
-    if secret_key != 'NOSSA_CHAVE_SECRETA_123': 
-        return jsonify({"erro": "Acesso negado"}), 403
-    
-    try:
-        # Converte o dicionário de variáveis de ambiente para um formato JSON
-        env_vars = dict(os.environ)
-        return jsonify(env_vars)
-    except Exception as e:
-        return jsonify({"erro": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
