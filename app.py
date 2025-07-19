@@ -1040,5 +1040,19 @@ def inspect_users(secret_key):
         # Se algo der errado, retorna o erro
         return jsonify({"erro": str(e)}), 500
 
+# ROTA DE DIAGNÓSTICO DE AMBIENTE - LANTERNA PARA VARIÁVEIS DE AMBIENTE
+@app.route('/api/debug/inspect-env/<secret_key>')
+def inspect_env(secret_key):
+    # Use a mesma chave secreta da outra rota de debug
+    if secret_key != 'NOSSA_CHAVE_SECRETA_123': 
+        return jsonify({"erro": "Acesso negado"}), 403
+    
+    try:
+        # Converte o dicionário de variáveis de ambiente para um formato JSON
+        env_vars = dict(os.environ)
+        return jsonify(env_vars)
+    except Exception as e:
+        return jsonify({"erro": str(e)}), 500
+
 if __name__ == '__main__':
     app.run(debug=True)
