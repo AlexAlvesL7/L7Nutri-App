@@ -464,6 +464,62 @@ def cadastro_usuario():
         db.session.rollback()
         return jsonify({'message': f'Erro ao cadastrar usuário: {str(e)}'}), 500
 
+# --- Rota para Cadastro de Usuário ---
+@app.route('/api/cadastro', methods=['POST'])
+def cadastro_novo_usuario():
+    """
+    Endpoint para cadastro de novos usuários
+    Aceita: nome, email, username, password
+    Retorna: JSON com mensagem de sucesso ou erro
+    """
+    data = request.get_json()
+    
+    # Validação de dados obrigatórios
+    if not data:
+        return jsonify({'erro': 'Dados são obrigatórios!'}), 400
+    
+    if not 'nome' in data or not 'email' in data or not 'username' in data or not 'password' in data:
+        return jsonify({'erro': 'Campos nome, email, username e password são obrigatórios!'}), 400
+    
+    nome = data['nome']
+    email = data['email']
+    username = data['username']
+    password = data['password']
+    
+    # Validação de duplicidade - verifica se email ou username já existem
+    usuario_existente = Usuario.query.filter(
+        (Usuario.email == email) | (Usuario.username == username)
+    ).first()
+    
+    if usuario_existente:
+        if usuario_existente.email == email:
+            return jsonify({'erro': 'E-mail já cadastrado'}), 409
+        else:
+            return jsonify({'erro': 'Username já cadastrado'}), 409
+    
+    try:
+        # Segurança da senha - gera hash usando bcrypt
+        senha_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+        
+        # Criação do novo usuário
+        novo_usuario = Usuario(
+            nome=nome,
+            email=email,
+            username=username,
+            password=senha_hash
+        )
+        
+        # Persistência no banco de dados
+        db.session.add(novo_usuario)
+        db.session.commit()
+        
+        return jsonify({'mensagem': 'Usuário criado com sucesso'}), 201
+        
+    except Exception as e:
+        # Em caso de erro, desfaz a transação
+        db.session.rollback()
+        return jsonify({'erro': f'Erro ao criar usuário: {str(e)}'}), 500
+
 # Rota para Login de Usuário usando JWT
 @app.route('/api/login', methods=['POST'])
 def login_usuario():
@@ -957,5 +1013,32 @@ def logout():
     """
     Rota de logout - limpa sessão e redireciona
     """
+    return render_template('logout.html')
+
+# ROTA DE DIAGNÓSTICO TEMPORÁRIA - REMOVER APÓS O TESTE
+@app.route('/api/debug/inspect-users/<secret_key>')
+def inspect_users(secret_key):
+    # Medida de segurança simples para não deixar o endpoint aberto ao público
+    if secret_key != 'NOSSA_CHAVE_SECRETA_123':
+        return jsonify({"erro": "Acesso negado"}), 403
+
+    try:
+        # Acessa o modelo Usuario e busca por todos os registros
+        usuarios = Usuario.query.all()
+        resultado = []
+        for usuario in usuarios:
+            resultado.append({
+                "id": usuario.id,
+                "nome": usuario.nome,
+                "email": usuario.email,
+                "username": usuario.username
+                # Propositalmente não exibimos o hash da senha
+            })
+        # Retorna a lista de usuários como uma resposta JSON
+        return jsonify(resultado)
+    except Exception as e:
+        # Se algo der errado, retorna o erro
+        return jsonify({"erro": str(e)}), 500
+
 if __name__ == '__main__':
     app.run(debug=True)
