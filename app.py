@@ -39,18 +39,19 @@ jwt = JWTManager(app)
 # Configura a chave secreta para a aplicação
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', os.urandom(24))
 
-# === CONFIGURAÇÃO DO BANCO DE DADOS (VERSÃO CORRIGIDA E SEGURA) ===
-# Lê a URL do banco de dados diretamente do ambiente do Render.
+# === CONFIGURAÇÃO DO BANCO DE DADOS (VERSÃO FINAL E CORRIGIDA) ===
 DATABASE_URL = os.getenv('DATABASE_URL')
 
-# Verifica se a DATABASE_URL foi encontrada e se é de um PostgreSQL
-if DATABASE_URL and DATABASE_URL.startswith('postgres://'):
-    # O Render fornece 'postgres://' mas o SQLAlchemy prefere 'postgresql://'
-    # Esta linha faz a correção necessária para garantir a compatibilidade.
-    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
+# A nova lógica: Se a variável DATABASE_URL existir no ambiente, use-a.
+if DATABASE_URL:
+    # Garante a compatibilidade com SQLAlchemy trocando 'postgres://' por 'postgresql://' se necessário
+    if DATABASE_URL.startswith('postgres://'):
+        DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
+    
+    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
     print("✅ MODO PRODUÇÃO: Conectando ao banco de dados PostgreSQL do Render...")
 else:
-    # Se a DATABASE_URL não for encontrada, usa o SQLite para desenvolvimento local
+    # Fallback para desenvolvimento local se a variável não existir
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(os.path.abspath(os.getcwd()), 'nutricao.db')
     print("⚠️ MODO DESENVOLVIMENTO: Usando banco de dados SQLite local.")
 
