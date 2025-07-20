@@ -1275,6 +1275,7 @@ def pagina_verificacao_email():
     return render_template('verificacao_email.html')
 
 @app.route('/cadastro-seguro')
+@app.route('/cadastro_seguro')  # Rota alternativa para compatibilidade
 def pagina_cadastro_seguro():
     """Página de cadastro com verificação"""
     return render_template('cadastro_seguro.html')
