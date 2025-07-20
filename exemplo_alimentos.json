@@ -1,0 +1,72 @@
+[
+  {
+    "nome": "Maçã",
+    "categoria": "frutas",
+    "calorias": 52.0,
+    "proteinas": 0.3,
+    "carboidratos": 13.8,
+    "gorduras": 0.2,
+    "fibras": 2.4,
+    "sodio": 1.0,
+    "acucar": 10.4,
+    "colesterol": 0.0,
+    "porcao_referencia": "100g",
+    "fonte_dados": "TACO"
+  },
+  {
+    "nome": "Banana",
+    "categoria": "frutas",
+    "calorias": 89.0,
+    "proteinas": 1.1,
+    "carboidratos": 22.8,
+    "gorduras": 0.3,
+    "fibras": 2.6,
+    "sodio": 1.0,
+    "acucar": 12.2,
+    "colesterol": 0.0,
+    "porcao_referencia": "100g",
+    "fonte_dados": "TACO"
+  },
+  {
+    "nome": "Arroz branco cozido",
+    "categoria": "cereais",
+    "calorias": 130.0,
+    "proteinas": 2.7,
+    "carboidratos": 28.1,
+    "gorduras": 0.3,
+    "fibras": 0.4,
+    "sodio": 1.0,
+    "acucar": 0.1,
+    "colesterol": 0.0,
+    "porcao_referencia": "100g",
+    "fonte_dados": "TACO"
+  },
+  {
+    "nome": "Peito de frango grelhado",
+    "categoria": "carnes",
+    "calorias": 165.0,
+    "proteinas": 31.0,
+    "carboidratos": 0.0,
+    "gorduras": 3.6,
+    "fibras": 0.0,
+    "sodio": 74.0,
+    "acucar": 0.0,
+    "colesterol": 85.0,
+    "porcao_referencia": "100g",
+    "fonte_dados": "TACO"
+  },
+  {
+    "nome": "Brócolis cozido",
+    "categoria": "vegetais",
+    "calorias": 25.0,
+    "proteinas": 3.4,
+    "carboidratos": 4.0,
+    "gorduras": 0.4,
+    "fibras": 3.4,
+    "sodio": 8.0,
+    "acucar": 1.9,
+    "colesterol": 0.0,
+    "porcao_referencia": "100g",
+    "fonte_dados": "TACO"
+  }
+]

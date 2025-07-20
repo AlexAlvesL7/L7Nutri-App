@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L7Nutri - Cadastro Seguro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 450px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .security-notice {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .security-notice h3 {
+            color: #0066cc;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .security-notice p {
+            color: #004499;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .security-features {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+        }
+
+        .security-feature {
+            text-align: center;
+            font-size: 12px;
+            color: #0066cc;
+        }
+
+        .security-feature span {
+            font-size: 20px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .campo-grupo {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .campo-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .campo-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .campo-input:focus {
+            outline: none;
+            border-color: #28a745;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+        }
+
+        .campo-input.invalido {
+            border-color: #dc3545;
+            background: #fff5f5;
+        }
+
+        .campo-input.valido {
+            border-color: #28a745;
+            background: #f8fff8;
+        }
+
+        .validacao-feedback {
+            position: absolute;
+            right: 15px;
+            top: 43px;
+            font-size: 18px;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .success-message {
+            color: #28a745;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .senha-requisitos {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .senha-requisito {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            color: #6c757d;
+        }
+
+        .senha-requisito.valido {
+            color: #28a745;
+        }
+
+        .senha-requisito span {
+            margin-right: 8px;
+        }
+
+        .btn-cadastrar {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-cadastrar:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-cadastrar:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.ativo {
+            display: block;
+        }
+
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #28a745;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .email-verification-info {
+            background: #e7f3ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .email-verification-info.ativo {
+            display: block;
+        }
+
+        .email-verification-info h4 {
+            color: #0066cc;
+            margin-bottom: 10px;
+        }
+
+        .email-verification-info p {
+            color: #004499;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .btn-reenviar {
+            background: transparent;
+            color: #0066cc;
+            border: 1px solid #0066cc;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-reenviar:hover {
+            background: #0066cc;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+
+            .form-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🥗 L7Nutri</h1>
+            <p>Cadastro Seguro - Sua jornada nutricional começa aqui</p>
+        </div>
+
+        <div class="form-container">
+            <!-- Aviso de Segurança -->
+            <div class="security-notice">
+                <h3>🔒 Conta Protegida</h3>
+                <p>Para sua segurança, validamos todos os emails e criamos um questionário personalizado para você.</p>
+                <div class="security-features">
+                    <div class="security-feature">
+                        <span>📧</span>
+                        Email Verificado
+                    </div>
+                    <div class="security-feature">
+                        <span>🤖</span>
+                        Anti-Bot
+                    </div>
+                    <div class="security-feature">
+                        <span>🎯</span>
+                        Plano Personalizado
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alertas -->
+            <div id="alertContainer"></div>
+
+            <!-- Formulário de Cadastro -->
+            <form id="cadastroForm">
+                <div class="campo-grupo">
+                    <label class="campo-label">Nome Completo *</label>
+                    <input type="text" id="nome" name="nome" class="campo-input" required>
+                    <div class="validacao-feedback" id="nomeValidacao"></div>
+                    <div class="error-message" id="nomeErro"></div>
+                </div>
+
+                <div class="campo-grupo">
+                    <label class="campo-label">Email *</label>
+                    <input type="email" id="email" name="email" class="campo-input" required>
+                    <div class="validacao-feedback" id="emailValidacao"></div>
+                    <div class="error-message" id="emailErro"></div>
+                    <div class="success-message" id="emailSucesso"></div>
+                </div>
+
+                <div class="campo-grupo">
+                    <label class="campo-label">Senha *</label>
+                    <input type="password" id="senha" name="senha" class="campo-input" required>
+                    <div class="validacao-feedback" id="senhaValidacao"></div>
+                    
+                    <div class="senha-requisitos">
+                        <div class="senha-requisito" id="senhaMinimo">
+                            <span>○</span> Mínimo 8 caracteres
+                        </div>
+                        <div class="senha-requisito" id="senhaMaiuscula">
+                            <span>○</span> Uma letra maiúscula
+                        </div>
+                        <div class="senha-requisito" id="senhaNumero">
+                            <span>○</span> Um número
+                        </div>
+                        <div class="senha-requisito" id="senhaEspecial">
+                            <span>○</span> Um caractere especial
+                        </div>
+                    </div>
+                </div>
+
+                <div class="campo-grupo">
+                    <label class="campo-label">Confirmar Senha *</label>
+                    <input type="password" id="confirmarSenha" name="confirmarSenha" class="campo-input" required>
+                    <div class="validacao-feedback" id="confirmarSenhaValidacao"></div>
+                    <div class="error-message" id="confirmarSenhaErro"></div>
+                </div>
+
+                <button type="submit" class="btn-cadastrar" id="btnCadastrar" disabled>
+                    🚀 Criar Minha Conta Segura
+                </button>
+            </form>
+
+            <!-- Loading -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Criando sua conta e enviando email de verificação...</p>
+            </div>
+
+            <!-- Informações de Verificação de Email -->
+            <div class="email-verification-info" id="emailVerificationInfo">
+                <h4>📧 Verifique seu Email</h4>
+                <p>Enviamos um email de confirmação para <strong id="emailEnviado"></strong></p>
+                <p>Clique no link do email para ativar sua conta e começar seu questionário personalizado.</p>
+                <button type="button" class="btn-reenviar" id="btnReenviar">
+                    🔄 Reenviar Email
+                </button>
+            </div>
+
+            <!-- Link para Login -->
+            <div class="login-link">
+                <p>Já tem uma conta? <a href="/login">Faça login aqui</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variáveis globais
+        let emailValido = false;
+        let senhaValida = false;
+        let senhasIguais = false;
+        let nomeValido = false;
+
+        // Validação de email em tempo real
+        document.getElementById('email').addEventListener('input', async function() {
+            const email = this.value;
+            const emailValidacao = document.getElementById('emailValidacao');
+            const emailErro = document.getElementById('emailErro');
+            const emailSucesso = document.getElementById('emailSucesso');
+
+            if (email.length < 5) {
+                this.className = 'campo-input';
+                emailValidacao.textContent = '';
+                emailErro.style.display = 'none';
+                emailSucesso.style.display = 'none';
+                emailValido = false;
+                atualizarBotaoCadastro();
+                return;
+            }
+
+            // Validação básica de formato
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                this.className = 'campo-input invalido';
+                emailValidacao.textContent = '❌';
+                emailErro.textContent = 'Formato de email inválido';
+                emailErro.style.display = 'block';
+                emailSucesso.style.display = 'none';
+                emailValido = false;
+                atualizarBotaoCadastro();
+                return;
+            }
+
+            // Verificar domínios temporários
+            const dominiosTemporarios = ['10minutemail.com', 'tempmail.org', 'guerrillamail.com'];
+            const dominio = email.split('@')[1].toLowerCase();
+            
+            if (dominiosTemporarios.includes(dominio)) {
+                this.className = 'campo-input invalido';
+                emailValidacao.textContent = '⚠️';
+                emailErro.textContent = 'Emails temporários não são permitidos';
+                emailErro.style.display = 'block';
+                emailSucesso.style.display = 'none';
+                emailValido = false;
+                atualizarBotaoCadastro();
+                return;
+            }
+
+            // Email válido
+            this.className = 'campo-input valido';
+            emailValidacao.textContent = '✅';
+            emailErro.style.display = 'none';
+            emailSucesso.textContent = 'Email válido';
+            emailSucesso.style.display = 'block';
+            emailValido = true;
+            atualizarBotaoCadastro();
+        });
+
+        // Validação de nome
+        document.getElementById('nome').addEventListener('input', function() {
+            const nome = this.value.trim();
+            const nomeValidacao = document.getElementById('nomeValidacao');
+            const nomeErro = document.getElementById('nomeErro');
+
+            if (nome.length < 2) {
+                this.className = 'campo-input';
+                nomeValidacao.textContent = '';
+                nomeErro.style.display = 'none';
+                nomeValido = false;
+            } else if (nome.length < 3) {
+                this.className = 'campo-input invalido';
+                nomeValidacao.textContent = '❌';
+                nomeErro.textContent = 'Nome deve ter pelo menos 3 caracteres';
+                nomeErro.style.display = 'block';
+                nomeValido = false;
+            } else {
+                this.className = 'campo-input valido';
+                nomeValidacao.textContent = '✅';
+                nomeErro.style.display = 'none';
+                nomeValido = true;
+            }
+            
+            atualizarBotaoCadastro();
+        });
+
+        // Validação de senha
+        document.getElementById('senha').addEventListener('input', function() {
+            const senha = this.value;
+            validarSenha(senha);
+            verificarSenhasIguais();
+            atualizarBotaoCadastro();
+        });
+
+        document.getElementById('confirmarSenha').addEventListener('input', function() {
+            verificarSenhasIguais();
+            atualizarBotaoCadastro();
+        });
+
+        function validarSenha(senha) {
+            const minimo = senha.length >= 8;
+            const maiuscula = /[A-Z]/.test(senha);
+            const numero = /[0-9]/.test(senha);
+            const especial = /[!@#$%^&*(),.?":{}|<>]/.test(senha);
+
+            atualizarRequisitoSenha('senhaMinimo', minimo);
+            atualizarRequisitoSenha('senhaMaiuscula', maiuscula);
+            atualizarRequisitoSenha('senhaNumero', numero);
+            atualizarRequisitoSenha('senhaEspecial', especial);
+
+            senhaValida = minimo && maiuscula && numero && especial;
+
+            const senhaInput = document.getElementById('senha');
+            const senhaValidacao = document.getElementById('senhaValidacao');
+
+            if (senha.length === 0) {
+                senhaInput.className = 'campo-input';
+                senhaValidacao.textContent = '';
+            } else if (senhaValida) {
+                senhaInput.className = 'campo-input valido';
+                senhaValidacao.textContent = '✅';
+            } else {
+                senhaInput.className = 'campo-input invalido';
+                senhaValidacao.textContent = '❌';
+            }
+        }
+
+        function atualizarRequisitoSenha(id, valido) {
+            const elemento = document.getElementById(id);
+            const span = elemento.querySelector('span');
+            
+            if (valido) {
+                elemento.classList.add('valido');
+                span.textContent = '✓';
+            } else {
+                elemento.classList.remove('valido');
+                span.textContent = '○';
+            }
+        }
+
+        function verificarSenhasIguais() {
+            const senha = document.getElementById('senha').value;
+            const confirmarSenha = document.getElementById('confirmarSenha').value;
+            const confirmarSenhaInput = document.getElementById('confirmarSenha');
+            const confirmarSenhaValidacao = document.getElementById('confirmarSenhaValidacao');
+            const confirmarSenhaErro = document.getElementById('confirmarSenhaErro');
+
+            if (confirmarSenha.length === 0) {
+                confirmarSenhaInput.className = 'campo-input';
+                confirmarSenhaValidacao.textContent = '';
+                confirmarSenhaErro.style.display = 'none';
+                senhasIguais = false;
+            } else if (senha === confirmarSenha) {
+                confirmarSenhaInput.className = 'campo-input valido';
+                confirmarSenhaValidacao.textContent = '✅';
+                confirmarSenhaErro.style.display = 'none';
+                senhasIguais = true;
+            } else {
+                confirmarSenhaInput.className = 'campo-input invalido';
+                confirmarSenhaValidacao.textContent = '❌';
+                confirmarSenhaErro.textContent = 'Senhas não coincidem';
+                confirmarSenhaErro.style.display = 'block';
+                senhasIguais = false;
+            }
+        }
+
+        function atualizarBotaoCadastro() {
+            const btnCadastrar = document.getElementById('btnCadastrar');
+            const todosValidos = nomeValido && emailValido && senhaValida && senhasIguais;
+            
+            btnCadastrar.disabled = !todosValidos;
+            
+            if (todosValidos) {
+                btnCadastrar.textContent = '🚀 Criar Minha Conta Segura';
+            } else {
+                btnCadastrar.textContent = 'Complete todos os campos';
+            }
+        }
+
+        // Envio do formulário
+        document.getElementById('cadastroForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!nomeValido || !emailValido || !senhaValida || !senhasIguais) {
+                mostrarAlerta('error', 'Por favor, corrija os erros no formulário');
+                return;
+            }
+
+            const formData = new FormData(this);
+            const dados = Object.fromEntries(formData);
+
+            // Mostrar loading
+            document.getElementById('cadastroForm').style.display = 'none';
+            document.getElementById('loading').classList.add('ativo');
+
+            try {
+                const response = await fetch('/api/usuario/registro-seguro', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        nome: dados.nome,
+                        email: dados.email,
+                        senha: dados.senha
+                    })
+                });
+
+                const resultado = await response.json();
+
+                // Esconder loading
+                document.getElementById('loading').classList.remove('ativo');
+
+                if (resultado.sucesso) {
+                    // Mostrar informações de verificação de email
+                    document.getElementById('emailEnviado').textContent = dados.email;
+                    document.getElementById('emailVerificationInfo').classList.add('ativo');
+                    
+                    mostrarAlerta('success', resultado.mensagem);
+
+                    // Configurar botão de reenvio
+                    document.getElementById('btnReenviar').addEventListener('click', function() {
+                        reenviarEmailVerificacao(dados.email);
+                    });
+
+                } else {
+                    document.getElementById('cadastroForm').style.display = 'block';
+                    mostrarAlerta('error', resultado.erro);
+                }
+
+            } catch (error) {
+                document.getElementById('loading').classList.remove('ativo');
+                document.getElementById('cadastroForm').style.display = 'block';
+                mostrarAlerta('error', 'Erro de conexão. Tente novamente.');
+                console.error('Erro:', error);
+            }
+        });
+
+        async function reenviarEmailVerificacao(email) {
+            const btnReenviar = document.getElementById('btnReenviar');
+            const textoOriginal = btnReenviar.textContent;
+            
+            btnReenviar.disabled = true;
+            btnReenviar.textContent = '⏳ Enviando...';
+
+            try {
+                const response = await fetch('/api/reenviar-verificacao', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email })
+                });
+
+                const resultado = await response.json();
+
+                if (resultado.sucesso) {
+                    mostrarAlerta('success', resultado.mensagem);
+                } else {
+                    mostrarAlerta('error', resultado.erro);
+                }
+
+            } catch (error) {
+                mostrarAlerta('error', 'Erro ao reenviar email');
+            } finally {
+                btnReenviar.disabled = false;
+                btnReenviar.textContent = textoOriginal;
+            }
+        }
+
+        function mostrarAlerta(tipo, mensagem) {
+            const alertContainer = document.getElementById('alertContainer');
+            
+            const alert = document.createElement('div');
+            alert.className = `alert ${tipo}`;
+            alert.textContent = mensagem;
+            alert.style.display = 'block';
+            
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alert);
+
+            // Auto remover após 5 segundos
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            atualizarBotaoCadastro();
+        });
+    </script>
+</body>
+</html>

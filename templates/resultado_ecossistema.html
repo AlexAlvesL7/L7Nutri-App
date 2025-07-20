@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seu Plano Personalizado - L7Nutri</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --l7-primary: #2E8B57;
+            --l7-secondary: #32CD32;
+            --l7-accent: #FFD700;
+            --l7-dark: #1B4332;
+            --l7-light: #90EE90;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8fffe 0%, #e8f5e8 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, var(--l7-primary) 0%, var(--l7-secondary) 100%);
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .ecossistema-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .ecossistema-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            border-color: var(--l7-secondary);
+        }
+
+        .card-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem;
+            background: linear-gradient(135deg, var(--l7-primary), var(--l7-secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, var(--l7-accent), #FFA500);
+            color: #333;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5);
+            color: #333;
+        }
+
+        .suplemento-destaque {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E8E);
+            color: white;
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .badge-recomendado {
+            background: var(--l7-accent);
+            color: #333;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .progress-meta {
+            height: 10px;
+            border-radius: 10px;
+            background: #e9ecef;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, var(--l7-primary), var(--l7-secondary));
+            transition: width 0.8s ease;
+        }
+
+        .macro-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+        }
+
+        .macro-valor {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--l7-primary);
+        }
+
+        .treino-do-dia {
+            background: linear-gradient(135deg, #4ECDC4, #44A08D);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 1rem 0;
+        }
+
+        .receita-destaque {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 1rem 0;
+        }
+
+        .proximos-passos {
+            background: #f8f9fa;
+            border-left: 5px solid var(--l7-secondary);
+            padding: 1.5rem;
+            border-radius: 0 15px 15px 0;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            background: white;
+            border-radius: 10px;
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            background: var(--l7-primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-weight: bold;
+        }
+
+        .motivacional-quote {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-style: italic;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .motivacional-quote::before {
+            content: '"';
+            font-size: 4rem;
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            opacity: 0.3;
+        }
+
+        .urgencia-badge {
+            background: #FF4757;
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .nav-ecossistema {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: inline-block;
+            margin: 0 1rem;
+            text-decoration: none;
+            color: var(--l7-primary);
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover {
+            color: var(--l7-secondary);
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2rem; }
+            .ecossistema-card { padding: 1.5rem; }
+            .nav-ecossistema { 
+                position: relative;
+                transform: none;
+                left: auto;
+                bottom: auto;
+                margin: 2rem auto;
+                display: block;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="container">
+            <h1 class="hero-title">🎉 Seu Plano Personalizado Está Pronto!</h1>
+            <p class="hero-subtitle" id="analise-personalizada">
+                Baseado no seu perfil único, criamos um ecossistema completo para sua transformação
+            </p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Mensagem Motivacional -->
+        <div class="motivacional-quote" id="mensagem-motivacional">
+            Sua jornada de transformação começa agora! Cada escolha conta. 💪
+        </div>
+
+        <!-- Plano Nutricional -->
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="ecossistema-card">
+                    <div class="card-icon">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <h3 class="text-center mb-4">🍎 Seu Plano Nutricional L7Nutri</h3>
+                    
+                    <div id="meta-calorica" class="text-center mb-4">
+                        <div class="macro-valor">1800 kcal/dia</div>
+                        <p class="text-muted">Meta personalizada para seus objetivos</p>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="macro-card">
+                                <div class="macro-valor" id="proteinas">135g</div>
+                                <small class="text-muted">Proteínas (30%)</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="macro-card">
+                                <div class="macro-valor" id="carboidratos">203g</div>
+                                <small class="text-muted">Carboidratos (45%)</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="macro-card">
+                                <div class="macro-valor" id="gorduras">50g</div>
+                                <small class="text-muted">Gorduras (25%)</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <a href="/diario-alimentar" class="cta-button">
+                            <i class="fas fa-book me-2"></i>Acessar Meu Diário
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <!-- Suplemento Recomendado -->
+                <div class="suplemento-destaque">
+                    <span class="badge-recomendado mb-3">
+                        <i class="fas fa-star me-1"></i>Recomendado para você
+                    </span>
+                    <h4 id="suplemento-nome">L7Ultra</h4>
+                    <p id="suplemento-descricao">Termogênico ideal para iniciantes</p>
+                    <div id="suplemento-motivo" class="mb-3">
+                        Ideal para quem está começando a jornada do emagrecimento
+                    </div>
+                    <div id="suplemento-preco" class="h5 mb-3">R$ 89,90</div>
+                    <span class="urgencia-badge mb-3">Oferta especial!</span>
+                    <br><br>
+                    <a href="#" id="link-suplemento" class="cta-button">
+                        <i class="fas fa-shopping-cart me-2"></i>Conhecer L7Ultra
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Treino Personalizado -->
+        <div class="row mt-4">
+            <div class="col-lg-6">
+                <div class="treino-do-dia">
+                    <h4><i class="fas fa-dumbbell me-2"></i>Seu Treino L7Personal</h4>
+                    <div id="treino-foco" class="mb-3">Foco: Queima de gordura</div>
+                    <div id="treino-hoje" class="h5 mb-3">
+                        HIIT 15min: 30s ativo, 30s descanso
+                    </div>
+                    <div id="treino-frequencia" class="mb-3">Frequência: 5x por semana</div>
+                    <a href="#" id="link-treino" class="cta-button">
+                        <i class="fas fa-play me-2"></i>Ver Meus Treinos
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="receita-destaque">
+                    <h4><i class="fas fa-chef-hat me-2"></i>Receita L7Chef</h4>
+                    <div id="receita-categoria" class="mb-3">Estilo: Equilibrado</div>
+                    <div id="receita-destaque" class="h5 mb-3">
+                        Peito de frango com batata doce
+                    </div>
+                    <div id="dica-chef" class="mb-3">
+                        💡 Use temperos naturais para dar sabor sem calorias!
+                    </div>
+                    <a href="#" id="link-receitas" class="cta-button">
+                        <i class="fas fa-book-open me-2"></i>Ver Receitas
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Próximos Passos -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="ecossistema-card">
+                    <h3 class="text-center mb-4">
+                        <i class="fas fa-route me-2"></i>Seus Próximos Passos
+                    </h3>
+                    <div class="proximos-passos">
+                        <div id="passos-lista">
+                            <div class="step-item">
+                                <div class="step-number">1</div>
+                                <div>Complete 30 dias com L7Ultra</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">2</div>
+                                <div>Avalie seus resultados</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">3</div>
+                                <div>Considere evoluir para L7Turbo</div>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">4</div>
+                                <div>Intensifique seus treinos</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progresso e Evolução -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="ecossistema-card text-center">
+                    <h3 class="mb-4">
+                        <i class="fas fa-chart-line me-2"></i>Sua Evolução no Ecossistema L7
+                    </h3>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="card-icon mx-auto">
+                                <i class="fas fa-utensils"></i>
+                            </div>
+                            <h5>L7Nutri</h5>
+                            <p class="text-muted">Nutrição Personalizada</p>
+                            <div class="progress-meta">
+                                <div class="progress-fill" style="width: 100%"></div>
+                            </div>
+                            <small class="text-success">✅ Ativo</small>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card-icon mx-auto">
+                                <i class="fas fa-dumbbell"></i>
+                            </div>
+                            <h5>L7Personal</h5>
+                            <p class="text-muted">Treinos em Casa</p>
+                            <div class="progress-meta">
+                                <div class="progress-fill" style="width: 80%"></div>
+                            </div>
+                            <small class="text-warning">🎯 Recomendado</small>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card-icon mx-auto">
+                                <i class="fas fa-chef-hat"></i>
+                            </div>
+                            <h5>L7Chef</h5>
+                            <p class="text-muted">Receitas Personalizadas</p>
+                            <div class="progress-meta">
+                                <div class="progress-fill" style="width: 75%"></div>
+                            </div>
+                            <small class="text-info">🍽️ Disponível</small>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card-icon mx-auto">
+                                <i class="fas fa-shopping-bag"></i>
+                            </div>
+                            <h5>L7Shop</h5>
+                            <p class="text-muted">Suplementos</p>
+                            <div class="progress-meta">
+                                <div class="progress-fill" style="width: 60%"></div>
+                            </div>
+                            <small class="text-primary">⭐ Recomendado</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navegação do Ecossistema -->
+    <div class="nav-ecossistema">
+        <a href="/diario-alimentar" class="nav-item">
+            <i class="fas fa-utensils me-1"></i>Nutri
+        </a>
+        <a href="#" class="nav-item" id="nav-personal">
+            <i class="fas fa-dumbbell me-1"></i>Personal
+        </a>
+        <a href="#" class="nav-item" id="nav-chef">
+            <i class="fas fa-chef-hat me-1"></i>Chef
+        </a>
+        <a href="#" class="nav-item" id="nav-shop">
+            <i class="fas fa-shopping-bag me-1"></i>Shop
+        </a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Dados que serão preenchidos pelo backend
+        let recomendacoes = {};
+
+        // Carregar dados do usuário e recomendações
+        document.addEventListener('DOMContentLoaded', function() {
+            carregarRecomendacoes();
+        });
+
+        async function carregarRecomendacoes() {
+            try {
+                const token = localStorage.getItem('access_token');
+                
+                if (!token) {
+                    window.location.href = '/login';
+                    return;
+                }
+
+                const response = await fetch('/api/ecossistema/recomendacoes', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    recomendacoes = await response.json();
+                    preencherDados();
+                } else {
+                    console.error('Erro ao carregar recomendações');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+            }
+        }
+
+        function preencherDados() {
+            // Análise personalizada
+            if (recomendacoes.perfil_analisado) {
+                document.getElementById('analise-personalizada').innerHTML = 
+                    recomendacoes.perfil_analisado.replace(/\n/g, '<br>');
+            }
+
+            // Mensagem motivacional
+            if (recomendacoes.mensagem_motivacional) {
+                document.getElementById('mensagem-motivacional').textContent = 
+                    recomendacoes.mensagem_motivacional;
+            }
+
+            // Plano nutricional
+            if (recomendacoes.plano_nutricional) {
+                const plano = recomendacoes.plano_nutricional;
+                document.getElementById('meta-calorica').innerHTML = `
+                    <div class="macro-valor">${plano.meta_calorica} kcal/dia</div>
+                    <p class="text-muted">${plano.resumo}</p>
+                `;
+
+                // Calcular gramas dos macros
+                const calorias = plano.meta_calorica;
+                const proteinaG = Math.round((calorias * 0.30) / 4);
+                const carboG = Math.round((calorias * 0.45) / 4);
+                const gorduraG = Math.round((calorias * 0.25) / 9);
+
+                document.getElementById('proteinas').textContent = proteinaG + 'g';
+                document.getElementById('carboidratos').textContent = carboG + 'g';
+                document.getElementById('gorduras').textContent = gorduraG + 'g';
+            }
+
+            // Suplemento recomendado
+            if (recomendacoes.suplemento_recomendado) {
+                const supl = recomendacoes.suplemento_recomendado;
+                document.getElementById('suplemento-nome').textContent = supl.produto.nome;
+                document.getElementById('suplemento-descricao').textContent = supl.produto.descricao;
+                document.getElementById('suplemento-motivo').textContent = supl.motivo_recomendacao;
+                document.getElementById('suplemento-preco').textContent = supl.produto.preco;
+                
+                const linkSupl = document.getElementById('link-suplemento');
+                linkSupl.href = supl.produto.link;
+                linkSupl.innerHTML = `<i class="fas fa-shopping-cart me-2"></i>${supl.cta}`;
+            }
+
+            // Treino personalizado
+            if (recomendacoes.treino_personalizado) {
+                const treino = recomendacoes.treino_personalizado;
+                document.getElementById('treino-foco').textContent = `Foco: ${treino.programa.foco}`;
+                document.getElementById('treino-hoje').textContent = treino.treino_hoje;
+                document.getElementById('treino-frequencia').textContent = `Frequência: ${treino.programa.frequencia}`;
+                
+                const linkTreino = document.getElementById('link-treino');
+                linkTreino.href = treino.programa.link;
+            }
+
+            // Receitas
+            if (recomendacoes.receitas_sugeridas) {
+                const receitas = recomendacoes.receitas_sugeridas;
+                document.getElementById('receita-categoria').textContent = `Estilo: ${receitas.categoria.estilo}`;
+                document.getElementById('receita-destaque').textContent = receitas.receita_destaque;
+                document.getElementById('dica-chef').textContent = `💡 ${receitas.dica_chef}`;
+                
+                const linkReceitas = document.getElementById('link-receitas');
+                linkReceitas.href = receitas.categoria.link;
+            }
+
+            // Próximos passos
+            if (recomendacoes.proximos_passos) {
+                const passos = recomendacoes.proximos_passos;
+                const lista = document.getElementById('passos-lista');
+                lista.innerHTML = '';
+                
+                passos.forEach((passo, index) => {
+                    lista.innerHTML += `
+                        <div class="step-item">
+                            <div class="step-number">${index + 1}</div>
+                            <div>${passo}</div>
+                        </div>
+                    `;
+                });
+            }
+
+            // Configurar links da navegação
+            if (recomendacoes.treino_personalizado) {
+                document.getElementById('nav-personal').href = recomendacoes.treino_personalizado.programa.link;
+            }
+            if (recomendacoes.receitas_sugeridas) {
+                document.getElementById('nav-chef').href = recomendacoes.receitas_sugeridas.categoria.link;
+            }
+            if (recomendacoes.suplemento_recomendado) {
+                document.getElementById('nav-shop').href = recomendacoes.suplemento_recomendado.produto.link;
+            }
+        }
+
+        // Animações de entrada
+        function animarElementos() {
+            const cards = document.querySelectorAll('.ecossistema-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'all 0.6s ease';
+                    
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 200);
+            });
+        }
+
+        // Executar animações após carregamento
+        window.addEventListener('load', () => {
+            setTimeout(animarElementos, 500);
+        });
+
+        // Tracking de cliques para analytics
+        function trackClick(elemento, acao) {
+            // Aqui você pode integrar com Google Analytics, Facebook Pixel, etc.
+            console.log(`Clique em ${elemento}: ${acao}`);
+            
+            // Exemplo de tracking
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'click', {
+                    'event_category': 'Ecossistema L7',
+                    'event_label': elemento,
+                    'action': acao
+                });
+            }
+        }
+
+        // Adicionar tracking aos botões
+        document.querySelectorAll('.cta-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const texto = this.textContent.trim();
+                trackClick('CTA Button', texto);
+            });
+        });
+    </script>
+</body>
+</html>

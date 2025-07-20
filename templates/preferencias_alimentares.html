@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preferências Alimentares - L7 Nutri</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2E8B57;
+            --secondary-color: #90EE90;
+            --accent-color: #32CD32;
+            --gradient-start: #228B22;
+            --gradient-end: #32CD32;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .onboarding-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 2px solid rgba(46, 139, 87, 0.1);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            border-bottom: none;
+        }
+
+        .card-body {
+            padding: 3rem;
+        }
+
+        .progress-bar-container {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 8px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            height: 100%;
+            width: 80%; /* 4 de 5 passos */
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .form-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 0.5rem;
+            font-size: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.8rem;
+        }
+
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(46, 139, 87, 0.25);
+        }
+
+        .form-check {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .form-check:hover {
+            border-color: var(--primary-color);
+            background: rgba(46, 139, 87, 0.05);
+        }
+
+        .form-check-input {
+            margin-right: 0.8rem;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .form-check-label {
+            font-weight: 500;
+            color: #333;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .restriction-icon, .diet-icon {
+            margin-right: 0.8rem;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            border: none;
+            border-radius: 15px;
+            padding: 1rem 3rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(46, 139, 87, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(46, 139, 87, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            border: none;
+            border-radius: 15px;
+            padding: 1rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 3rem;
+        }
+
+        .section-description {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .restriction-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .diet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .progress-indicator {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .progress-text {
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .onboarding-container {
+                padding: 1rem;
+            }
+
+            .card-body {
+                padding: 2rem 1.5rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .restriction-grid,
+            .diet-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="onboarding-container">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="h2 mb-3">
+                    <i class="fas fa-utensils me-2"></i>
+                    Preferências Alimentares
+                </h1>
+                <p class="mb-0">Vamos personalizar sua experiência nutricional</p>
+            </div>
+
+            <div class="card-body">
+                <!-- Barra de Progresso -->
+                <div class="progress-indicator">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar"></div>
+                    </div>
+                    <div class="progress-text">Passo 4 de 5 - Preferências Alimentares</div>
+                </div>
+
+                <!-- Formulário -->
+                <form id="preferenciasForm">
+                    <!-- Seção 1: Alimentos a Evitar -->
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-ban"></i>
+                            Alimentos que Deseja Evitar
+                        </div>
+                        <div class="section-description">
+                            Liste alimentos que você não gosta ou prefere evitar. Isso nos ajudará a personalizar suas recomendações.
+                        </div>
+                        <div class="mb-3">
+                            <label for="alimentosEvitar" class="form-label">
+                                Alimentos para evitar (opcional)
+                            </label>
+                            <textarea 
+                                class="form-control" 
+                                id="alimentosEvitar" 
+                                name="alimentosEvitar"
+                                rows="3" 
+                                placeholder="Ex: brócolis, peixe, leite integral, doces muito açucarados..."
+                            ></textarea>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Separe os alimentos por vírgula. Este campo é opcional.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Seção 2: Restrições Alimentares -->
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Restrições Alimentares
+                        </div>
+                        <div class="section-description">
+                            Selecione qualquer restrição alimentar que você tenha por motivos médicos ou de saúde.
+                        </div>
+                        <div class="restriction-grid">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="lactose" id="lactose" name="restricoes">
+                                <label class="form-check-label" for="lactose">
+                                    <i class="fas fa-glass-whiskey restriction-icon"></i>
+                                    Intolerância à Lactose
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="gluten" id="gluten" name="restricoes">
+                                <label class="form-check-label" for="gluten">
+                                    <i class="fas fa-bread-slice restriction-icon"></i>
+                                    Intolerância ao Glúten
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="diabetes" id="diabetes" name="restricoes">
+                                <label class="form-check-label" for="diabetes">
+                                    <i class="fas fa-heartbeat restriction-icon"></i>
+                                    Diabetes
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="hipertensao" id="hipertensao" name="restricoes">
+                                <label class="form-check-label" for="hipertensao">
+                                    <i class="fas fa-tint restriction-icon"></i>
+                                    Hipertensão
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="alergia_nozes" id="alergia_nozes" name="restricoes">
+                                <label class="form-check-label" for="alergia_nozes">
+                                    <i class="fas fa-seedling restriction-icon"></i>
+                                    Alergia a Nozes
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="nenhuma" id="nenhuma_restricao" name="restricoes">
+                                <label class="form-check-label" for="nenhuma_restricao">
+                                    <i class="fas fa-check-circle restriction-icon"></i>
+                                    Nenhuma Restrição
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Seção 3: Estilo Alimentar -->
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-leaf"></i>
+                            Estilo Alimentar
+                        </div>
+                        <div class="section-description">
+                            Escolha o estilo alimentar que melhor representa suas preferências ou filosofia de vida.
+                        </div>
+                        <div class="diet-grid">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" value="tradicional" id="tradicional" name="estiloAlimentar">
+                                <label class="form-check-label" for="tradicional">
+                                    <i class="fas fa-utensils diet-icon"></i>
+                                    Tradicional
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" value="vegetariano" id="vegetariano" name="estiloAlimentar">
+                                <label class="form-check-label" for="vegetariano">
+                                    <i class="fas fa-carrot diet-icon"></i>
+                                    Vegetariano
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" value="vegano" id="vegano" name="estiloAlimentar">
+                                <label class="form-check-label" for="vegano">
+                                    <i class="fas fa-leaf diet-icon"></i>
+                                    Vegano
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" value="low_carb" id="low_carb" name="estiloAlimentar">
+                                <label class="form-check-label" for="low_carb">
+                                    <i class="fas fa-drumstick-bite diet-icon"></i>
+                                    Low Carb
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" value="jejum_intermitente" id="jejum_intermitente" name="estiloAlimentar">
+                                <label class="form-check-label" for="jejum_intermitente">
+                                    <i class="fas fa-clock diet-icon"></i>
+                                    Jejum Intermitente
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" value="mediterranea" id="mediterranea" name="estiloAlimentar">
+                                <label class="form-check-label" for="mediterranea">
+                                    <i class="fas fa-fish diet-icon"></i>
+                                    Mediterrânea
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Loading -->
+                    <div class="loading" id="loading">
+                        <div class="spinner"></div>
+                        <p>Salvando suas preferências...</p>
+                    </div>
+
+                    <!-- Botões -->
+                    <div class="button-group">
+                        <button type="button" class="btn btn-secondary" onclick="voltarEtapa()">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Voltar
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="btnAvancar">
+                            Avançar
+                            <i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // --- Configuração de Autenticação ---
+        const token = localStorage.getItem('access_token');
+        
+        if (!token) {
+            alert('Acesso negado. Faça login primeiro.');
+            window.location.href = '/login';
+        }
+
+        // --- Gerenciamento de Restrições Mutuamente Exclusivas ---
+        document.getElementById('nenhuma_restricao').addEventListener('change', function() {
+            if (this.checked) {
+                // Desmarcar todas as outras restrições
+                const outrasRestricoes = document.querySelectorAll('input[name="restricoes"]:not(#nenhuma_restricao)');
+                outrasRestricoes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+            }
+        });
+
+        // Se qualquer outra restrição for marcada, desmarcar "Nenhuma"
+        document.querySelectorAll('input[name="restricoes"]:not(#nenhuma_restricao)').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    document.getElementById('nenhuma_restricao').checked = false;
+                }
+            });
+        });
+
+        // --- Submissão do Formulário ---
+        document.getElementById('preferenciasForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            enviarPreferencias();
+        });
+
+        async function enviarPreferencias() {
+            try {
+                // Mostrar loading
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('btnAvancar').disabled = true;
+
+                // Coletar dados do formulário
+                const alimentosEvitar = document.getElementById('alimentosEvitar').value.trim();
+                
+                // Coletar restrições selecionadas
+                const restricoes = [];
+                document.querySelectorAll('input[name="restricoes"]:checked').forEach(checkbox => {
+                    restricoes.push(checkbox.value);
+                });
+
+                // Coletar estilo alimentar
+                const estiloAlimentar = document.querySelector('input[name="estiloAlimentar"]:checked')?.value || '';
+
+                // Validação básica
+                if (restricoes.length === 0) {
+                    alert('Por favor, selecione pelo menos uma opção em restrições alimentares (ou "Nenhuma Restrição").');
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('btnAvancar').disabled = false;
+                    return;
+                }
+
+                if (!estiloAlimentar) {
+                    alert('Por favor, selecione um estilo alimentar.');
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('btnAvancar').disabled = false;
+                    return;
+                }
+
+                // Preparar dados para envio
+                const dados = {
+                    alimentos_evitar: alimentosEvitar,
+                    restricoes: restricoes,
+                    estilo_alimentar: estiloAlimentar
+                };
+
+                console.log('Enviando dados:', dados);
+
+                // Enviar para o backend
+                const response = await fetch('/api/onboarding/preferencias', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(dados)
+                });
+
+                if (response.ok) {
+                    const resultado = await response.json();
+                    console.log('Preferências salvas:', resultado);
+                    
+                    // Salvar dados no localStorage para uso futuro
+                    localStorage.setItem('preferencias_alimentares', JSON.stringify(dados));
+                    
+                    // Redirecionar para tela de metas personalizadas
+                    window.location.href = '/metas-personalizadas';
+                } else {
+                    const erro = await response.json();
+                    throw new Error(erro.erro || 'Erro ao salvar preferências');
+                }
+
+            } catch (error) {
+                console.error('Erro ao enviar preferências:', error);
+                alert(`Erro ao salvar preferências: ${error.message}`);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('btnAvancar').disabled = false;
+            }
+        }
+
+        function voltarEtapa() {
+            window.location.href = '/objetivo';
+        }
+
+        // --- Animação de Entrada ---
+        window.addEventListener('load', function() {
+            const card = document.querySelector('.card');
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'all 0.6s ease';
+            
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
+</body>
+</html>

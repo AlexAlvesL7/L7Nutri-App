@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Diário Alimentar - L7Nutri</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .search-section {
+            margin-bottom: 30px;
+        }
+
+        .search-container {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        #busca-alimento {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        #busca-alimento:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        #busca-alimento::placeholder {
+            color: #999;
+        }
+
+        #resultados-busca {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e1e5e9;
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .resultado-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .resultado-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .resultado-item:last-child {
+            border-bottom: none;
+        }
+
+        .resultado-nome {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .resultado-calorias {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .loading-indicator {
+            padding: 15px 20px;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+
+        .refeicoes-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .refeicao-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            border: 2px solid #e1e5e9;
+            transition: all 0.3s ease;
+        }
+
+        .refeicao-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+        }
+
+        .refeicao-titulo {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .refeicao-icon {
+            font-size: 24px;
+        }
+
+        .alimentos-lista {
+            min-height: 80px;
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #e1e5e9;
+        }
+
+        .alimento-adicionado {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #f0f8ff;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .alimento-info {
+            flex: 1;
+        }
+
+        .alimento-nome {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .alimento-calorias {
+            font-size: 12px;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .btn-remover {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-remover:hover {
+            background: #c82333;
+        }
+
+        .placeholder-text {
+            color: #999;
+            text-align: center;
+            font-style: italic;
+            padding: 20px;
+        }
+
+        .total-calorias {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .total-numero {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .total-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .refeicoes-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .refeicao-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍽️ Meu Diário Alimentar</h1>
+            <p>Registre suas refeições e acompanhe sua nutrição diária</p>
+        </div>
+
+        <div class="content">
+            <!-- Seção de Busca -->
+            <div class="search-section">
+                <div class="search-container">
+                    <input 
+                        type="search" 
+                        id="busca-alimento" 
+                        placeholder="🔍 Digite o nome do alimento para buscar..."
+                        autocomplete="off"
+                    >
+                    <div id="resultados-busca"></div>
+                </div>
+            </div>
+
+            <!-- Seções das Refeições -->
+            <div class="refeicoes-container">
+                <div class="refeicao-card" data-refeicao="cafe-manha">
+                    <div class="refeicao-titulo">
+                        <span class="refeicao-icon">☀️</span>
+                        Café da Manhã
+                    </div>
+                    <div class="alimentos-lista" id="cafe-manha">
+                        <div class="placeholder-text">Nenhum alimento adicionado</div>
+                    </div>
+                </div>
+
+                <div class="refeicao-card" data-refeicao="almoco">
+                    <div class="refeicao-titulo">
+                        <span class="refeicao-icon">🌞</span>
+                        Almoço
+                    </div>
+                    <div class="alimentos-lista" id="almoco">
+                        <div class="placeholder-text">Nenhum alimento adicionado</div>
+                    </div>
+                </div>
+
+                <div class="refeicao-card" data-refeicao="jantar">
+                    <div class="refeicao-titulo">
+                        <span class="refeicao-icon">🌙</span>
+                        Jantar
+                    </div>
+                    <div class="alimentos-lista" id="jantar">
+                        <div class="placeholder-text">Nenhum alimento adicionado</div>
+                    </div>
+                </div>
+
+                <div class="refeicao-card" data-refeicao="lanches">
+                    <div class="refeicao-titulo">
+                        <span class="refeicao-icon">🍎</span>
+                        Lanches
+                    </div>
+                    <div class="alimentos-lista" id="lanches">
+                        <div class="placeholder-text">Nenhum alimento adicionado</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total de Calorias -->
+            <div class="total-calorias">
+                <div class="total-numero" id="total-calorias-numero">0</div>
+                <div class="total-label">calorias consumidas hoje</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variáveis globais
+        let debounceTimer;
+        let alimentosConsumidos = {
+            'cafe-manha': [],
+            'almoco': [],
+            'jantar': [],
+            'lanches': []
+        };
+
+        // Elementos DOM
+        const campoBusca = document.getElementById('busca-alimento');
+        const resultadosBusca = document.getElementById('resultados-busca');
+        const totalCaloriasElement = document.getElementById('total-calorias-numero');
+
+        // Event listener para busca com debounce
+        campoBusca.addEventListener('input', function() {
+            const termo = this.value.trim();
+            
+            // Limpar timer anterior
+            clearTimeout(debounceTimer);
+            
+            // Se termo muito curto, esconder resultados
+            if (termo.length < 2) {
+                esconderResultados();
+                return;
+            }
+
+            // Mostrar indicador de carregamento
+            mostrarCarregamento();
+
+            // Debounce: esperar 300ms após última digitação
+            debounceTimer = setTimeout(() => {
+                buscarAlimentos(termo);
+            }, 300);
+        });
+
+        // Esconder resultados ao clicar fora
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.search-container')) {
+                esconderResultados();
+            }
+        });
+
+        // Função para buscar alimentos na API
+        async function buscarAlimentos(termo) {
+            try {
+                const response = await fetch(`/api/alimentos/buscar?q=${encodeURIComponent(termo)}`);
+                const alimentos = await response.json();
+                
+                mostrarResultados(alimentos);
+            } catch (error) {
+                console.error('Erro ao buscar alimentos:', error);
+                mostrarErro();
+            }
+        }
+
+        // Função para mostrar resultados da busca
+        function mostrarResultados(alimentos) {
+            resultadosBusca.innerHTML = '';
+            
+            if (alimentos.length === 0) {
+                resultadosBusca.innerHTML = '<div class="loading-indicator">Nenhum alimento encontrado</div>';
+            } else {
+                alimentos.forEach(alimento => {
+                    const item = document.createElement('div');
+                    item.className = 'resultado-item';
+                    item.innerHTML = `
+                        <div class="resultado-nome">${alimento.nome}</div>
+                        <div class="resultado-calorias">${alimento.calorias} kcal</div>
+                    `;
+                    
+                    // Event listener para adicionar alimento
+                    item.addEventListener('click', () => {
+                        selecionarRefeicao(alimento);
+                    });
+                    
+                    resultadosBusca.appendChild(item);
+                });
+            }
+            
+            resultadosBusca.style.display = 'block';
+        }
+
+        // Função para mostrar carregamento
+        function mostrarCarregamento() {
+            resultadosBusca.innerHTML = '<div class="loading-indicator">Buscando alimentos...</div>';
+            resultadosBusca.style.display = 'block';
+        }
+
+        // Função para mostrar erro
+        function mostrarErro() {
+            resultadosBusca.innerHTML = '<div class="loading-indicator">Erro ao buscar alimentos</div>';
+            resultadosBusca.style.display = 'block';
+        }
+
+        // Função para esconder resultados
+        function esconderResultados() {
+            resultadosBusca.style.display = 'none';
+        }
+
+        // Função para selecionar em qual refeição adicionar o alimento
+        function selecionarRefeicao(alimento) {
+            // Criar modal simples para seleção de refeição
+            const refeicoes = [
+                { id: 'cafe-manha', nome: 'Café da Manhã', icon: '☀️' },
+                { id: 'almoco', nome: 'Almoço', icon: '🌞' },
+                { id: 'jantar', nome: 'Jantar', icon: '🌙' },
+                { id: 'lanches', nome: 'Lanches', icon: '🍎' }
+            ];
+
+            const opcoes = refeicoes.map(refeicao => 
+                `${refeicao.icon} ${refeicao.nome}`
+            ).join('\n');
+
+            const escolha = prompt(`Selecione a refeição para adicionar "${alimento.nome}":\n\n1. ${refeicoes[0].icon} ${refeicoes[0].nome}\n2. ${refeicoes[1].icon} ${refeicoes[1].nome}\n3. ${refeicoes[2].icon} ${refeicoes[2].nome}\n4. ${refeicoes[3].icon} ${refeicoes[3].nome}\n\nDigite 1, 2, 3 ou 4:`);
+
+            if (escolha && escolha >= 1 && escolha <= 4) {
+                const refeicaoSelecionada = refeicoes[escolha - 1];
+                adicionarAlimento(alimento, refeicaoSelecionada.id);
+                campoBusca.value = '';
+                esconderResultados();
+            }
+        }
+
+        // Função para adicionar alimento à refeição
+        async function adicionarAlimento(alimento, refeicaoId) {
+            try {
+                // Obter token JWT do localStorage
+                const token = localStorage.getItem('access_token');
+                if (!token) {
+                    alert('Erro: Token de autenticação não encontrado. Faça login novamente.');
+                    return;
+                }
+
+                // Solicitar quantidade ao usuário
+                const quantidadeInput = prompt(`Qual a quantidade em gramas de "${alimento.nome}"?`, "100");
+                
+                // Validar se o usuário cancelou ou não inseriu nada
+                if (quantidadeInput === null || quantidadeInput.trim() === "") {
+                    return; // Cancelar operação
+                }
+
+                // Validar se é um número válido
+                const quantidade = parseFloat(quantidadeInput);
+                if (isNaN(quantidade) || quantidade <= 0) {
+                    alert('Por favor, insira uma quantidade válida maior que zero.');
+                    return;
+                }
+
+                // Preparar dados para envio à API
+                const dadosApi = {
+                    alimento_id: alimento.id,
+                    quantidade: quantidade,
+                    refeicao: refeicaoId
+                };
+
+                // Fazer requisição POST para a API
+                const response = await fetch('/api/diario', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(dadosApi)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.erro || 'Erro ao salvar alimento no diário');
+                }
+
+                // Verificar se resposta foi 201 Created (sucesso)
+                if (response.status === 201) {
+                    // Obter resposta de sucesso da API
+                    const responseData = await response.json();
+                    
+                    // Criar objeto completo com dados da API para adicionar ao array local
+                    const alimentoCompleto = {
+                        id: responseData.registro.alimento_id,
+                        registroId: responseData.registro.id,
+                        nome: responseData.registro.alimento_nome,
+                        calorias: responseData.registro.calorias_calculadas,
+                        proteinas: responseData.registro.proteinas_calculadas,
+                        carboidratos: responseData.registro.carboidratos_calculados,
+                        gorduras: responseData.registro.gorduras_calculadas,
+                        quantidadeConsumida: responseData.registro.quantidade,
+                        dataEntrada: responseData.registro.data_entrada
+                    };
+
+                    // Adicionar ao array local
+                    alimentosConsumidos[refeicaoId].push(alimentoCompleto);
+                    
+                    // Atualizar interface
+                    atualizarRefeicao(refeicaoId);
+                    atualizarTotalCalorias();
+
+                    console.log('Alimento adicionado com sucesso:', responseData);
+                } else {
+                    throw new Error('Resposta inesperada do servidor');
+                }
+
+            } catch (error) {
+                console.error('Erro ao adicionar alimento:', error);
+                alert(`Erro ao adicionar alimento ao diário: ${error.message}`);
+            }
+        }
+
+        // Função para atualizar lista de alimentos de uma refeição
+        function atualizarRefeicao(refeicaoId) {
+            const container = document.getElementById(refeicaoId);
+            const alimentos = alimentosConsumidos[refeicaoId];
+
+            if (alimentos.length === 0) {
+                container.innerHTML = '<div class="placeholder-text">Nenhum alimento adicionado</div>';
+                return;
+            }
+
+            container.innerHTML = '';
+            alimentos.forEach((alimento, index) => {
+                const alimentoElement = document.createElement('div');
+                alimentoElement.className = 'alimento-adicionado';
+                alimentoElement.id = `alimento-${alimento.registroId}`; // ID único baseado no ID do registro
+                alimentoElement.innerHTML = `
+                    <div class="alimento-info">
+                        <div class="alimento-nome">${alimento.nome}</div>
+                        <div class="alimento-calorias">${alimento.calorias} kcal • P: ${alimento.proteinas}g • C: ${alimento.carboidratos}g • G: ${alimento.gorduras}g</div>
+                    </div>
+                    <button class="btn-remover" onclick="excluirAlimento(${alimento.registroId})">
+                        Excluir
+                    </button>
+                `;
+                container.appendChild(alimentoElement);
+            });
+        }
+
+        // Função para remover alimento
+        function removerAlimento(refeicaoId, index) {
+            alimentosConsumidos[refeicaoId].splice(index, 1);
+            atualizarRefeicao(refeicaoId);
+            atualizarTotalCalorias();
+        }
+
+        // Função para excluir alimento do backend e da interface
+        async function excluirAlimento(registroId) {
+            try {
+                // Obter token JWT do localStorage
+                const token = localStorage.getItem('access_token');
+                if (!token) {
+                    console.error('Token de autenticação não encontrado. Usuário não autenticado.');
+                    alert('Erro: Token de autenticação não encontrado. Faça login novamente.');
+                    return;
+                }
+
+                // Confirmar exclusão com o usuário
+                if (!confirm('Tem certeza que deseja excluir este alimento do seu diário?')) {
+                    return;
+                }
+
+                // Fazer requisição DELETE para a API
+                const response = await fetch(`/api/diario/${registroId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error('Registro não encontrado');
+                    } else if (response.status === 401) {
+                        throw new Error('Não autorizado. Faça login novamente.');
+                    } else {
+                        const errorData = await response.json();
+                        throw new Error(errorData.erro || 'Erro ao excluir alimento');
+                    }
+                }
+
+                // Remover elemento HTML da interface
+                const elementoAlimento = document.getElementById(`alimento-${registroId}`);
+                if (elementoAlimento) {
+                    elementoAlimento.remove();
+                }
+
+                // Remover do array local
+                Object.keys(alimentosConsumidos).forEach(refeicaoId => {
+                    alimentosConsumidos[refeicaoId] = alimentosConsumidos[refeicaoId].filter(
+                        alimento => alimento.registroId !== registroId
+                    );
+                });
+
+                // Atualizar total de calorias
+                atualizarTotalCalorias();
+
+                console.log(`Alimento com ID ${registroId} excluído com sucesso`);
+
+            } catch (error) {
+                console.error('Erro ao excluir alimento:', error);
+                alert(`Erro ao excluir alimento: ${error.message}`);
+            }
+        }
+
+        // Função para atualizar total de calorias
+        function atualizarTotalCalorias() {
+            let total = 0;
+            
+            Object.values(alimentosConsumidos).forEach(alimentos => {
+                alimentos.forEach(alimento => {
+                    total += alimento.calorias || 0;
+                });
+            });
+
+            totalCaloriasElement.textContent = Math.round(total);
+        }
+
+        // Função para carregar registros existentes do diário
+        async function carregarDiarioExistente() {
+            try {
+                // Obter token JWT do localStorage
+                const token = localStorage.getItem('access_token');
+                if (!token) {
+                    console.log('Token não encontrado. Usuário não autenticado.');
+                    return;
+                }
+
+                // Fazer requisição GET para obter registros do diário
+                const response = await fetch('/api/diario', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erro ao carregar dados do diário');
+                }
+
+                const registros = await response.json();
+                console.log('Registros carregados:', registros);
+
+                // Limpar arrays locais antes de carregar
+                alimentosConsumidos = {
+                    'cafe-manha': [],
+                    'almoco': [],
+                    'jantar': [],
+                    'lanches': []
+                };
+
+                // Processar cada registro e adicionar ao array correto
+                registros.forEach(registro => {
+                    const alimentoCompleto = {
+                        id: registro.alimento_id,
+                        registroId: registro.id,
+                        nome: registro.alimento_nome,
+                        calorias: registro.calorias_calculadas,
+                        proteinas: registro.proteinas_calculadas,
+                        carboidratos: registro.carboidratos_calculados,
+                        gorduras: registro.gorduras_calculadas,
+                        quantidadeConsumida: registro.quantidade,
+                        dataEntrada: registro.data
+                    };
+
+                    // Mapear tipo_refeicao para o ID correto
+                    const refeicaoId = mapearTipoRefeicao(registro.tipo_refeicao);
+                    if (refeicaoId && alimentosConsumidos[refeicaoId]) {
+                        alimentosConsumidos[refeicaoId].push(alimentoCompleto);
+                    }
+                });
+
+                // Atualizar todas as seções de refeições
+                Object.keys(alimentosConsumidos).forEach(refeicaoId => {
+                    atualizarRefeicao(refeicaoId);
+                });
+
+                // Atualizar total de calorias
+                atualizarTotalCalorias();
+
+                console.log('Diário carregado com sucesso!');
+
+            } catch (error) {
+                console.error('Erro ao carregar diário:', error);
+            }
+        }
+
+        // Função para mapear tipo_refeicao do backend para IDs do frontend
+        function mapearTipoRefeicao(tipoRefeicao) {
+            const mapeamento = {
+                'cafe-manha': 'cafe-manha',
+                'almoco': 'almoco',
+                'jantar': 'jantar',
+                'lanches': 'lanches'
+            };
+            return mapeamento[tipoRefeicao] || null;
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            // Carregar registros existentes do diário
+            carregarDiarioExistente();
+            
+            // Atualizar total de calorias
+            atualizarTotalCalorias();
+            
+            // Focar no campo de busca
+            campoBusca.focus();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete seu Perfil - L7Nutri</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            background-color: #f8f9fa;
+        }
+
+        input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            background-color: white;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .progress-indicator {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background-color: #e1e5e9;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            width: 66%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .input-hint {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="progress-indicator">
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <p class="progress-text">Passo 2 de 3</p>
+        </div>
+
+        <div class="header">
+            <h1>Só mais um passo! Complete seu perfil</h1>
+            <p>Essas informações nos ajudarão a criar o plano nutricional perfeito para você.</p>
+        </div>
+
+        <form id="perfilForm" method="POST" action="/api/usuario/perfil">
+            <div class="form-group">
+                <label for="idade">Idade</label>
+                <input type="number" id="idade" name="idade" min="1" max="120" required>
+                <div class="input-hint">Digite sua idade em anos</div>
+            </div>
+
+            <div class="form-group">
+                <label for="genero">Gênero</label>
+                <select id="genero" name="genero" required>
+                    <option value="">Selecione seu gênero</option>
+                    <option value="masculino">Masculino</option>
+                    <option value="feminino">Feminino</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="peso">Peso (em kg)</label>
+                <input type="number" id="peso" name="peso" step="0.1" min="1" max="500" required>
+                <div class="input-hint">Ex: 70.5</div>
+            </div>
+
+            <div class="form-group">
+                <label for="altura">Altura (em cm)</label>
+                <input type="number" id="altura" name="altura" min="50" max="300" required>
+                <div class="input-hint">Ex: 175</div>
+            </div>
+
+            <button type="submit" class="submit-btn">Salvar e Continuar</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('perfilForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Coletar dados do formulário
+            const formData = {
+                idade: parseInt(document.getElementById('idade').value),
+                genero: document.getElementById('genero').value,
+                peso: parseFloat(document.getElementById('peso').value),
+                altura: parseFloat(document.getElementById('altura').value)
+            };
+
+            // Validar dados
+            if (!formData.idade || !formData.genero || !formData.peso || !formData.altura) {
+                alert('Por favor, preencha todos os campos obrigatórios.');
+                return;
+            }
+
+            // Obter token JWT do localStorage
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                alert('Sessão expirada. Por favor, faça login novamente.');
+                window.location.href = '/login';
+                return;
+            }
+
+            // Enviar dados para a API
+            fetch('/api/usuario/perfil', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.mensagem) {
+                    alert('Perfil atualizado com sucesso!');
+                    // Redirecionar para próxima etapa: nível de atividade física
+                    window.location.href = '/atividade-fisica';
+                } else if (data.erro) {
+                    alert('Erro: ' + data.erro);
+                } else {
+                    alert('Erro inesperado. Tente novamente.');
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro de conexão. Verifique sua internet e tente novamente.');
+            });
+        });
+
+        // Validação em tempo real para melhor UX
+        document.getElementById('idade').addEventListener('input', function() {
+            const value = parseInt(this.value);
+            if (value < 1 || value > 120) {
+                this.style.borderColor = '#e74c3c';
+            } else {
+                this.style.borderColor = '#27ae60';
+            }
+        });
+
+        document.getElementById('peso').addEventListener('input', function() {
+            const value = parseFloat(this.value);
+            if (value < 1 || value > 500) {
+                this.style.borderColor = '#e74c3c';
+            } else {
+                this.style.borderColor = '#27ae60';
+            }
+        });
+
+        document.getElementById('altura').addEventListener('input', function() {
+            const value = parseInt(this.value);
+            if (value < 50 || value > 300) {
+                this.style.borderColor = '#e74c3c';
+            } else {
+                this.style.borderColor = '#27ae60';
+            }
+        });
+    </script>
+</body>
+</html>

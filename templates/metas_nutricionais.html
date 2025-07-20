@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suas Metas Nutricionais - L7Nutri</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .metas-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .user-info {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-left: 5px solid #28a745;
+        }
+
+        .user-info h3 {
+            color: #28a745;
+            margin-bottom: 15px;
+        }
+
+        .user-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .user-detail {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .calorias-section {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .meta-calorica {
+            font-size: 4em;
+            font-weight: bold;
+            color: #28a745;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .meta-label {
+            font-size: 1.3em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .calculos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .calculo-card {
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .calculo-card:hover {
+            border-color: #28a745;
+            transform: translateY(-5px);
+        }
+
+        .calculo-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #495057;
+            margin: 10px 0;
+        }
+
+        .calculo-label {
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .macros-section {
+            margin: 40px 0;
+        }
+
+        .macros-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .macro-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border-top: 5px solid;
+        }
+
+        .macro-card.proteina { border-top-color: #dc3545; }
+        .macro-card.carboidrato { border-top-color: #ffc107; }
+        .macro-card.gordura { border-top-color: #17a2b8; }
+
+        .macro-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        .macro-card.proteina .macro-icon { color: #dc3545; }
+        .macro-card.carboidrato .macro-icon { color: #ffc107; }
+        .macro-card.gordura .macro-icon { color: #17a2b8; }
+
+        .macro-value {
+            font-size: 2.2em;
+            font-weight: bold;
+            margin: 10px 0;
+            color: #343a40;
+        }
+
+        .macro-details {
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .resumo-section {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .resumo-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .resumo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            text-align: center;
+        }
+
+        .resumo-item {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .resumo-valor {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .btn-comecar {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            display: block;
+            margin: 30px auto;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-comecar:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #28a745;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid #f5c6cb;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .metas-card {
+                padding: 20px;
+            }
+            
+            .meta-calorica {
+                font-size: 3em;
+            }
+            
+            .calculos-grid,
+            .macros-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Suas Metas Nutricionais</h1>
+            <p>Personalizadas com base no seu perfil</p>
+        </div>
+
+        <!-- Loading -->
+        <div id="loading" class="loading">
+            <div class="loading-spinner"></div>
+            <p>Calculando suas metas personalizadas...</p>
+        </div>
+
+        <!-- Error -->
+        <div id="error" class="error hidden">
+            <h3>❌ Erro ao carregar metas</h3>
+            <p id="error-message"></p>
+        </div>
+
+        <!-- Conteúdo Principal -->
+        <div id="content" class="hidden">
+            <!-- Informações do Usuário -->
+            <div class="metas-card">
+                <div class="user-info">
+                    <h3>👤 Seu Perfil</h3>
+                    <div class="user-details" id="user-details">
+                        <!-- Preenchido pelo JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Meta Calórica Principal -->
+                <div class="calorias-section">
+                    <div class="meta-label">Sua Meta Calórica Diária</div>
+                    <div class="meta-calorica" id="meta-calorica">0</div>
+                    <div class="meta-label">calorias por dia</div>
+                </div>
+
+                <!-- Cálculos Base -->
+                <div class="calculos-grid" id="calculos-grid">
+                    <!-- Preenchido pelo JavaScript -->
+                </div>
+            </div>
+
+            <!-- Macronutrientes -->
+            <div class="metas-card">
+                <h2 style="text-align: center; margin-bottom: 30px; color: #343a40;">
+                    📊 Distribuição de Macronutrientes
+                </h2>
+                <div class="macros-grid" id="macros-grid">
+                    <!-- Preenchido pelo JavaScript -->
+                </div>
+            </div>
+
+            <!-- Resumo -->
+            <div class="resumo-section">
+                <div class="resumo-title">📋 Resumo das Suas Metas</div>
+                <div class="resumo-grid" id="resumo-grid">
+                    <!-- Preenchido pelo JavaScript -->
+                </div>
+            </div>
+
+            <!-- Botão de Ação -->
+            <a href="/diario-alimentar" class="btn-comecar">
+                🍽️ Começar Diário Alimentar
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Função para buscar e exibir as metas
+        async function carregarMetas() {
+            try {
+                // Recuperar token JWT do localStorage
+                const token = localStorage.getItem('token');
+                
+                if (!token) {
+                    throw new Error('Token não encontrado. Faça login novamente.');
+                }
+
+                // Fazer requisição para a API
+                const response = await fetch('/api/onboarding/metas', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.erro || 'Erro ao buscar metas');
+                }
+
+                const data = await response.json();
+                console.log('✅ Metas carregadas:', data);
+                
+                // Exibir os dados na tela
+                exibirMetas(data);
+                
+            } catch (error) {
+                console.error('❌ Erro ao carregar metas:', error);
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('error').classList.remove('hidden');
+                document.getElementById('error-message').textContent = error.message;
+            }
+        }
+
+        // Função para exibir as metas na tela
+        function exibirMetas(data) {
+            // Ocultar loading e mostrar conteúdo
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('content').classList.remove('hidden');
+
+            // Preencher informações do usuário
+            const userDetails = document.getElementById('user-details');
+            userDetails.innerHTML = `
+                <div class="user-detail">
+                    <span><strong>Nome:</strong></span>
+                    <span>${data.usuario_info.nome}</span>
+                </div>
+                <div class="user-detail">
+                    <span><strong>Idade:</strong></span>
+                    <span>${data.usuario_info.idade} anos</span>
+                </div>
+                <div class="user-detail">
+                    <span><strong>Sexo:</strong></span>
+                    <span>${data.usuario_info.sexo}</span>
+                </div>
+                <div class="user-detail">
+                    <span><strong>Peso:</strong></span>
+                    <span>${data.usuario_info.peso} kg</span>
+                </div>
+                <div class="user-detail">
+                    <span><strong>Altura:</strong></span>
+                    <span>${data.usuario_info.altura} cm</span>
+                </div>
+                <div class="user-detail">
+                    <span><strong>Objetivo:</strong></span>
+                    <span>${formatarObjetivo(data.usuario_info.objetivo)}</span>
+                </div>
+            `;
+
+            // Meta calórica principal
+            document.getElementById('meta-calorica').textContent = data.calculos.meta_calorica;
+
+            // Cálculos base
+            const calculosGrid = document.getElementById('calculos-grid');
+            calculosGrid.innerHTML = `
+                <div class="calculo-card">
+                    <div class="calculo-value">${data.calculos.tmb}</div>
+                    <div class="calculo-label">TMB<br><small>Taxa Metabólica Basal</small></div>
+                </div>
+                <div class="calculo-card">
+                    <div class="calculo-value">${data.calculos.gasto_total}</div>
+                    <div class="calculo-label">Gasto Total<br><small>Com atividade física</small></div>
+                </div>
+                <div class="calculo-card">
+                    <div class="calculo-value">${data.calculos.ajuste_calorico > 0 ? '+' : ''}${data.calculos.ajuste_calorico}</div>
+                    <div class="calculo-label">Ajuste<br><small>Para seu objetivo</small></div>
+                </div>
+            `;
+
+            // Macronutrientes
+            const macrosGrid = document.getElementById('macros-grid');
+            macrosGrid.innerHTML = `
+                <div class="macro-card proteina">
+                    <div class="macro-icon">🥩</div>
+                    <h3>Proteína</h3>
+                    <div class="macro-value">${data.macronutrientes.proteina_g}g</div>
+                    <div class="macro-details">
+                        ${data.macronutrientes.proteina_kcal} kcal (${data.macronutrientes.proteina_perc}%)
+                    </div>
+                </div>
+                <div class="macro-card carboidrato">
+                    <div class="macro-icon">🍞</div>
+                    <h3>Carboidrato</h3>
+                    <div class="macro-value">${data.macronutrientes.carboidrato_g}g</div>
+                    <div class="macro-details">
+                        ${data.macronutrientes.carboidrato_kcal} kcal (${data.macronutrientes.carboidrato_perc}%)
+                    </div>
+                </div>
+                <div class="macro-card gordura">
+                    <div class="macro-icon">🥑</div>
+                    <h3>Gordura</h3>
+                    <div class="macro-value">${data.macronutrientes.gordura_g}g</div>
+                    <div class="macro-details">
+                        ${data.macronutrientes.gordura_kcal} kcal (${data.macronutrientes.gordura_perc}%)
+                    </div>
+                </div>
+            `;
+
+            // Resumo
+            const resumoGrid = document.getElementById('resumo-grid');
+            resumoGrid.innerHTML = `
+                <div class="resumo-item">
+                    <div class="resumo-valor">${data.resumo.total_calorias}</div>
+                    <div>Calorias</div>
+                </div>
+                <div class="resumo-item">
+                    <div class="resumo-valor">${data.resumo.total_proteina}g</div>
+                    <div>Proteína</div>
+                </div>
+                <div class="resumo-item">
+                    <div class="resumo-valor">${data.resumo.total_carboidrato}g</div>
+                    <div>Carboidrato</div>
+                </div>
+                <div class="resumo-item">
+                    <div class="resumo-valor">${data.resumo.total_gordura}g</div>
+                    <div>Gordura</div>
+                </div>
+            `;
+        }
+
+        // Função para formatar o objetivo
+        function formatarObjetivo(objetivo) {
+            const objetivos = {
+                'perder_peso': 'Perder Peso',
+                'emagrecer': 'Emagrecer',
+                'manter_peso': 'Manter Peso',
+                'manter': 'Manter Peso',
+                'vida_saudavel': 'Vida Saudável',
+                'ganhar_peso': 'Ganhar Peso',
+                'ganhar_massa': 'Ganhar Massa',
+                'performance': 'Performance'
+            };
+            return objetivos[objetivo] || objetivo;
+        }
+
+        // Carregar metas quando a página carregar
+        document.addEventListener('DOMContentLoaded', carregarMetas);
+    </script>
+</body>
+</html>

@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>📱 Diário Alimentar | L7Nutri</title>
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -113,6 +117,149 @@
             align-items: center;
             gap: 15px;
             margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .date-input-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            padding: 8px 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .date-nav-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .date-nav-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        .date-input {
+            border: 1px solid #e2e8f0;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 1rem;
+            color: #2d3748;
+            min-width: 150px;
+        }
+
+        .mini-calendar {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 350px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .mini-calendar.active {
+            display: block;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .calendar-month {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .calendar-nav {
+            background: #667eea;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .calendar-nav:hover {
+            background: #5a67d8;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            padding: 8px 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #666;
+        }
+
+        .calendar-day {
+            background: #f7fafc;
+            border: none;
+            padding: 8px 4px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            min-height: 32px;
+        }
+
+        .calendar-day:hover {
+            background: #e2e8f0;
+        }
+
+        .calendar-day.other-month {
+            color: #cbd5e0;
+        }
+
+        .calendar-day.today {
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+        }
+
+        .calendar-day.has-data {
+            background: #48bb78;
+            color: white;
+            font-weight: bold;
+        }
+
+        .calendar-day.has-data:hover {
+            background: #38a169;
+        }
+
+        .calendar-toggle {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+
+        .calendar-toggle:hover {
+            background: #5a67d8;
         }
 
         .date-btn {
@@ -355,6 +502,244 @@
             background: #dd6b20;
         }
 
+        /* === ESTILOS PARA EDIÇÃO DE ALIMENTOS === */
+        .food-item {
+            background: white;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .food-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .food-actions {
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .food-item:hover .food-actions {
+            opacity: 1;
+        }
+
+        .edit-btn, .delete-btn {
+            background: none;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .edit-btn {
+            color: #667eea;
+        }
+
+        .edit-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .delete-btn {
+            color: #e53e3e;
+        }
+
+        .delete-btn:hover {
+            background: #e53e3e;
+            color: white;
+        }
+
+        /* === ESTILOS PARA BADGES E NOTIFICAÇÕES === */
+        .badges-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 2000;
+            max-width: 300px;
+        }
+
+        .badge-notification {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            transform: translateX(100%);
+            animation: slideInRight 0.5s ease forwards;
+            cursor: pointer;
+        }
+
+        .badge-notification.success {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        }
+
+        .badge-notification.achievement {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+        }
+
+        @keyframes slideInRight {
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        .badge-icon {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .badge-title {
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+
+        .badge-description {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .streak-display {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .motivational-message {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* === ESTILOS PARA GRÁFICOS DE MACROS === */
+        .macros-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .macros-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .macros-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .chart-toggle-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .chart-toggle-btn:hover {
+            background: #5a67d8;
+        }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .chart-wrapper {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            min-height: 300px;
+        }
+
+        .chart-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .macros-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .macro-stat {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            position: relative;
+        }
+
+        .macro-name {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .macro-values {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .macro-percentage {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .macro-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .macro-progress {
+            height: 100%;
+            background: white;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
         @media (max-width: 768px) {
             .main-grid {
                 grid-template-columns: 1fr;
@@ -362,6 +747,14 @@
             
             .date-selector {
                 flex-wrap: wrap;
+            }
+            
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .macros-stats {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -390,9 +783,96 @@
             <p>Registre suas refeições e acompanhe sua jornada nutricional</p>
             
             <div class="date-selector">
-                <button class="date-btn" onclick="changeDate(-1)">← Anterior</button>
-                <div class="current-date" id="currentDate">Hoje, 17 de Julho de 2025</div>
-                <button class="date-btn" onclick="changeDate(1)">Próximo →</button>
+                <button class="date-nav-btn" onclick="voltarDia()">← Anterior</button>
+                
+                <div class="date-input-container">
+                    <input type="date" id="dateInput" class="date-input" onchange="mudarDataSelecionada()">
+                    <button class="calendar-toggle" onclick="toggleCalendario()">📅 Calendário</button>
+                </div>
+                
+                <button class="date-nav-btn" onclick="avancarDia()">Próximo →</button>
+            </div>
+        </div>
+
+        <!-- Mini Calendário -->
+        <div class="mini-calendar" id="miniCalendar">
+            <div class="calendar-header">
+                <button class="calendar-nav" onclick="navegarCalendario(-1)">‹</button>
+                <div class="calendar-month" id="calendarMonth">Julho 2025</div>
+                <button class="calendar-nav" onclick="navegarCalendario(1)">›</button>
+            </div>
+            <div class="calendar-grid" id="calendarGrid">
+                <!-- Dias da semana -->
+                <div class="calendar-day-header">Dom</div>
+                <div class="calendar-day-header">Seg</div>
+                <div class="calendar-day-header">Ter</div>
+                <div class="calendar-day-header">Qua</div>
+                <div class="calendar-day-header">Qui</div>
+                <div class="calendar-day-header">Sex</div>
+                <div class="calendar-day-header">Sáb</div>
+                <!-- Os dias serão gerados dinamicamente pelo JavaScript -->
+            </div>
+        </div>
+
+        <!-- Seção de Macros -->
+        <div class="macros-section" id="macrosSection">
+            <div class="macros-header">
+                <h2 class="macros-title">📊 Análise Nutricional do Dia</h2>
+                <button class="chart-toggle-btn" onclick="toggleChartType()" id="chartToggleBtn">
+                    🔄 Mudar Visualização
+                </button>
+            </div>
+
+            <!-- Estatísticas dos Macros -->
+            <div class="macros-stats" id="macrosStats">
+                <div class="macro-stat">
+                    <div class="macro-name">🍖 Proteínas</div>
+                    <div class="macro-values" id="proteinaValues">0g / 100g</div>
+                    <div class="macro-percentage" id="proteinaPercentage">0% da meta</div>
+                    <div class="macro-bar">
+                        <div class="macro-progress" id="proteinaProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="macro-stat">
+                    <div class="macro-name">🍞 Carboidratos</div>
+                    <div class="macro-values" id="carboidratoValues">0g / 200g</div>
+                    <div class="macro-percentage" id="carboidratoPercentage">0% da meta</div>
+                    <div class="macro-bar">
+                        <div class="macro-progress" id="carboidratoProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="macro-stat">
+                    <div class="macro-name">🥑 Gorduras</div>
+                    <div class="macro-values" id="gorduraValues">0g / 60g</div>
+                    <div class="macro-percentage" id="gorduraPercentage">0% da meta</div>
+                    <div class="macro-bar">
+                        <div class="macro-progress" id="gorduraProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="macro-stat">
+                    <div class="macro-name">🔥 Calorias</div>
+                    <div class="macro-values" id="caloriaValues">0 / 2000</div>
+                    <div class="macro-percentage" id="caloriaPercentage">0% da meta</div>
+                    <div class="macro-bar">
+                        <div class="macro-progress" id="caloriaProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráficos -->
+            <div class="charts-container">
+                <div class="chart-wrapper">
+                    <div class="chart-title">📊 Consumido vs Meta</div>
+                    <canvas id="macrosBarChart" width="400" height="300"></canvas>
+                </div>
+
+                <div class="chart-wrapper">
+                    <div class="chart-title">🥧 Distribuição de Macros</div>
+                    <canvas id="macrosPieChart" width="400" height="300"></canvas>
+                </div>
             </div>
         </div>
 
@@ -503,6 +983,21 @@
         </div>
     </div>
 
+    <!-- Container para Badges e Notificações -->
+    <div class="badges-container" id="badgesContainer">
+        <!-- Badges serão adicionadas dinamicamente aqui -->
+    </div>
+
+    <!-- Streak Display -->
+    <div class="streak-display" id="streakDisplay" style="display: none;">
+        🔥 Sequência atual: <span id="streakDays">0</span> dias seguidos!
+    </div>
+
+    <!-- Mensagem Motivacional -->
+    <div class="motivational-message" id="motivationalMessage" style="display: none;">
+        <!-- Mensagem será adicionada dinamicamente -->
+    </div>
+
     <!-- Modal para Adicionar Alimento -->
     <div class="add-meal-modal" id="addMealModal">
         <div class="modal-content">
@@ -535,6 +1030,54 @@
         </div>
     </div>
 
+    <!-- Modal para Editar Alimento -->
+    <div class="add-meal-modal" id="editMealModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="editModalTitle">Editar Alimento</h3>
+                <button class="close-btn" onclick="closeEditMealModal()">&times;</button>
+            </div>
+            
+            <form id="editMealForm">
+                <input type="hidden" id="editRegistroId">
+                
+                <div class="form-group">
+                    <label class="form-label">Alimento</label>
+                    <select class="form-select" id="editFoodSelect" required>
+                        <option value="">Selecione um alimento...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Quantidade (gramas)</label>
+                    <input type="number" class="form-input" id="editFoodQuantity" placeholder="Ex: 100" required min="1">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Tipo de Refeição</label>
+                    <select class="form-select" id="editMealType" required>
+                        <option value="cafe_manha">☀️ Café da Manhã</option>
+                        <option value="almoco">🌞 Almoço</option>
+                        <option value="lanche">🍎 Lanche</option>
+                        <option value="jantar">🌙 Jantar</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Calorias Estimadas</label>
+                    <input type="text" class="form-input" id="editEstimatedCalories" readonly 
+                           placeholder="Calculado automaticamente">
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="save-btn" style="flex: 1;">✏️ Salvar Alterações</button>
+                    <button type="button" class="delete-btn" style="flex: 0 0 auto; padding: 12px;" 
+                            onclick="deletarAlimento()" id="deleteAlimentoBtn">🗑️</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         // Estado da aplicação
         let currentDate = new Date();
@@ -546,14 +1089,34 @@
             lanche: [],
             jantar: []
         };
+        let calendarDate = new Date(); // Data do calendário (pode ser diferente da currentDate)
+        let diasPreenchidos = []; // Array de dias com registros no mês atual
+        
+        // Variáveis para gráficos
+        let macrosBarChart = null;
+        let macrosPieChart = null;
+        let currentChartType = 'bar'; // 'bar' ou 'pie'
+        let macrosData = null;
+        
+        // Variáveis para edição e badges
+        let currentEditingId = null;
+        let userBadges = [];
+        let currentStreak = 0;
 
         // Inicialização
         document.addEventListener('DOMContentLoaded', function() {
             checkAuthStatus();
-            updateDateDisplay();
+            initializeDateInput();
             loadFoodDatabase();
             loadDailyMeals();
             setupFormEvents();
+            carregarDiasPreenchidos();
+            carregarMacrosDiarios(); // Carregar gráficos de macros
+            carregarBadgesUsuario(); // Carregar badges
+            setupEditFormEvents(); // Configurar eventos de edição
+            
+            // Verificar badges de login diário
+            verificarBadges('login_diario');
         });
 
         // Verificar autenticação
@@ -562,13 +1125,11 @@
             const username = localStorage.getItem('username');
             
             if (!token) {
-                // Não está logado - redirecionar para login
                 alert('Você precisa estar logado para acessar o diário alimentar.');
                 window.location.href = '/login';
                 return;
             }
             
-            // Atualizar info do usuário
             if (username) {
                 document.getElementById('userInfo').textContent = `Olá, ${username}!`;
             }
@@ -583,29 +1144,191 @@
             }
         }
 
-        // Atualizar exibição da data
-        function updateDateDisplay() {
-            const options = { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            };
-            document.getElementById('currentDate').textContent = 
-                currentDate.toLocaleDateString('pt-BR', options);
+        // Inicializar input de data
+        function initializeDateInput() {
+            const dateInput = document.getElementById('dateInput');
+            dateInput.value = currentDate.toISOString().split('T')[0];
         }
 
-        // Navegar entre datas
-        function changeDate(direction) {
-            currentDate.setDate(currentDate.getDate() + direction);
-            updateDateDisplay();
+        // === FUNÇÕES DE NAVEGAÇÃO POR DATA ===
+
+        // Voltar um dia
+        function voltarDia() {
+            currentDate.setDate(currentDate.getDate() - 1);
+            updateDateInput();
             loadDailyMeals();
+            carregarDiasPreenchidos();
+            carregarMacrosDiarios(); // Atualizar gráficos
+        }
+
+        // Avançar um dia
+        function avancarDia() {
+            currentDate.setDate(currentDate.getDate() + 1);
+            updateDateInput();
+            loadDailyMeals();
+            carregarDiasPreenchidos();
+            carregarMacrosDiarios(); // Atualizar gráficos
+        }
+
+        // Atualizar input de data
+        function updateDateInput() {
+            const dateInput = document.getElementById('dateInput');
+            dateInput.value = currentDate.toISOString().split('T')[0];
+        }
+
+        // Quando o usuário altera a data no input
+        function mudarDataSelecionada() {
+            const dateInput = document.getElementById('dateInput');
+            currentDate = new Date(dateInput.value + 'T00:00:00');
+            loadDailyMeals();
+            carregarDiasPreenchidos();
+            carregarMacrosDiarios(); // Atualizar gráficos
+        }
+
+        // === FUNÇÕES DO MINI CALENDÁRIO ===
+
+        // Toggle do calendário
+        function toggleCalendario() {
+            const calendar = document.getElementById('miniCalendar');
+            calendar.classList.toggle('active');
+            if (calendar.classList.contains('active')) {
+                calendarDate = new Date(currentDate);
+                renderizarCalendario();
+            }
+        }
+
+        // Navegar meses no calendário
+        function navegarCalendario(direction) {
+            calendarDate.setMonth(calendarDate.getMonth() + direction);
+            renderizarCalendario();
+            carregarDiasPreenchidos();
+        }
+
+        // Renderizar calendário
+        function renderizarCalendario() {
+            const monthElement = document.getElementById('calendarMonth');
+            const gridElement = document.getElementById('calendarGrid');
+            
+            // Atualizar header do mês
+            const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                          'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+            monthElement.textContent = `${months[calendarDate.getMonth()]} ${calendarDate.getFullYear()}`;
+            
+            // Limpar grid (mantendo headers)
+            while (gridElement.children.length > 7) {
+                gridElement.removeChild(gridElement.lastChild);
+            }
+            
+            // Calcular primeiro dia do mês e quantos dias tem
+            const firstDay = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), 1);
+            const lastDay = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0);
+            const firstDayWeek = firstDay.getDay();
+            const daysInMonth = lastDay.getDate();
+            
+            // Adicionar dias do mês anterior (se necessário)
+            const prevMonth = new Date(calendarDate.getFullYear(), calendarDate.getMonth() - 1, 0);
+            for (let i = firstDayWeek - 1; i >= 0; i--) {
+                const day = prevMonth.getDate() - i;
+                const dayButton = createCalendarDay(day, true, calendarDate.getMonth() - 1);
+                gridElement.appendChild(dayButton);
+            }
+            
+            // Adicionar dias do mês atual
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayButton = createCalendarDay(day, false, calendarDate.getMonth());
+                gridElement.appendChild(dayButton);
+            }
+            
+            // Adicionar dias do próximo mês (se necessário)
+            const totalCells = gridElement.children.length - 7; // -7 para headers
+            const remainingCells = 42 - totalCells; // 6 semanas * 7 dias = 42
+            for (let day = 1; day <= remainingCells && totalCells < 35; day++) {
+                const dayButton = createCalendarDay(day, true, calendarDate.getMonth() + 1);
+                gridElement.appendChild(dayButton);
+            }
+        }
+
+        // Criar botão de dia do calendário
+        function createCalendarDay(day, otherMonth, month) {
+            const button = document.createElement('button');
+            button.className = 'calendar-day';
+            button.textContent = day;
+            
+            if (otherMonth) {
+                button.classList.add('other-month');
+            }
+            
+            // Verificar se é hoje
+            const today = new Date();
+            const dayDate = new Date(calendarDate.getFullYear(), month, day);
+            if (!otherMonth && 
+                dayDate.toDateString() === today.toDateString()) {
+                button.classList.add('today');
+            }
+            
+            // Verificar se tem registros
+            if (!otherMonth && diasPreenchidos.includes(day)) {
+                button.classList.add('has-data');
+            }
+            
+            // Evento de clique
+            if (!otherMonth) {
+                button.onclick = () => selecionarDiaCalendario(day);
+            }
+            
+            return button;
+        }
+
+        // Selecionar dia no calendário
+        function selecionarDiaCalendario(day) {
+            currentDate = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), day);
+            updateDateInput();
+            loadDailyMeals();
+            carregarMacrosDiarios(); // Atualizar gráficos
+            toggleCalendario(); // Fechar calendário
+        }
+
+        // Carregar dias preenchidos do mês
+        async function carregarDiasPreenchidos() {
+            try {
+                const token = localStorage.getItem('auth_token');
+                const mesParam = `${calendarDate.getFullYear()}-${String(calendarDate.getMonth() + 1).padStart(2, '0')}`;
+                
+                const response = await fetch(`/api/diario/dias-preenchidos?mes=${mesParam}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    diasPreenchidos = data.dias_preenchidos || [];
+                    if (document.getElementById('miniCalendar').classList.contains('active')) {
+                        renderizarCalendario(); // Re-renderizar se calendário estiver aberto
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao carregar dias preenchidos:', error);
+                diasPreenchidos = [];
+            }
         }
 
         // Carregar banco de alimentos
         async function loadFoodDatabase() {
             try {
-                const response = await fetch('/alimentos');
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch('/alimentos', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Erro ao carregar alimentos');
+                }
+                
                 foodDatabase = await response.json();
                 populateFoodSelect();
             } catch (error) {
@@ -698,30 +1421,31 @@
             };
 
             try {
-                const response = await fetch('/usuarios/1/registros', {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch('/api/diario', {
                     method: 'POST',
                     headers: {
+                        'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(mealData)
                 });
 
                 if (response.ok) {
-                    // Adicionar à lista local
-                    const mealItem = {
-                        ...food,
-                        quantidade_gramas: quantity,
-                        calorias_porcao: (food.calorias * quantity / 100).toFixed(1)
-                    };
+                    const result = await response.json();
                     
-                    dailyMeals[currentMealType].push(mealItem);
-                    updateMealDisplay(currentMealType);
-                    updateSummary();
+                    // Recarregar os dados do dia para refletir a adição
+                    await loadDailyMeals();
+                    await carregarMacrosDiarios(); // Atualizar gráficos também
                     closeAddMealModal();
+                    
+                    // Verificar badges após adicionar alimento
+                    verificarBadges('registro_diario');
                     
                     alert('Alimento adicionado com sucesso!');
                 } else {
-                    alert('Erro ao salvar alimento. Tente novamente.');
+                    const error = await response.json();
+                    alert(error.error || 'Erro ao salvar alimento. Tente novamente.');
                 }
             } catch (error) {
                 console.error('Erro ao salvar:', error);
@@ -732,30 +1456,29 @@
         // Carregar refeições do dia
         async function loadDailyMeals() {
             try {
-                const response = await fetch('/usuarios/1/registros');
-                const registros = await response.json();
-                
-                // Filtrar registros do dia atual
                 const dateString = currentDate.toISOString().split('T')[0];
-                const todayRegistros = registros.filter(r => r.data === dateString);
+                const token = localStorage.getItem('auth_token');
                 
-                // Organizar por tipo de refeição
-                dailyMeals = {
-                    cafe_manha: [],
-                    almoco: [],
-                    lanche: [],
-                    jantar: []
-                };
-
-                todayRegistros.forEach(registro => {
-                    if (registro.nome_alimento) {
-                        dailyMeals[registro.tipo_refeicao].push({
-                            nome: registro.nome_alimento,
-                            quantidade_gramas: registro.quantidade_gramas,
-                            calorias_porcao: 'Calculando...'
-                        });
+                const response = await fetch(`/api/diario?data=${dateString}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
                     }
                 });
+                
+                if (!response.ok) {
+                    throw new Error('Erro ao carregar refeições');
+                }
+                
+                const data = await response.json();
+                
+                // Usar os dados organizados que vêm da API
+                dailyMeals = {
+                    cafe_manha: data.cafe_manha || [],
+                    almoco: data.almoco || [],
+                    lanche: data.lanche || [],
+                    jantar: data.jantar || []
+                };
 
                 // Atualizar displays
                 Object.keys(dailyMeals).forEach(mealType => {
@@ -765,6 +1488,16 @@
                 updateSummary();
             } catch (error) {
                 console.error('Erro ao carregar refeições:', error);
+                // Inicializar com dados vazios em caso de erro
+                dailyMeals = {
+                    cafe_manha: [],
+                    almoco: [],
+                    lanche: [],
+                    jantar: []
+                };
+                Object.keys(dailyMeals).forEach(mealType => {
+                    updateMealDisplay(mealType);
+                });
             }
         }
 
@@ -773,20 +1506,36 @@
             const list = document.getElementById(`${mealType}_list`);
             const meals = dailyMeals[mealType];
             
-            if (meals.length === 0) {
+            if (!meals || meals.length === 0) {
                 list.innerHTML = '<li style="text-align: center; color: #999; padding: 20px;">Nenhum alimento registrado ainda</li>';
                 return;
             }
 
-            list.innerHTML = meals.map(meal => `
-                <li class="food-item">
-                    <div>
-                        <div class="food-name">${meal.nome}</div>
-                        <div style="font-size: 0.8rem; color: #666;">${meal.quantidade_gramas}g</div>
-                    </div>
-                    <div class="food-calories">${meal.calorias_porcao} kcal</div>
-                </li>
-            `).join('');
+            list.innerHTML = meals.map(meal => {
+                // Calcular calorias se não estiver calculado
+                const calorias = meal.calorias_totais || 
+                               (meal.calorias_porcao !== undefined ? meal.calorias_porcao : 
+                               (meal.calorias && meal.quantidade_gramas ? 
+                               (meal.calorias * meal.quantidade_gramas / 100).toFixed(1) : 'N/A'));
+                
+                const registroId = meal.id || meal.registro_id || '';
+                
+                return `
+                    <li class="food-item" onclick="openEditMealModal(${registroId}, '${mealType}')">
+                        <div>
+                            <div class="food-name">${meal.nome || meal.nome_alimento}</div>
+                            <div style="font-size: 0.8rem; color: #666;">${meal.quantidade_gramas}g</div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="food-calories">${calorias} kcal</div>
+                            <div class="food-actions">
+                                <button class="edit-btn" onclick="event.stopPropagation(); openEditMealModal(${registroId}, '${mealType}')" title="Editar">✏️</button>
+                                <button class="delete-btn" onclick="event.stopPropagation(); deletarAlimentoDireto(${registroId})" title="Excluir">🗑️</button>
+                            </div>
+                        </div>
+                    </li>
+                `;
+            }).join('');
         }
 
         // Atualizar resumo nutricional
@@ -797,11 +1546,35 @@
             let totalFats = 0;
 
             Object.values(dailyMeals).forEach(meals => {
-                meals.forEach(meal => {
-                    if (typeof meal.calorias_porcao === 'number') {
-                        totalCalories += meal.calorias_porcao;
-                    }
-                });
+                if (meals && Array.isArray(meals)) {
+                    meals.forEach(meal => {
+                        // Calcular calorias totais
+                        const calorias = meal.calorias_totais || 
+                                       meal.calorias_porcao ||
+                                       (meal.calorias && meal.quantidade_gramas ? 
+                                       (meal.calorias * meal.quantidade_gramas / 100) : 0);
+                        
+                        if (typeof calorias === 'number') {
+                            totalCalories += calorias;
+                        } else if (typeof calorias === 'string') {
+                            const numCalorias = parseFloat(calorias);
+                            if (!isNaN(numCalorias)) {
+                                totalCalories += numCalorias;
+                            }
+                        }
+
+                        // Calcular outros macros se disponíveis
+                        if (meal.proteinas && meal.quantidade_gramas) {
+                            totalProteins += (meal.proteinas * meal.quantidade_gramas / 100);
+                        }
+                        if (meal.carboidratos && meal.quantidade_gramas) {
+                            totalCarbs += (meal.carboidratos * meal.quantidade_gramas / 100);
+                        }
+                        if (meal.gorduras && meal.quantidade_gramas) {
+                            totalFats += (meal.gorduras * meal.quantidade_gramas / 100);
+                        }
+                    });
+                }
             });
 
             document.getElementById('totalCalories').textContent = Math.round(totalCalories);
@@ -812,6 +1585,490 @@
             // Atualizar barra de progresso (meta de 2000 kcal)
             const progressPercent = Math.min((totalCalories / 2000) * 100, 100);
             document.getElementById('caloriesProgress').style.width = `${progressPercent}%`;
+        }
+
+        // === FUNÇÕES DOS GRÁFICOS DE MACROS ===
+
+        // Carregar dados de macros diários
+        async function carregarMacrosDiarios() {
+            try {
+                const token = localStorage.getItem('auth_token');
+                const dateString = currentDate.toISOString().split('T')[0];
+                
+                const response = await fetch(`/api/diario/macros?data=${dateString}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    macrosData = await response.json();
+                    atualizarEstatisticasMacros();
+                    renderizarGraficos();
+                } else {
+                    console.error('Erro ao carregar macros:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Erro ao carregar macros diários:', error);
+            }
+        }
+
+        // Atualizar estatísticas dos macros
+        function atualizarEstatisticasMacros() {
+            if (!macrosData) return;
+
+            const { consumido, meta, percentuais } = macrosData;
+
+            // Atualizar valores
+            document.getElementById('proteinaValues').textContent = `${consumido.proteina}g / ${meta.proteina}g`;
+            document.getElementById('carboidratoValues').textContent = `${consumido.carboidrato}g / ${meta.carboidrato}g`;
+            document.getElementById('gorduraValues').textContent = `${consumido.gordura}g / ${meta.gordura}g`;
+            document.getElementById('caloriaValues').textContent = `${Math.round(consumido.calorias)} / ${Math.round(meta.calorias)}`;
+
+            // Atualizar percentuais
+            document.getElementById('proteinaPercentage').textContent = `${percentuais.proteina}% da meta`;
+            document.getElementById('carboidratoPercentage').textContent = `${percentuais.carboidrato}% da meta`;
+            document.getElementById('gorduraPercentage').textContent = `${percentuais.gordura}% da meta`;
+            document.getElementById('caloriaPercentage').textContent = `${percentuais.calorias}% da meta`;
+
+            // Atualizar barras de progresso
+            document.getElementById('proteinaProgress').style.width = `${Math.min(percentuais.proteina, 100)}%`;
+            document.getElementById('carboidratoProgress').style.width = `${Math.min(percentuais.carboidrato, 100)}%`;
+            document.getElementById('gorduraProgress').style.width = `${Math.min(percentuais.gordura, 100)}%`;
+            document.getElementById('caloriaProgress').style.width = `${Math.min(percentuais.calorias, 100)}%`;
+        }
+
+        // Renderizar gráficos
+        function renderizarGraficos() {
+            if (!macrosData) return;
+
+            // Destruir gráficos existentes
+            if (macrosBarChart) {
+                macrosBarChart.destroy();
+            }
+            if (macrosPieChart) {
+                macrosPieChart.destroy();
+            }
+
+            renderizarGraficoBarras();
+            renderizarGraficoPizza();
+        }
+
+        // Renderizar gráfico de barras (Consumido vs Meta)
+        function renderizarGraficoBarras() {
+            const ctx = document.getElementById('macrosBarChart').getContext('2d');
+            const { consumido, meta } = macrosData;
+
+            macrosBarChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Proteínas', 'Carboidratos', 'Gorduras'],
+                    datasets: [{
+                        label: 'Consumido (g)',
+                        data: [consumido.proteina, consumido.carboidrato, consumido.gordura],
+                        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+                        borderColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+                        borderWidth: 2,
+                        borderRadius: 6
+                    }, {
+                        label: 'Meta (g)',
+                        data: [meta.proteina, meta.carboidrato, meta.gordura],
+                        backgroundColor: ['rgba(255,99,132,0.3)', 'rgba(54,162,235,0.3)', 'rgba(255,206,86,0.3)'],
+                        borderColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 15,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.parsed.y}g`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0,0,0,0.1)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + 'g';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Renderizar gráfico de pizza (Distribuição de Macros)
+        function renderizarGraficoPizza() {
+            const ctx = document.getElementById('macrosPieChart').getContext('2d');
+            const { consumido } = macrosData;
+
+            // Calcular calorias de cada macro
+            const caloriasProteina = consumido.proteina * 4;
+            const caloriasCarboidrato = consumido.carboidrato * 4;
+            const caloriasGordura = consumido.gordura * 9;
+            const totalCalorias = caloriasProteina + caloriasCarboidrato + caloriasGordura;
+
+            macrosPieChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Proteínas', 'Carboidratos', 'Gorduras'],
+                    datasets: [{
+                        data: [caloriasProteina, caloriasCarboidrato, caloriasGordura],
+                        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+                        borderColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+                        borderWidth: 3,
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 15,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const percentage = totalCalorias > 0 ? ((context.parsed / totalCalorias) * 100).toFixed(1) : 0;
+                                    return `${context.label}: ${context.parsed} kcal (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '50%'
+                }
+            });
+        }
+
+        // Alternar tipo de gráfico
+        function toggleChartType() {
+            currentChartType = currentChartType === 'bar' ? 'pie' : 'bar';
+            
+            const barWrapper = document.querySelector('#macrosBarChart').closest('.chart-wrapper');
+            const pieWrapper = document.querySelector('#macrosPieChart').closest('.chart-wrapper');
+            
+            if (currentChartType === 'bar') {
+                barWrapper.style.display = 'block';
+                pieWrapper.style.display = 'block';
+                document.getElementById('chartToggleBtn').textContent = '🔄 Mudar Visualização';
+            } else {
+                // Alternar entre os dois tipos
+                if (barWrapper.style.display === 'none') {
+                    barWrapper.style.display = 'block';
+                    pieWrapper.style.display = 'none';
+                } else {
+                    barWrapper.style.display = 'none';
+                    pieWrapper.style.display = 'block';
+                }
+            }
+        }
+
+        // === FUNÇÕES DE EDIÇÃO DE ALIMENTOS ===
+
+        // Configurar eventos do formulário de edição
+        function setupEditFormEvents() {
+            document.getElementById('editFoodSelect').addEventListener('change', calculateEditCalories);
+            document.getElementById('editFoodQuantity').addEventListener('input', calculateEditCalories);
+            document.getElementById('editMealForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                salvarEdicaoAlimento();
+            });
+        }
+
+        // Abrir modal de edição
+        async function openEditMealModal(registroId, mealType) {
+            if (!registroId) return;
+            
+            currentEditingId = registroId;
+            
+            // Buscar dados do registro
+            const meal = dailyMeals[mealType].find(m => (m.id || m.registro_id) == registroId);
+            if (!meal) return;
+            
+            // Preencher modal de edição
+            document.getElementById('editRegistroId').value = registroId;
+            document.getElementById('editMealType').value = mealType;
+            document.getElementById('editFoodQuantity').value = meal.quantidade_gramas;
+            
+            // Popular select de alimentos
+            const editSelect = document.getElementById('editFoodSelect');
+            editSelect.innerHTML = '<option value="">Selecione um alimento...</option>';
+            
+            foodDatabase.forEach(food => {
+                const option = document.createElement('option');
+                option.value = JSON.stringify(food);
+                option.textContent = `${food.nome} (${food.calorias} kcal/100g)`;
+                if (food.nome === (meal.nome || meal.nome_alimento)) {
+                    option.selected = true;
+                }
+                editSelect.appendChild(option);
+            });
+            
+            calculateEditCalories();
+            document.getElementById('editMealModal').style.display = 'flex';
+        }
+
+        // Fechar modal de edição
+        function closeEditMealModal() {
+            document.getElementById('editMealModal').style.display = 'none';
+            document.getElementById('editMealForm').reset();
+            currentEditingId = null;
+        }
+
+        // Calcular calorias na edição
+        function calculateEditCalories() {
+            const foodSelect = document.getElementById('editFoodSelect');
+            const quantity = parseFloat(document.getElementById('editFoodQuantity').value) || 0;
+            
+            if (foodSelect.value && quantity > 0) {
+                const food = JSON.parse(foodSelect.value);
+                const calories = (food.calorias * quantity / 100).toFixed(1);
+                document.getElementById('editEstimatedCalories').value = `${calories} kcal`;
+            } else {
+                document.getElementById('editEstimatedCalories').value = '';
+            }
+        }
+
+        // Salvar edição do alimento
+        async function salvarEdicaoAlimento() {
+            const foodSelect = document.getElementById('editFoodSelect');
+            const quantity = parseFloat(document.getElementById('editFoodQuantity').value);
+            const mealType = document.getElementById('editMealType').value;
+            
+            if (!foodSelect.value || !quantity || !currentEditingId) {
+                alert('Por favor, preencha todos os campos.');
+                return;
+            }
+
+            const food = JSON.parse(foodSelect.value);
+            const updateData = {
+                alimento_id: food.id,
+                quantidade_gramas: quantity,
+                tipo_refeicao: mealType
+            };
+
+            try {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch(`/api/diario/${currentEditingId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updateData)
+                });
+
+                if (response.ok) {
+                    await loadDailyMeals();
+                    await carregarMacrosDiarios();
+                    closeEditMealModal();
+                    
+                    // Verificar badges após edição
+                    verificarBadges('registro_diario');
+                    
+                    alert('Alimento atualizado com sucesso!');
+                } else {
+                    const error = await response.json();
+                    alert(error.error || 'Erro ao atualizar alimento.');
+                }
+            } catch (error) {
+                console.error('Erro ao salvar edição:', error);
+                alert('Erro ao salvar alterações.');
+            }
+        }
+
+        // Deletar alimento diretamente
+        async function deletarAlimentoDireto(registroId) {
+            if (!confirm('Tem certeza que deseja excluir este alimento?')) return;
+            
+            try {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch(`/api/diario/${registroId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    await loadDailyMeals();
+                    await carregarMacrosDiarios();
+                    alert('Alimento excluído com sucesso!');
+                } else {
+                    alert('Erro ao excluir alimento.');
+                }
+            } catch (error) {
+                console.error('Erro ao deletar:', error);
+                alert('Erro ao excluir alimento.');
+            }
+        }
+
+        // Deletar alimento via modal
+        function deletarAlimento() {
+            if (currentEditingId) {
+                deletarAlimentoDireto(currentEditingId);
+                closeEditMealModal();
+            }
+        }
+
+        // === FUNÇÕES DE BADGES E GAMIFICAÇÃO ===
+
+        // Carregar badges do usuário
+        async function carregarBadgesUsuario() {
+            try {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch('/api/badges/usuario', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    userBadges = data.badges;
+                    
+                    // Mostrar streak atual se houver
+                    if (data.streaks.diario_preenchido) {
+                        currentStreak = data.streaks.diario_preenchido.atual;
+                        mostrarStreak(currentStreak);
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao carregar badges:', error);
+            }
+        }
+
+        // Verificar e conceder badges
+        async function verificarBadges(acao = 'registro_diario') {
+            try {
+                const token = localStorage.getItem('auth_token');
+                const dateString = currentDate.toISOString().split('T')[0];
+                
+                const response = await fetch('/api/badges/verificar', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        acao: acao,
+                        data: dateString
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.badges_conquistadas.length > 0) {
+                        data.badges_conquistadas.forEach(badge => {
+                            mostrarNotificacaoBadge(badge);
+                        });
+                    }
+                    
+                    // Verificar metas também
+                    if (acao === 'registro_diario') {
+                        verificarBadges('meta_atingida');
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao verificar badges:', error);
+            }
+        }
+
+        // Mostrar notificação de badge
+        function mostrarNotificacaoBadge(badge) {
+            const container = document.getElementById('badgesContainer');
+            
+            const notification = document.createElement('div');
+            notification.className = `badge-notification ${badge.tipo === 'notificacao_diaria' ? 'success' : 'achievement'}`;
+            notification.innerHTML = `
+                <div class="badge-icon">${badge.icone}</div>
+                <div class="badge-title">${badge.nome}</div>
+                <div class="badge-description">${badge.descricao}</div>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Remover após 5 segundos
+            setTimeout(() => {
+                notification.style.animation = 'slideInRight 0.5s ease reverse';
+                setTimeout(() => {
+                    container.removeChild(notification);
+                }, 500);
+            }, 5000);
+            
+            // Clique para fechar
+            notification.addEventListener('click', () => {
+                notification.style.animation = 'slideInRight 0.5s ease reverse';
+                setTimeout(() => {
+                    container.removeChild(notification);
+                }, 500);
+            });
+        }
+
+        // Mostrar streak atual
+        function mostrarStreak(streak) {
+            if (streak > 0) {
+                const streakDisplay = document.getElementById('streakDisplay');
+                document.getElementById('streakDays').textContent = streak;
+                streakDisplay.style.display = 'block';
+            }
+        }
+
+        // Mostrar mensagem motivacional
+        function mostrarMensagemMotivacional(mensagem) {
+            const messageDiv = document.getElementById('motivationalMessage');
+            messageDiv.innerHTML = mensagem;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 6000);
+        }
+
+        // Atualizar função de salvar refeição para incluir verificação de badges
+        const originalSaveMeal = window.saveMeal;
+        if (typeof originalSaveMeal === 'function') {
+            window.saveMeal = async function() {
+                await originalSaveMeal();
+                verificarBadges('registro_diario');
+            };
         }
     </script>
 </body>

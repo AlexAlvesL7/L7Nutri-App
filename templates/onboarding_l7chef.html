@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L7Chef - Questionário Nutricional</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 800px;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .progress-container {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #28a745, #20c997);
+            height: 100%;
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .progress-text {
+            margin-top: 10px;
+            color: #666;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .etapa {
+            display: none;
+        }
+
+        .etapa.ativa {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .etapa-titulo {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .campo-grupo {
+            margin-bottom: 25px;
+        }
+
+        .campo-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .campo-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .campo-input:focus {
+            outline: none;
+            border-color: #28a745;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+        }
+
+        .campo-select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 16px;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+
+        .campo-select:focus {
+            outline: none;
+            border-color: #28a745;
+            background: white;
+        }
+
+        .checkbox-grupo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .checkbox-item:hover {
+            background: #e9ecef;
+        }
+
+        .checkbox-item.selecionado {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+
+        .checkbox-item input {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+
+        .botoes-navegacao {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .btn-anterior {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-anterior:hover {
+            background: #5a6268;
+        }
+
+        .btn-proximo {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .btn-proximo:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-finalizar {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-finalizar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 123, 255, 0.3);
+        }
+
+        .resumo-container {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+
+        .resumo-titulo {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .resumo-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .resumo-item:last-child {
+            border-bottom: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+
+        .loading.ativo {
+            display: block;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #28a745;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+
+            .form-container {
+                padding: 20px;
+            }
+
+            .checkbox-grupo {
+                grid-template-columns: 1fr;
+            }
+
+            .botoes-navegacao {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🥗 L7Chef - Sua Nutricionista IA</h1>
+            <p>Vamos conhecer você melhor para criar seu plano nutricional personalizado</p>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+            <div class="progress-text">
+                Etapa <span id="etapaAtual">1</span> de <span id="totalEtapas">4</span>
+            </div>
+        </div>
+
+        <div class="form-container">
+            <div id="errorMessage" class="error-message"></div>
+            <div id="successMessage" class="success-message"></div>
+
+            <form id="questionarioForm">
+                <!-- Etapa 1: Dados Pessoais -->
+                <div class="etapa ativa" data-etapa="1">
+                    <h2 class="etapa-titulo">📊 Dados Pessoais</h2>
+                    
+                    <div class="campo-grupo">
+                        <label class="campo-label">Idade *</label>
+                        <input type="number" name="idade" class="campo-input" min="13" max="100" required>
+                    </div>
+
+                    <div class="campo-grupo">
+                        <label class="campo-label">Sexo *</label>
+                        <select name="sexo" class="campo-select" required>
+                            <option value="">Selecione...</option>
+                            <option value="Masculino">Masculino</option>
+                            <option value="Feminino">Feminino</option>
+                        </select>
+                    </div>
+
+                    <div class="campo-grupo">
+                        <label class="campo-label">Peso Atual (kg) *</label>
+                        <input type="number" name="peso_atual" class="campo-input" step="0.1" min="30" max="300" required>
+                    </div>
+
+                    <div class="campo-grupo">
+                        <label class="campo-label">Altura (cm) *</label>
+                        <input type="number" name="altura" class="campo-input" min="100" max="250" required>
+                    </div>
+
+                    <div class="campo-grupo">
+                        <label class="campo-label">Peso Desejado (kg) *</label>
+                        <input type="number" name="peso_meta" class="campo-input" step="0.1" min="30" max="300" required>
+                    </div>
+                </div>
+
+                <!-- Etapa 2: Estilo de Vida -->
+                <div class="etapa" data-etapa="2">
+                    <h2 class="etapa-titulo">🏃‍♀️ Estilo de Vida</h2>
+                    
+                    <div class="campo-grupo">
+                        <label class="campo-label">Nível de Atividade Física *</label>
+                        <select name="nivel_atividade" class="campo-select" required>
+                            <option value="">Selecione...</option>
+                            <option value="Sedentário (pouco ou nenhum exercício)">Sedentário (pouco ou nenhum exercício)</option>
+                            <option value="Levemente ativo (exercício leve 1-3 dias/semana)">Levemente ativo (exercício leve 1-3 dias/semana)</option>
+                            <option value="Moderadamente ativo (exercício moderado 3-5 dias/semana)">Moderadamente ativo (exercício moderado 3-5 dias/semana)</option>
+                            <option value="Muito ativo (exercício intenso 6-7 dias/semana)">Muito ativo (exercício intenso 6-7 dias/semana)</option>
+                            <option value="Extremamente ativo (exercício muito intenso, trabalho físico)">Extremamente ativo (exercício muito intenso, trabalho físico)</option>
+                        </select>
+                    </div>
+
+                    <div class="campo-grupo">
+                        <label class="campo-label">Objetivo Principal *</label>
+                        <select name="objetivo_principal" class="campo-select" required>
+                            <option value="">Selecione...</option>
+                            <option value="Perder peso">Perder peso</option>
+                            <option value="Ganhar massa muscular">Ganhar massa muscular</option>
+                            <option value="Manter peso atual">Manter peso atual</option>
+                            <option value="Melhorar saúde geral">Melhorar saúde geral</option>
+                            <option value="Aumentar energia">Aumentar energia</option>
+                            <option value="Melhorar performance esportiva">Melhorar performance esportiva</option>
+                        </select>
+                    </div>
+
+                    <div class="campo-grupo">
+                        <label class="campo-label">Horas de sono por noite *</label>
+                        <input type="number" name="horas_sono" class="campo-input" min="4" max="12" step="0.5" required>
+                    </div>
+
+                    <div class="campo-grupo">
+                        <label class="campo-label">Nível de Stress *</label>
+                        <select name="nivel_stress" class="campo-select" required>
+                            <option value="">Selecione...</option>
+                            <option value="Baixo">Baixo</option>
+                            <option value="Médio">Médio</option>
+                            <option value="Alto">Alto</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Etapa 3: Hábitos Alimentares -->
+                <div class="etapa" data-etapa="3">
+                    <h2 class="etapa-titulo">🍽️ Hábitos Alimentares</h2>
+                    
+                    <div class="campo-grupo">
+                        <label class="campo-label">Quantas refeições faz por dia? *</label>
+                        <input type="number" name="refeicoes_dia" class="campo-input" min="2" max="8" required>
+                    </div>
+
+                    <div class="campo-grupo">
+                        <label class="campo-label">Litros de água por dia *</label>
+                        <input type="number" name="agua_diaria" class="campo-input" step="0.1" min="0.5" max="5" required>
+                    </div>
+
+                    <div class="campo-grupo">
+                        <label class="campo-label">Restrições Alimentares</label>
+                        <div class="checkbox-grupo">
+                            <div class="checkbox-item" onclick="toggleCheckbox(this, 'restricoes_alimentares')">
+                                <input type="checkbox" name="restricoes_alimentares" value="Vegetariano">
+                                <span>Vegetariano</span>
+                            </div>
+                            <div class="checkbox-item" onclick="toggleCheckbox(this, 'restricoes_alimentares')">
+                                <input type="checkbox" name="restricoes_alimentares" value="Vegano">
+                                <span>Vegano</span>
+                            </div>
+                            <div class="checkbox-item" onclick="toggleCheckbox(this, 'restricoes_alimentares')">
+                                <input type="checkbox" name="restricoes_alimentares" value="Intolerância à lactose">
+                                <span>Intolerância à lactose</span>
+                            </div>
+                            <div class="checkbox-item" onclick="toggleCheckbox(this, 'restricoes_alimentares')">
+                                <input type="checkbox" name="restricoes_alimentares" value="Diabético">
+                                <span>Diabético</span>
+                            </div>
+                            <div class="checkbox-item" onclick="toggleCheckbox(this, 'restricoes_alimentares')">
+                                <input type="checkbox" name="restricoes_alimentares" value="Hipertensão">
+                                <span>Hipertensão</span>
+                            </div>
+                            <div class="checkbox-item" onclick="toggleCheckbox(this, 'restricoes_alimentares')">
+                                <input type="checkbox" name="restricoes_alimentares" value="Nenhuma">
+                                <span>Nenhuma</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="campo-grupo">
+                        <label class="campo-label">Alimentos Favoritos</label>
+                        <div class="checkbox-grupo">
+                            <div class="checkbox-item" onclick="toggleCheckbox(this, 'alimentos_favoritos')">
+                                <input type="checkbox" name="alimentos_favoritos" value="Frutas">
+                                <span>🍎 Frutas</span>
+                            </div>
+                            <div class="checkbox-item" onclick="toggleCheckbox(this, 'alimentos_favoritos')">
+                                <input type="checkbox" name="alimentos_favoritos" value="Verduras">
+                                <span>🥬 Verduras</span>
+                            </div>
+                            <div class="checkbox-item" onclick="toggleCheckbox(this, 'alimentos_favoritos')">
+                                <input type="checkbox" name="alimentos_favoritos" value="Carnes">
+                                <span>🥩 Carnes</span>
+                            </div>
+                            <div class="checkbox-item" onclick="toggleCheckbox(this, 'alimentos_favoritos')">
+                                <input type="checkbox" name="alimentos_favoritos" value="Peixes">
+                                <span>🐟 Peixes</span>
+                            </div>
+                            <div class="checkbox-item" onclick="toggleCheckbox(this, 'alimentos_favoritos')">
+                                <input type="checkbox" name="alimentos_favoritos" value="Massas">
+                                <span>🍝 Massas</span>
+                            </div>
+                            <div class="checkbox-item" onclick="toggleCheckbox(this, 'alimentos_favoritos')">
+                                <input type="checkbox" name="alimentos_favoritos" value="Arroz">
+                                <span>🍚 Arroz</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Etapa 4: Informações de Saúde -->
+                <div class="etapa" data-etapa="4">
+                    <h2 class="etapa-titulo">🏥 Informações de Saúde</h2>
+                    
+                    <div class="campo-grupo">
+                        <label class="campo-label">Problemas de saúde ou medicamentos</label>
+                        <textarea name="problemas_saude" class="campo-input" rows="3" placeholder="Descreva qualquer problema de saúde ou medicamento que usa..."></textarea>
+                    </div>
+
+                    <div class="campo-grupo">
+                        <label class="campo-label">Já fez alguma dieta? Qual resultado?</label>
+                        <textarea name="historico_dietas" class="campo-input" rows="3" placeholder="Conte sobre suas experiências anteriores com dietas..."></textarea>
+                    </div>
+
+                    <div class="campo-grupo">
+                        <label class="campo-label">Com que frequência se exercita? *</label>
+                        <select name="frequencia_exercicio" class="campo-select" required>
+                            <option value="">Selecione...</option>
+                            <option value="Nunca">Nunca</option>
+                            <option value="1x/semana">1x por semana</option>
+                            <option value="2-3x/semana">2-3x por semana</option>
+                            <option value="4-5x/semana">4-5x por semana</option>
+                            <option value="Todos os dias">Todos os dias</option>
+                        </select>
+                    </div>
+
+                    <div class="campo-grupo">
+                        <label class="campo-label">O que mais te motiva a cuidar da alimentação? *</label>
+                        <textarea name="motivacao" class="campo-input" rows="3" placeholder="Compartilhe sua motivação..." required></textarea>
+                    </div>
+
+                    <!-- Resumo -->
+                    <div class="resumo-container" id="resumoContainer" style="display: none;">
+                        <h3 class="resumo-titulo">📋 Resumo das suas informações</h3>
+                        <div id="resumoConteudo"></div>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Loading -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>🤖 L7Chef está analisando suas informações e criando seu plano personalizado...</p>
+            </div>
+
+            <!-- Botões de navegação -->
+            <div class="botoes-navegacao" id="botoesNavegacao">
+                <button type="button" class="btn btn-anterior" id="btnAnterior" onclick="etapaAnterior()">
+                    ← Anterior
+                </button>
+                <button type="button" class="btn btn-proximo" id="btnProximo" onclick="proximaEtapa()">
+                    Próximo →
+                </button>
+                <button type="button" class="btn btn-finalizar" id="btnFinalizar" onclick="finalizarQuestionario()" style="display: none;">
+                    🚀 Finalizar e Criar Meu Plano
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let etapaAtual = 1;
+        const totalEtapas = 4;
+        let respostasQuestionario = {};
+
+        function atualizarProgresso() {
+            const porcentagem = (etapaAtual / totalEtapas) * 100;
+            document.getElementById('progressBar').style.width = porcentagem + '%';
+            document.getElementById('etapaAtual').textContent = etapaAtual;
+        }
+
+        function mostrarEtapa(numeroEtapa) {
+            // Esconder todas as etapas
+            document.querySelectorAll('.etapa').forEach(etapa => {
+                etapa.classList.remove('ativa');
+            });
+
+            // Mostrar etapa atual
+            const etapaElement = document.querySelector(`[data-etapa="${numeroEtapa}"]`);
+            if (etapaElement) {
+                etapaElement.classList.add('ativa');
+            }
+
+            // Atualizar botões
+            const btnAnterior = document.getElementById('btnAnterior');
+            const btnProximo = document.getElementById('btnProximo');
+            const btnFinalizar = document.getElementById('btnFinalizar');
+
+            btnAnterior.style.display = numeroEtapa === 1 ? 'none' : 'block';
+            
+            if (numeroEtapa === totalEtapas) {
+                btnProximo.style.display = 'none';
+                btnFinalizar.style.display = 'block';
+                mostrarResumo();
+            } else {
+                btnProximo.style.display = 'block';
+                btnFinalizar.style.display = 'none';
+            }
+
+            atualizarProgresso();
+        }
+
+        function proximaEtapa() {
+            if (validarEtapaAtual()) {
+                salvarRespostasEtapa();
+                if (etapaAtual < totalEtapas) {
+                    etapaAtual++;
+                    mostrarEtapa(etapaAtual);
+                }
+            }
+        }
+
+        function etapaAnterior() {
+            if (etapaAtual > 1) {
+                etapaAtual--;
+                mostrarEtapa(etapaAtual);
+            }
+        }
+
+        function validarEtapaAtual() {
+            const etapaElement = document.querySelector(`[data-etapa="${etapaAtual}"]`);
+            const camposObrigatorios = etapaElement.querySelectorAll('[required]');
+            
+            for (let campo of camposObrigatorios) {
+                if (!campo.value.trim()) {
+                    mostrarErro(`Por favor, preencha o campo: ${campo.previousElementSibling.textContent}`);
+                    campo.focus();
+                    return false;
+                }
+            }
+            
+            limparErro();
+            return true;
+        }
+
+        function salvarRespostasEtapa() {
+            const etapaElement = document.querySelector(`[data-etapa="${etapaAtual}"]`);
+            const campos = etapaElement.querySelectorAll('input, select, textarea');
+            
+            campos.forEach(campo => {
+                if (campo.type === 'checkbox') {
+                    if (!respostasQuestionario[campo.name]) {
+                        respostasQuestionario[campo.name] = [];
+                    }
+                    if (campo.checked && !respostasQuestionario[campo.name].includes(campo.value)) {
+                        respostasQuestionario[campo.name].push(campo.value);
+                    }
+                } else {
+                    respostasQuestionario[campo.name] = campo.value;
+                }
+            });
+        }
+
+        function toggleCheckbox(element, name) {
+            const checkbox = element.querySelector('input');
+            checkbox.checked = !checkbox.checked;
+            
+            if (checkbox.checked) {
+                element.classList.add('selecionado');
+            } else {
+                element.classList.remove('selecionado');
+            }
+
+            // Se "Nenhuma" for selecionado, desmarcar outros
+            if (checkbox.value === 'Nenhuma' && checkbox.checked) {
+                const outrosCheckboxes = document.querySelectorAll(`input[name="${name}"]:not([value="Nenhuma"])`);
+                outrosCheckboxes.forEach(cb => {
+                    cb.checked = false;
+                    cb.closest('.checkbox-item').classList.remove('selecionado');
+                });
+            } else if (checkbox.checked && checkbox.value !== 'Nenhuma') {
+                // Se outro for selecionado, desmarcar "Nenhuma"
+                const nenhumaCheckbox = document.querySelector(`input[name="${name}"][value="Nenhuma"]`);
+                if (nenhumaCheckbox) {
+                    nenhumaCheckbox.checked = false;
+                    nenhumaCheckbox.closest('.checkbox-item').classList.remove('selecionado');
+                }
+            }
+        }
+
+        function mostrarResumo() {
+            salvarRespostasEtapa();
+            
+            const resumoContainer = document.getElementById('resumoContainer');
+            const resumoConteudo = document.getElementById('resumoConteudo');
+            
+            let html = '';
+            
+            // Dados pessoais
+            html += `<div class="resumo-item"><strong>Idade:</strong> <span>${respostasQuestionario.idade} anos</span></div>`;
+            html += `<div class="resumo-item"><strong>Sexo:</strong> <span>${respostasQuestionario.sexo}</span></div>`;
+            html += `<div class="resumo-item"><strong>Peso atual:</strong> <span>${respostasQuestionario.peso_atual} kg</span></div>`;
+            html += `<div class="resumo-item"><strong>Altura:</strong> <span>${respostasQuestionario.altura} cm</span></div>`;
+            html += `<div class="resumo-item"><strong>Objetivo:</strong> <span>${respostasQuestionario.objetivo_principal}</span></div>`;
+            html += `<div class="resumo-item"><strong>Atividade física:</strong> <span>${respostasQuestionario.nivel_atividade}</span></div>`;
+            
+            resumoConteudo.innerHTML = html;
+            resumoContainer.style.display = 'block';
+        }
+
+        async function finalizarQuestionario() {
+            if (!validarEtapaAtual()) return;
+            
+            salvarRespostasEtapa();
+            
+            // Mostrar loading
+            document.getElementById('botoesNavegacao').style.display = 'none';
+            document.getElementById('loading').classList.add('ativo');
+            
+            try {
+                // Obter token de autenticação
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    throw new Error('Token de autenticação não encontrado');
+                }
+                
+                // Chamar nova API de finalização com análise IA
+                const response = await fetch('/api/finalizar-onboarding', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(respostasQuestionario)
+                });
+                
+                const resultado = await response.json();
+                
+                if (response.ok && resultado.analise_gerada) {
+                    mostrarSucesso('🧠 IA analisando seu perfil... Criando plano personalizado!');
+                    
+                    // Aguardar um pouco para mostrar o processo
+                    setTimeout(() => {
+                        mostrarSucesso('✅ Análise completa! Redirecionando para seus resultados...');
+                        
+                        setTimeout(() => {
+                            window.location.href = resultado.redirect || '/analise-nutricional';
+                        }, 1500);
+                    }, 2000);
+                    
+                } else {
+                    throw new Error(resultado.erro || 'Erro ao finalizar onboarding');
+                }
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                mostrarErro('Erro ao processar questionário: ' + error.message);
+                document.getElementById('loading').classList.remove('ativo');
+                document.getElementById('botoesNavegacao').style.display = 'flex';
+            }
+        }
+
+        function mostrarErro(mensagem) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = mensagem;
+            errorDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function mostrarSucesso(mensagem) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = mensagem;
+            successDiv.style.display = 'block';
+        }
+
+        function limparErro() {
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            mostrarEtapa(1);
+        });
+    </script>
+</body>
+</html>

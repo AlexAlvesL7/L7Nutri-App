@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nível de Atividade Física - L7Nutri</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+            line-height: 1.5;
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.2);
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: white;
+            height: 100%;
+            width: 75%; /* 3ª etapa de 4 */
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .radio-option {
+            position: relative;
+            background: #f8f9fa;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .radio-option:hover {
+            border-color: #667eea;
+            background: #f0f8ff;
+        }
+
+        .radio-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .radio-option input[type="radio"]:checked + .radio-content {
+            color: #667eea;
+        }
+
+        .radio-option input[type="radio"]:checked ~ .radio-option {
+            border-color: #667eea;
+            background: #f0f8ff;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+        }
+
+        .radio-option.selected {
+            border-color: #667eea;
+            background: #f0f8ff;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+        }
+
+        .radio-content {
+            transition: color 0.3s ease;
+        }
+
+        .radio-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .radio-description {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .radio-value {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: #667eea;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .radio-option.selected .radio-title {
+            color: #667eea;
+        }
+
+        .btn-container {
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .step-indicator {
+            text-align: center;
+            margin-bottom: 20px;
+            color: white;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+
+            .header {
+                padding: 30px 20px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .content {
+                padding: 30px 20px;
+            }
+
+            .radio-option {
+                padding: 15px;
+            }
+
+            .radio-value {
+                position: static;
+                display: inline-block;
+                margin-top: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="step-indicator">Etapa 3 de 4</div>
+            <h1>🏃‍♂️ Nível de Atividade Física</h1>
+            <p>Selecione a opção que melhor descreve seu nível de atividade física atual</p>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+
+        <div class="content">
+            <form id="atividadeFisicaForm">
+                <div class="form-group">
+                    <label class="form-label">Qual é o seu nível de atividade física?</label>
+                    
+                    <div class="radio-group">
+                        <div class="radio-option" onclick="selecionarOpcao(this, 1.2)">
+                            <input type="radio" id="sedentario" name="nivelAtividade" value="1.2">
+                            <div class="radio-content">
+                                <div class="radio-title">Sedentário</div>
+                                <div class="radio-description">Pouco ou nenhum exercício, trabalho de escritório</div>
+                            </div>
+                            <div class="radio-value">1.2x</div>
+                        </div>
+
+                        <div class="radio-option" onclick="selecionarOpcao(this, 1.375)">
+                            <input type="radio" id="levemente-ativo" name="nivelAtividade" value="1.375">
+                            <div class="radio-content">
+                                <div class="radio-title">Levemente Ativo</div>
+                                <div class="radio-description">Exercício leve 1-3 dias por semana</div>
+                            </div>
+                            <div class="radio-value">1.375x</div>
+                        </div>
+
+                        <div class="radio-option" onclick="selecionarOpcao(this, 1.55)">
+                            <input type="radio" id="moderadamente-ativo" name="nivelAtividade" value="1.55">
+                            <div class="radio-content">
+                                <div class="radio-title">Moderadamente Ativo</div>
+                                <div class="radio-description">Exercício moderado 3-5 dias por semana</div>
+                            </div>
+                            <div class="radio-value">1.55x</div>
+                        </div>
+
+                        <div class="radio-option" onclick="selecionarOpcao(this, 1.725)">
+                            <input type="radio" id="muito-ativo" name="nivelAtividade" value="1.725">
+                            <div class="radio-content">
+                                <div class="radio-title">Muito Ativo</div>
+                                <div class="radio-description">Exercício intenso 6-7 dias por semana</div>
+                            </div>
+                            <div class="radio-value">1.725x</div>
+                        </div>
+
+                        <div class="radio-option" onclick="selecionarOpcao(this, 1.9)">
+                            <input type="radio" id="extremamente-ativo" name="nivelAtividade" value="1.9">
+                            <div class="radio-content">
+                                <div class="radio-title">Extremamente Ativo</div>
+                                <div class="radio-description">Exercício muito intenso, trabalho físico ou treinamento 2x/dia</div>
+                            </div>
+                            <div class="radio-value">1.9x</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-container">
+                    <button type="submit" class="btn-primary" id="btnAvancar" disabled>
+                        Avançar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let nivelAtividadeSelecionado = null;
+
+        function selecionarOpcao(elemento, valor) {
+            // Remover seleção anterior
+            document.querySelectorAll('.radio-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+
+            // Adicionar seleção atual
+            elemento.classList.add('selected');
+
+            // Marcar radio button
+            const radioInput = elemento.querySelector('input[type="radio"]');
+            radioInput.checked = true;
+
+            // Salvar valor selecionado
+            nivelAtividadeSelecionado = valor;
+
+            // Habilitar botão de avançar
+            document.getElementById('btnAvancar').disabled = false;
+        }
+
+        document.getElementById('atividadeFisicaForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            if (!nivelAtividadeSelecionado) {
+                alert('Por favor, selecione seu nível de atividade física.');
+                return;
+            }
+
+            // Salvar no localStorage para usar nas próximas etapas
+            localStorage.setItem('nivelAtividade', nivelAtividadeSelecionado);
+
+            // Enviar dados para o backend
+            enviarDadosAtividade();
+        });
+
+        async function enviarDadosAtividade() {
+            try {
+                // Obter token do localStorage
+                const token = localStorage.getItem('access_token');
+                if (!token) {
+                    alert('Erro: Token de autenticação não encontrado. Faça login novamente.');
+                    window.location.href = '/login';
+                    return;
+                }
+
+                // Enviar dados para o backend usando POST
+                const response = await fetch('/api/onboarding/atividade', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        fator_atividade: nivelAtividadeSelecionado
+                    })
+                });
+
+                if (response.status === 200) {
+                    // Redirecionar para a próxima etapa (objetivo nutricional)
+                    window.location.href = '/objetivo';
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.erro || 'Erro ao salvar fator de atividade');
+                }
+
+            } catch (error) {
+                console.error('Erro ao enviar dados:', error);
+                alert(`Erro ao salvar fator de atividade: ${error.message}`);
+            }
+        }
+
+        // Verificar se há dados salvos anteriormente
+        window.addEventListener('DOMContentLoaded', function() {
+            const nivelSalvo = localStorage.getItem('nivelAtividade');
+            if (nivelSalvo) {
+                const radioInput = document.querySelector(`input[value="${nivelSalvo}"]`);
+                if (radioInput) {
+                    const elemento = radioInput.closest('.radio-option');
+                    selecionarOpcao(elemento, parseFloat(nivelSalvo));
+                }
+            }
+        });
+    </script>
+</body>
+</html>

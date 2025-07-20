@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L7Nutri - Verificação de Email</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .verificacao-sucesso {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 40px;
+        }
+
+        .verificacao-erro {
+            background: linear-gradient(135deg, #dc3545, #fd7e14);
+            color: white;
+            padding: 40px;
+        }
+
+        .verificacao-processando {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 40px;
+        }
+
+        .icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .title {
+            font-size: 28px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .message {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .next-steps {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .next-steps h3 {
+            color: #28a745;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+        }
+
+        .step-number {
+            background: #28a745;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            font-size: 14px;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .step-description {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #667eea;
+            padding: 15px 30px;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .error-details {
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .error-details h3 {
+            color: #dc3545;
+            margin-bottom: 15px;
+        }
+
+        .error-details ul {
+            color: #721c24;
+            margin-left: 20px;
+        }
+
+        .error-details li {
+            margin-bottom: 10px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .security-info {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .security-info h4 {
+            color: #0066cc;
+            margin-bottom: 10px;
+        }
+
+        .security-info p {
+            color: #004499;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+
+            .verificacao-sucesso,
+            .verificacao-erro,
+            .verificacao-processando {
+                padding: 30px 20px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .icon {
+                font-size: 60px;
+            }
+
+            .title {
+                font-size: 24px;
+            }
+
+            .subtitle {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Verificação em andamento -->
+        <div id="verificandoStatus" class="verificacao-processando">
+            <span class="icon">🔍</span>
+            <h1 class="title">Verificando seu email...</h1>
+            <p class="subtitle">Aguarde enquanto confirmamos sua conta</p>
+            <div class="spinner"></div>
+        </div>
+
+        <!-- Verificação bem-sucedida -->
+        <div id="verificacaoSucesso" class="verificacao-sucesso" style="display: none;">
+            <span class="icon">🎉</span>
+            <h1 class="title">Email Verificado!</h1>
+            <p class="subtitle">Sua conta foi ativada com sucesso</p>
+        </div>
+
+        <!-- Verificação com erro -->
+        <div id="verificacaoErro" class="verificacao-erro" style="display: none;">
+            <span class="icon">❌</span>
+            <h1 class="title">Erro na Verificação</h1>
+            <p class="subtitle">Não foi possível verificar seu email</p>
+        </div>
+
+        <div class="content">
+            <!-- Conteúdo para sucesso -->
+            <div id="conteudoSucesso" style="display: none;">
+                <div class="message">
+                    <strong>Parabéns!</strong> Sua conta L7Nutri foi ativada e você já pode começar sua jornada nutricional.
+                </div>
+
+                <div class="next-steps">
+                    <h3>🚀 Próximos Passos:</h3>
+                    
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Complete o Questionário L7Chef</div>
+                            <div class="step-description">Responda algumas perguntas para criarmos seu plano nutricional personalizado</div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Receba suas Recomendações</div>
+                            <div class="step-description">Obtenha dicas personalizadas baseadas no seu perfil e objetivos</div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Acesse seu Diário Alimentar</div>
+                            <div class="step-description">Comece a registrar suas refeições e acompanhar seu progresso</div>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="/onboarding" class="btn-primary">
+                    🎯 Começar Questionário L7Chef
+                </a>
+                
+                <a href="/login" class="btn-secondary">
+                    🔑 Fazer Login Direto
+                </a>
+
+                <div class="security-info">
+                    <h4>🔒 Sua Conta Está Protegida</h4>
+                    <p>Agora que seu email foi verificado, você tem acesso completo a todas as funcionalidades da L7Nutri de forma segura.</p>
+                </div>
+            </div>
+
+            <!-- Conteúdo para erro -->
+            <div id="conteudoErro" style="display: none;">
+                <div class="message">
+                    Ocorreu um problema ao verificar seu email. Isso pode acontecer por alguns motivos:
+                </div>
+
+                <div class="error-details">
+                    <h3>Possíveis Causas:</h3>
+                    <ul>
+                        <li>O link de verificação expirou (válido por 24 horas)</li>
+                        <li>O link já foi usado anteriormente</li>
+                        <li>O token de verificação é inválido</li>
+                        <li>Sua conta já estava verificada</li>
+                    </ul>
+                </div>
+
+                <a href="/cadastro" class="btn-primary">
+                    🔄 Cadastrar Novamente
+                </a>
+                
+                <a href="/login" class="btn-secondary">
+                    🔑 Tentar Fazer Login
+                </a>
+
+                <div class="security-info">
+                    <h4>💡 Precisa de Ajuda?</h4>
+                    <p>Se você continuar tendo problemas, entre em contato conosco ou tente fazer o cadastro novamente com o mesmo email.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Verificar email automaticamente quando a página carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            verificarEmail();
+        });
+
+        async function verificarEmail() {
+            // Pegar o token da URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+
+            if (!token) {
+                mostrarErro('Token de verificação não encontrado na URL');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/verificar-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ token })
+                });
+
+                const resultado = await response.json();
+
+                if (resultado.sucesso) {
+                    mostrarSucesso(resultado.mensagem);
+                } else {
+                    mostrarErro(resultado.erro);
+                }
+
+            } catch (error) {
+                console.error('Erro na verificação:', error);
+                mostrarErro('Erro de conexão. Tente novamente mais tarde.');
+            }
+        }
+
+        function mostrarSucesso(mensagem) {
+            // Esconder verificação em andamento
+            document.getElementById('verificandoStatus').style.display = 'none';
+            
+            // Mostrar sucesso
+            document.getElementById('verificacaoSucesso').style.display = 'block';
+            document.getElementById('conteudoSucesso').style.display = 'block';
+
+            // Atualizar mensagem se fornecida
+            if (mensagem) {
+                const messageElement = document.querySelector('#conteudoSucesso .message');
+                if (messageElement) {
+                    messageElement.innerHTML = `<strong>Parabéns!</strong> ${mensagem}`;
+                }
+            }
+        }
+
+        function mostrarErro(mensagem) {
+            // Esconder verificação em andamento
+            document.getElementById('verificandoStatus').style.display = 'none';
+            
+            // Mostrar erro
+            document.getElementById('verificacaoErro').style.display = 'block';
+            document.getElementById('conteudoErro').style.display = 'block';
+
+            // Atualizar mensagem se fornecida
+            if (mensagem) {
+                const messageElement = document.querySelector('#conteudoErro .message');
+                if (messageElement) {
+                    messageElement.textContent = mensagem;
+                }
+            }
+        }
+
+        // Função para recarregar a página (caso o usuário queira tentar novamente)
+        function tentarNovamente() {
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo - Sistema de Metas L7Nutri</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .demo-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .step-header {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #343a40;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #28a745;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .resultado {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #28a745;
+        }
+
+        .formula-explicacao {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #2196f3;
+        }
+
+        .formula-explicacao h3 {
+            color: #1976d2;
+            margin-bottom: 15px;
+        }
+
+        .formula-step {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+
+        .macros-demo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .macro-demo {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            border-top: 4px solid;
+        }
+
+        .macro-demo.proteina { border-top-color: #dc3545; }
+        .macro-demo.carboidrato { border-top-color: #ffc107; }
+        .macro-demo.gordura { border-top-color: #17a2b8; }
+
+        .link-metas {
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 10px 5px;
+            transition: all 0.3s;
+        }
+
+        .link-metas:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧮 Demo - Sistema de Metas L7Nutri</h1>
+            <p>Teste o cálculo de metas nutricionais personalizadas</p>
+        </div>
+
+        <div class="demo-card">
+            <div class="step-header">
+                <h2>📊 Calculadora de Metas Nutricionais</h2>
+                <p>Com base na fórmula de Mifflin-St Jeor</p>
+            </div>
+
+            <form id="form-metas">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="nome">Nome:</label>
+                        <input type="text" id="nome" value="João Silva" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="idade">Idade:</label>
+                        <input type="number" id="idade" value="30" min="15" max="100" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sexo">Sexo:</label>
+                        <select id="sexo" required>
+                            <option value="masculino">Masculino</option>
+                            <option value="feminino">Feminino</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="peso">Peso (kg):</label>
+                        <input type="number" id="peso" value="80" min="30" max="200" step="0.1" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="altura">Altura (cm):</label>
+                        <input type="number" id="altura" value="175" min="100" max="250" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="atividade">Nível de Atividade:</label>
+                        <select id="atividade" required>
+                            <option value="1.2">Sedentário (sem exercício)</option>
+                            <option value="1.375" selected>Leve (1-3 dias/semana)</option>
+                            <option value="1.55">Moderado (3-5 dias/semana)</option>
+                            <option value="1.725">Intenso (6-7 dias/semana)</option>
+                            <option value="1.9">Muito intenso (2x/dia)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="objetivo">Objetivo:</label>
+                    <select id="objetivo" required>
+                        <option value="perder_peso">Perder Peso</option>
+                        <option value="manter_peso" selected>Manter Peso</option>
+                        <option value="ganhar_massa">Ganhar Massa</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn">🧮 Calcular Metas</button>
+            </form>
+
+            <div id="resultado" class="resultado hidden">
+                <h3>🎯 Suas Metas Calculadas</h3>
+                <div id="resultado-conteudo"></div>
+                
+                <div id="formula-explicacao" class="formula-explicacao">
+                    <h3>🔬 Como foi calculado:</h3>
+                    <div id="passos-calculo"></div>
+                </div>
+
+                <div class="macros-demo" id="macros-resultado">
+                    <!-- Preenchido pelo JavaScript -->
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <a href="/metas-nutricionais" class="link-metas">
+                        📊 Ver Página Completa de Metas
+                    </a>
+                    <a href="/api/onboarding/metas" class="link-metas">
+                        🔗 Testar API Diretamente
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('form-metas').addEventListener('submit', function(e) {
+            e.preventDefault();
+            calcularMetas();
+        });
+
+        function calcularMetas() {
+            // Obter valores do formulário
+            const nome = document.getElementById('nome').value;
+            const idade = parseInt(document.getElementById('idade').value);
+            const sexo = document.getElementById('sexo').value;
+            const peso = parseFloat(document.getElementById('peso').value);
+            const altura = parseFloat(document.getElementById('altura').value);
+            const fatorAtividade = parseFloat(document.getElementById('atividade').value);
+            const objetivo = document.getElementById('objetivo').value;
+
+            // Calcular TMB usando fórmula de Mifflin-St Jeor
+            let tmb;
+            if (sexo === 'masculino') {
+                tmb = (10 * peso) + (6.25 * altura) - (5 * idade) + 5;
+            } else {
+                tmb = (10 * peso) + (6.25 * altura) - (5 * idade) - 161;
+            }
+
+            // Calcular gasto total
+            const gastoTotal = tmb * fatorAtividade;
+
+            // Ajustar por objetivo
+            const ajustes = {
+                'perder_peso': -500,
+                'manter_peso': 0,
+                'ganhar_massa': +500
+            };
+            const ajuste = ajustes[objetivo];
+            const metaCalorica = Math.round(gastoTotal + ajuste);
+
+            // Calcular macronutrientes
+            const percProteina = objetivo === 'ganhar_massa' ? 0.30 : objetivo === 'perder_peso' ? 0.35 : 0.25;
+            const percCarboidrato = objetivo === 'ganhar_massa' ? 0.45 : objetivo === 'perder_peso' ? 0.40 : 0.50;
+            const percGordura = 0.25;
+
+            const proteinaG = Math.round((metaCalorica * percProteina) / 4 * 10) / 10;
+            const carboidratoG = Math.round((metaCalorica * percCarboidrato) / 4 * 10) / 10;
+            const gorduraG = Math.round((metaCalorica * percGordura) / 9 * 10) / 10;
+
+            // Exibir resultado
+            exibirResultado({
+                nome,
+                idade,
+                sexo,
+                peso,
+                altura,
+                fatorAtividade,
+                objetivo,
+                tmb: Math.round(tmb),
+                gastoTotal: Math.round(gastoTotal),
+                ajuste,
+                metaCalorica,
+                proteinaG,
+                carboidratoG,
+                gorduraG,
+                percProteina: Math.round(percProteina * 100),
+                percCarboidrato: Math.round(percCarboidrato * 100),
+                percGordura: Math.round(percGordura * 100)
+            });
+        }
+
+        function exibirResultado(dados) {
+            document.getElementById('resultado').classList.remove('hidden');
+
+            // Resultado principal
+            document.getElementById('resultado-conteudo').innerHTML = `
+                <p><strong>Nome:</strong> ${dados.nome}</p>
+                <p><strong>Perfil:</strong> ${dados.sexo}, ${dados.idade} anos, ${dados.peso}kg, ${dados.altura}cm</p>
+                <p><strong>Objetivo:</strong> ${formatarObjetivo(dados.objetivo)}</p>
+                <h2 style="color: #28a745; margin: 20px 0; text-align: center;">
+                    🎯 Meta: ${dados.metaCalorica} calorias/dia
+                </h2>
+            `;
+
+            // Explicação da fórmula
+            document.getElementById('passos-calculo').innerHTML = `
+                <div class="formula-step">
+                    <strong>1. TMB (Taxa Metabólica Basal):</strong><br>
+                    ${dados.sexo === 'masculino' ? 
+                        `TMB = (10 × ${dados.peso}) + (6.25 × ${dados.altura}) - (5 × ${dados.idade}) + 5` :
+                        `TMB = (10 × ${dados.peso}) + (6.25 × ${dados.altura}) - (5 × ${dados.idade}) - 161`
+                    }<br>
+                    TMB = ${dados.tmb} kcal
+                </div>
+                <div class="formula-step">
+                    <strong>2. Gasto Total Diário:</strong><br>
+                    Gasto Total = TMB × Fator Atividade<br>
+                    Gasto Total = ${dados.tmb} × ${dados.fatorAtividade} = ${dados.gastoTotal} kcal
+                </div>
+                <div class="formula-step">
+                    <strong>3. Ajuste por Objetivo:</strong><br>
+                    Meta = Gasto Total ${dados.ajuste >= 0 ? '+' : ''} ${dados.ajuste}<br>
+                    Meta = ${dados.gastoTotal} ${dados.ajuste >= 0 ? '+' : ''} ${dados.ajuste} = ${dados.metaCalorica} kcal
+                </div>
+            `;
+
+            // Macronutrientes
+            document.getElementById('macros-resultado').innerHTML = `
+                <div class="macro-demo proteina">
+                    <h4>🥩 Proteína</h4>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #dc3545;">
+                        ${dados.proteinaG}g
+                    </div>
+                    <div>${dados.percProteina}% das calorias</div>
+                </div>
+                <div class="macro-demo carboidrato">
+                    <h4>🍞 Carboidrato</h4>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #ffc107;">
+                        ${dados.carboidratoG}g
+                    </div>
+                    <div>${dados.percCarboidrato}% das calorias</div>
+                </div>
+                <div class="macro-demo gordura">
+                    <h4>🥑 Gordura</h4>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #17a2b8;">
+                        ${dados.gorduraG}g
+                    </div>
+                    <div>${dados.percGordura}% das calorias</div>
+                </div>
+            `;
+        }
+
+        function formatarObjetivo(objetivo) {
+            const objetivos = {
+                'perder_peso': 'Perder Peso',
+                'manter_peso': 'Manter Peso',
+                'ganhar_massa': 'Ganhar Massa'
+            };
+            return objetivos[objetivo] || objetivo;
+        }
+    </script>
+</body>
+</html>
