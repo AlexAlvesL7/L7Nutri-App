@@ -1125,5 +1125,7 @@ def inicializar_analise_ia(modelo_ia=None):
     Inicializa sistema de análise nutricional
     """
     global analise_ia
-    analise_ia = AnaliseNutricionalIA(modelo_ia)
+    # Inicializar com dados padrão vazios
+    dados_padrao = {}
+    analise_ia = AnaliseNutricionalIA(dados_padrao, modelo_ia)
     return analise_ia
