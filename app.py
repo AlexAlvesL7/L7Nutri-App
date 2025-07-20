@@ -16,6 +16,12 @@ import re
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from functools import wraps
+import logging
+from logging.handlers import RotatingFileHandler
+import subprocess
+import schedule
+import threading
+import time
 
 # Importar sistema ecossistema L7
 from sistema_ecossistema_l7 import ecossistema_l7
@@ -42,6 +48,120 @@ inicializar_analise_ia(modelo_ia)
 # --- Configuração do Aplicativo Flask ---
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
+
+# === CONFIGURAÇÃO DE LOGGING ESTRUTURADO ===
+def configurar_logging():
+    """Configura sistema de logging com rotação de arquivos"""
+    # Criar diretório de logs se não existir
+    if not os.path.exists('logs'):
+        os.makedirs('logs')
+    
+    # Configurar logging principal
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            # Arquivo com rotação (10MB, 5 arquivos)
+            RotatingFileHandler('logs/l7nutri.log', maxBytes=10*1024*1024, backupCount=5),
+            # Console para desenvolvimento
+            logging.StreamHandler()
+        ]
+    )
+    
+    # Logger específico para IA
+    ia_logger = logging.getLogger('ia')
+    ia_handler = RotatingFileHandler('logs/ia.log', maxBytes=5*1024*1024, backupCount=3)
+    ia_handler.setFormatter(logging.Formatter('%(asctime)s - IA - %(levelname)s - %(message)s'))
+    ia_logger.addHandler(ia_handler)
+    
+    # Logger para análises
+    analise_logger = logging.getLogger('analise')
+    analise_handler = RotatingFileHandler('logs/analises.log', maxBytes=5*1024*1024, backupCount=3)
+    analise_handler.setFormatter(logging.Formatter('%(asctime)s - ANALISE - %(levelname)s - %(message)s'))
+    analise_logger.addHandler(analise_handler)
+    
+    app.logger.info("Sistema de logging configurado com sucesso")
+
+# Configurar logging
+configurar_logging()
+
+# === SISTEMA DE BACKUP AUTOMÁTICO ===
+def realizar_backup_banco():
+    """Realiza backup do banco de dados SQLite"""
+    try:
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        backup_filename = f'backups/nutricao_backup_{timestamp}.db'
+        
+        # Criar diretório de backup se não existir
+        if not os.path.exists('backups'):
+            os.makedirs('backups')
+        
+        # Copiar banco de dados
+        import shutil
+        shutil.copy2('nutricao.db', backup_filename)
+        
+        app.logger.info(f"Backup realizado com sucesso: {backup_filename}")
+        
+        # Limpar backups antigos (manter apenas 7 dias)
+        limpar_backups_antigos()
+        
+        return True
+    except Exception as e:
+        app.logger.error(f"Erro ao realizar backup: {str(e)}")
+        enviar_alerta_erro(f"Falha no backup: {str(e)}")
+        return False
+
+def limpar_backups_antigos():
+    """Remove backups com mais de 7 dias"""
+    try:
+        import glob
+        backups = glob.glob('backups/nutricao_backup_*.db')
+        cutoff_time = datetime.now() - timedelta(days=7)
+        
+        for backup in backups:
+            backup_time = datetime.fromtimestamp(os.path.getmtime(backup))
+            if backup_time < cutoff_time:
+                os.remove(backup)
+                app.logger.info(f"Backup antigo removido: {backup}")
+    except Exception as e:
+        app.logger.error(f"Erro ao limpar backups antigos: {str(e)}")
+
+def enviar_alerta_erro(mensagem):
+    """Envia alerta de erro por email"""
+    try:
+        email_admin = os.getenv('ADMIN_EMAIL', 'admin@l7nutri.com')
+        enviar_email(
+            email_admin,
+            'ALERTA L7Nutri - Erro do Sistema',
+            f"""
+            🚨 ALERTA DO SISTEMA L7NUTRI 🚨
+            
+            Mensagem: {mensagem}
+            Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+            Servidor: {os.getenv('RENDER_SERVICE_NAME', 'Local')}
+            
+            Verifique os logs para mais detalhes.
+            """,
+            tipo='alerta'
+        )
+    except Exception as e:
+        app.logger.error(f"Erro ao enviar alerta: {str(e)}")
+
+def executar_backup_agendado():
+    """Executa backup em thread separada"""
+    def job():
+        schedule.every().day.at("03:00").do(realizar_backup_banco)
+        while True:
+            schedule.run_pending()
+            time.sleep(60)  # Verificar a cada minuto
+    
+    # Executar em thread separada para não bloquear a aplicação
+    backup_thread = threading.Thread(target=job, daemon=True)
+    backup_thread.start()
+    app.logger.info("Sistema de backup automático iniciado (03:00 diariamente)")
+
+# Iniciar sistema de backup
+executar_backup_agendado()
 
 # === CONFIGURAÇÃO DE AMBIENTE ===
 # Detecta se estamos em produção ou desenvolvimento
@@ -567,7 +687,39 @@ class StreakUsuario(db.Model):
     
     # Relacionamento
     usuario = db.relationship('Usuario', backref='streaks')
+
+# === MODELO PARA SISTEMA DE LEADS ===
+class Lead(db.Model):
+    """Modelo para captura de leads antes do cadastro completo"""
+    __tablename__ = 'leads'
     
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    nome = db.Column(db.String(100), nullable=True)
+    telefone = db.Column(db.String(20), nullable=True)
+    objetivo = db.Column(db.String(50), nullable=True)  # emagrecer, ganhar_massa, etc.
+    fonte = db.Column(db.String(50), default='modal_captura')  # modal_captura, landing_page, etc.
+    ip_address = db.Column(db.String(45), nullable=True)  # Para analytics
+    user_agent = db.Column(db.Text, nullable=True)  # Para analytics
+    utm_source = db.Column(db.String(100), nullable=True)  # Tracking de origem
+    utm_medium = db.Column(db.String(100), nullable=True)
+    utm_campaign = db.Column(db.String(100), nullable=True)
+    converteu_cadastro = db.Column(db.Boolean, default=False)  # Se virou usuário completo
+    data_conversao = db.Column(db.DateTime, nullable=True)  # Quando se cadastrou completamente
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'email': self.email,
+            'nome': self.nome,
+            'objetivo': self.objetivo,
+            'fonte': self.fonte,
+            'converteu_cadastro': self.converteu_cadastro,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
     def __repr__(self):
         return f'<StreakUsuario {self.usuario_id}:{self.tipo_streak}>'
 
@@ -576,6 +728,12 @@ class StreakUsuario(db.Model):
 @app.route('/')
 def home():
     return render_template('home.html')
+
+# Rota para landing page de leads
+@app.route('/landing')
+def landing_page_leads():
+    """Landing page otimizada para captura de leads"""
+    return render_template('landing_page_leads.html')
 
 # --- Rota para página de metas nutricionais ---
 @app.route('/metas-nutricionais')
@@ -3504,6 +3662,224 @@ def api_analytics_ecossistema():
     except Exception as e:
         print(f"Erro no analytics: {str(e)}")
         return jsonify({'erro': 'Erro interno'}), 500
+
+# === SISTEMA DE CAPTURA DE LEADS ===
+
+@app.route('/api/leads/capturar', methods=['POST'])
+def capturar_lead():
+    """Captura lead antes do cadastro completo"""
+    try:
+        dados = request.get_json()
+        
+        # Validar dados obrigatórios
+        email = dados.get('email', '').strip().lower()
+        if not email or '@' not in email:
+            return jsonify({'erro': 'Email válido é obrigatório'}), 400
+        
+        # Verificar se lead já existe
+        lead_existente = Lead.query.filter_by(email=email).first()
+        if lead_existente:
+            # Atualizar informações se necessário
+            if dados.get('nome'):
+                lead_existente.nome = dados.get('nome')
+            if dados.get('objetivo'):
+                lead_existente.objetivo = dados.get('objetivo')
+            lead_existente.updated_at = datetime.utcnow()
+            
+            db.session.commit()
+            app.logger.info(f"Lead atualizado: {email}")
+            
+            return jsonify({
+                'sucesso': True,
+                'mensagem': 'Lead atualizado com sucesso',
+                'lead': lead_existente.to_dict()
+            })
+        
+        # Capturar dados adicionais para analytics
+        user_agent = request.headers.get('User-Agent', '')
+        ip_address = request.remote_addr
+        
+        # Criar novo lead
+        novo_lead = Lead(
+            email=email,
+            nome=dados.get('nome', ''),
+            telefone=dados.get('telefone', ''),
+            objetivo=dados.get('objetivo', ''),
+            fonte=dados.get('fonte', 'modal_captura'),
+            ip_address=ip_address,
+            user_agent=user_agent,
+            utm_source=dados.get('utm_source'),
+            utm_medium=dados.get('utm_medium'),
+            utm_campaign=dados.get('utm_campaign')
+        )
+        
+        db.session.add(novo_lead)
+        db.session.commit()
+        
+        # Log da captura
+        app.logger.info(f"Novo lead capturado: {email} - Objetivo: {dados.get('objetivo')} - Fonte: {dados.get('fonte')}")
+        
+        # Enviar email de boas-vindas ao lead (opcional)
+        try:
+            enviar_email_boas_vindas_lead(email, dados.get('nome', ''))
+        except Exception as e:
+            app.logger.warning(f"Erro ao enviar email para lead {email}: {str(e)}")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Lead capturado com sucesso',
+            'lead_id': novo_lead.id
+        })
+        
+    except Exception as e:
+        app.logger.error(f"Erro ao capturar lead: {str(e)}")
+        return jsonify({'success': False, 'error': 'Erro interno do servidor'}), 500
+
+def enviar_email_boas_vindas_lead(email, nome):
+    """Enviar email de boas-vindas para lead capturado"""
+    try:
+        # Implementar aqui integração com serviço de email
+        # Exemplo: MailChimp, SendGrid, etc.
+        app.logger.info(f"Email de boas-vindas enviado para {email}")
+        return True
+    except Exception as e:
+        app.logger.error(f"Erro ao enviar email de boas-vindas: {str(e)}")
+        return False
+
+@app.route('/api/leads/verificar', methods=['POST'])
+def verificar_lead():
+    """Verifica se email já é lead ou usuário"""
+    try:
+        dados = request.get_json()
+        email = dados.get('email', '').strip().lower()
+        
+        if not email:
+            return jsonify({'erro': 'Email é obrigatório'}), 400
+        
+        # Verificar se é usuário cadastrado
+        usuario = Usuario.query.filter_by(email=email).first()
+        if usuario:
+            return jsonify({
+                'tipo': 'usuario',
+                'cadastrado': True,
+                'onboarding_completo': usuario.onboarding_completo
+            })
+        
+        # Verificar se é lead
+        lead = Lead.query.filter_by(email=email).first()
+        if lead:
+            return jsonify({
+                'tipo': 'lead',
+                'cadastrado': False,
+                'lead': lead.to_dict()
+            })
+        
+        # Email não encontrado
+        return jsonify({
+            'tipo': 'novo',
+            'cadastrado': False
+        })
+        
+    except Exception as e:
+        app.logger.error(f"Erro ao verificar lead: {str(e)}")
+        return jsonify({'erro': 'Erro interno do servidor'}), 500
+
+@app.route('/api/admin/leads', methods=['GET'])
+@jwt_required()
+def listar_leads():
+    """Lista todos os leads para dashboard admin"""
+    try:
+        # Verificar se usuário é admin
+        current_user_id = get_jwt_identity()
+        usuario = Usuario.query.get(current_user_id)
+        
+        if not usuario or usuario.email != 'admin@l7nutri.com':
+            return jsonify({'erro': 'Acesso negado'}), 403
+        
+        # Parâmetros de paginação
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 50, type=int)
+        
+        # Filtros
+        convertidos = request.args.get('convertidos')  # 'true', 'false', ou None
+        fonte = request.args.get('fonte')
+        
+        # Query base
+        query = Lead.query
+        
+        # Aplicar filtros
+        if convertidos == 'true':
+            query = query.filter(Lead.converteu_cadastro == True)
+        elif convertidos == 'false':
+            query = query.filter(Lead.converteu_cadastro == False)
+        
+        if fonte:
+            query = query.filter(Lead.fonte == fonte)
+        
+        # Ordenar por data de criação (mais recentes primeiro)
+        query = query.order_by(Lead.created_at.desc())
+        
+        # Paginar resultados
+        leads_paginated = query.paginate(
+            page=page, 
+            per_page=per_page, 
+            error_out=False
+        )
+        
+        return jsonify({
+            'leads': [lead.to_dict() for lead in leads_paginated.items],
+            'total': leads_paginated.total,
+            'pages': leads_paginated.pages,
+            'current_page': page,
+            'per_page': per_page
+        })
+        
+    except Exception as e:
+        app.logger.error(f"Erro ao listar leads: {str(e)}")
+        return jsonify({'erro': 'Erro interno do servidor'}), 500
+
+def enviar_email_boas_vindas_lead(email, nome):
+    """Envia email de boas-vindas para lead capturado"""
+    subject = "🎯 Bem-vindo ao L7Nutri! Sua jornada para uma vida mais saudável começou"
+    
+    html_body = f"""
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f8f9fa; padding: 20px;">
+        <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="color: #e74c3c; margin: 0;">🧠 L7Nutri</h1>
+                <p style="color: #666; margin: 5px 0;">Inteligência Artificial para sua Nutrição</p>
+            </div>
+            
+            <h2 style="color: #2c3e50;">Olá{', ' + nome if nome else ''}! 👋</h2>
+            
+            <p>Que ótimo ter você conosco! Você acaba de dar o primeiro passo para transformar sua alimentação e alcançar seus objetivos.</p>
+            
+            <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                <h3 style="color: #27ae60; margin-top: 0;">🎯 O que você vai ganhar:</h3>
+                <ul style="margin: 0; padding-left: 20px;">
+                    <li>Análise nutricional personalizada com IA</li>
+                    <li>Plano alimentar 100% adaptado para você</li>
+                    <li>Receitas exclusivas do L7Chef</li>
+                    <li>Treinos personalizados do L7Personal</li>
+                    <li>Recomendações de suplementos L7Shop</li>
+                </ul>
+            </div>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="https://l7nutri-app.onrender.com/cadastro" 
+                   style="background: #e74c3c; color: white; text-decoration: none; padding: 15px 30px; border-radius: 25px; font-weight: bold; display: inline-block;">
+                    🚀 Completar Cadastro Agora
+                </a>
+            </div>
+            
+            <p style="font-size: 14px; color: #666; border-top: 1px solid #eee; padding-top: 15px; margin-top: 30px;">
+                Este email foi enviado porque você demonstrou interesse no L7Nutri. Se não foi você, pode ignorar este email.
+            </p>
+        </div>
+    </div>
+    """
+    
+    enviar_email(email, subject, html_body, tipo='lead')
 
 if __name__ == '__main__':
     app.run(debug=True)

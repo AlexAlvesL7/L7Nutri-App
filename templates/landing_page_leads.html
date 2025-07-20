@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L7Nutri - Inteligência Artificial para sua Nutrição</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --l7-primary: #e74c3c;
+            --l7-secondary: #2c3e50;
+            --l7-success: #27ae60;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .floating-icon {
+            position: absolute;
+            animation: float 6s ease-in-out infinite;
+            opacity: 0.1;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .hero-content {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            padding: 50px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo-text {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--l7-primary);
+            margin-bottom: 20px;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: var(--l7-secondary);
+            margin-bottom: 30px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, var(--l7-primary), #c0392b);
+            border: none;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.4);
+            color: white;
+        }
+
+        /* Modal de Captura de Lead */
+        .lead-modal .modal-content {
+            border-radius: 20px;
+            border: none;
+            overflow: hidden;
+        }
+
+        .lead-modal .modal-header {
+            background: linear-gradient(135deg, var(--l7-primary), #c0392b);
+            color: white;
+            border: none;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .lead-modal .modal-body {
+            padding: 40px;
+            background: #f8f9fa;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .benefit-icon {
+            background: var(--l7-success);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .urgency-banner {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .social-proof {
+            background: var(--l7-success);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        /* Scroll animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Exit intent cursor */
+        .exit-intent-active {
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .hero-content {
+                padding: 30px 20px;
+            }
+            
+            .logo-text {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Background Elements -->
+    <div class="floating-elements">
+        <i class="fas fa-brain floating-icon" style="top: 10%; left: 10%; font-size: 4rem; animation-delay: 0s;"></i>
+        <i class="fas fa-apple-alt floating-icon" style="top: 20%; right: 15%; font-size: 3rem; animation-delay: 1s;"></i>
+        <i class="fas fa-dumbbell floating-icon" style="bottom: 30%; left: 20%; font-size: 3.5rem; animation-delay: 2s;"></i>
+        <i class="fas fa-heart floating-icon" style="bottom: 15%; right: 10%; font-size: 3rem; animation-delay: 3s;"></i>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="hero-content mx-auto" style="max-width: 900px;">
+                <div class="logo-text">
+                    <i class="fas fa-brain"></i> L7Nutri
+                </div>
+                <div class="subtitle">
+                    Inteligência Artificial para sua Nutrição Personalizada
+                </div>
+                <p class="lead mb-4">
+                    Descubra o poder da IA aplicada à nutrição. Análise completa, plano personalizado e resultados reais.
+                </p>
+
+                <!-- Features Grid -->
+                <div class="features-grid fade-in">
+                    <div class="feature-card">
+                        <div class="feature-icon text-primary">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h5>Análise com IA</h5>
+                        <p class="text-muted">Algoritmos avançados criam seu plano nutricional perfeito</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon text-success">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h5>Resultados Reais</h5>
+                        <p class="text-muted">Mais de 10.000 pessoas já transformaram suas vidas</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon text-warning">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h5>100% Digital</h5>
+                        <p class="text-muted">Acesse de qualquer lugar, a qualquer hora</p>
+                    </div>
+                </div>
+
+                <!-- CTA Button -->
+                <button class="btn cta-button btn-lg" onclick="iniciarAnalise()">
+                    <i class="fas fa-rocket"></i> Quero Minha Análise Grátis
+                </button>
+                
+                <div class="mt-4">
+                    <small class="text-muted">
+                        <i class="fas fa-shield-alt text-success"></i>
+                        100% Grátis • Sem cartão de crédito • Resultados em 2 minutos
+                    </small>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal de Captura de Lead -->
+    <div class="modal fade lead-modal" id="modalCapturarLead" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="w-100">
+                        <h4 class="mb-2">
+                            <i class="fas fa-gift"></i> Sua Análise Nutricional GRÁTIS!
+                        </h4>
+                        <p class="mb-0">Descubra como a IA pode transformar sua alimentação</p>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <!-- Banner de Urgência -->
+                    <div class="urgency-banner">
+                        <i class="fas fa-clock"></i>
+                        <strong>Oferta Limitada!</strong> Apenas hoje: Análise completa + Bônus exclusivos
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="mb-3">🎯 O que você vai receber:</h5>
+                            
+                            <div class="benefit-item">
+                                <div class="benefit-icon">
+                                    <i class="fas fa-brain"></i>
+                                </div>
+                                <div>
+                                    <strong>Análise Nutricional IA</strong><br>
+                                    <small class="text-muted">Personalizada para seu perfil</small>
+                                </div>
+                            </div>
+
+                            <div class="benefit-item">
+                                <div class="benefit-icon">
+                                    <i class="fas fa-chart-pie"></i>
+                                </div>
+                                <div>
+                                    <strong>Plano Alimentar Completo</strong><br>
+                                    <small class="text-muted">Metas e refeições detalhadas</small>
+                                </div>
+                            </div>
+
+                            <div class="benefit-item">
+                                <div class="benefit-icon">
+                                    <i class="fas fa-dumbbell"></i>
+                                </div>
+                                <div>
+                                    <strong>Treino L7Personal</strong><br>
+                                    <small class="text-muted">Exercícios para casa, 30min</small>
+                                </div>
+                            </div>
+
+                            <div class="benefit-item">
+                                <div class="benefit-icon">
+                                    <i class="fas fa-chef-hat"></i>
+                                </div>
+                                <div>
+                                    <strong>Receitas L7Chef</strong><br>
+                                    <small class="text-muted">Saudáveis e práticas</small>
+                                </div>
+                            </div>
+
+                            <div class="benefit-item">
+                                <div class="benefit-icon">
+                                    <i class="fas fa-pills"></i>
+                                </div>
+                                <div>
+                                    <strong>Suplementação L7</strong><br>
+                                    <small class="text-muted">Recomendações personalizadas</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h5 class="mb-3">✨ Comece agora:</h5>
+                            
+                            <form id="formCapturarLead">
+                                <div class="mb-3">
+                                    <label class="form-label">Seu email</label>
+                                    <input type="email" class="form-control form-control-lg" 
+                                           id="emailLead" placeholder="seu@email.com" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Como podemos te chamar?</label>
+                                    <input type="text" class="form-control" 
+                                           id="nomeLead" placeholder="Seu nome">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Seu principal objetivo</label>
+                                    <select class="form-select" id="objetivoLead">
+                                        <option value="">Selecione...</option>
+                                        <option value="emagrecer">🎯 Emagrecer</option>
+                                        <option value="ganhar_massa">💪 Ganhar Massa Muscular</option>
+                                        <option value="manter_peso">⚖️ Manter Peso Ideal</option>
+                                        <option value="definir">✨ Definir o Corpo</option>
+                                        <option value="saude">❤️ Melhorar a Saúde</option>
+                                    </select>
+                                </div>
+
+                                <button type="submit" class="btn cta-button w-100 btn-lg">
+                                    <i class="fas fa-magic"></i> Gerar Minha Análise Grátis
+                                </button>
+
+                                <div class="text-center mt-3">
+                                    <small class="text-muted">
+                                        <i class="fas fa-lock"></i> Seus dados estão seguros. Não enviamos spam.
+                                    </small>
+                                </div>
+                            </form>
+
+                            <!-- Social Proof -->
+                            <div class="social-proof">
+                                <i class="fas fa-users"></i>
+                                <strong>Mais de 10.000 pessoas</strong> já descobriram seu plano ideal!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Saída (Exit Intent) -->
+    <div class="modal fade" id="modalExitIntent" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title">
+                        <i class="fas fa-exclamation-triangle"></i> Espera! Não vá embora!
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <h4 class="text-danger mb-3">🎁 OFERTA ESPECIAL!</h4>
+                    <p class="lead">Deixe seu email e ganhe <strong>50% de desconto</strong> em qualquer plano L7!</p>
+                    
+                    <form id="formExitIntent">
+                        <div class="mb-3">
+                            <input type="email" class="form-control form-control-lg" 
+                                   placeholder="Seu melhor email" required>
+                        </div>
+                        <button type="submit" class="btn btn-danger btn-lg">
+                            Quero 50% de Desconto!
+                        </button>
+                    </form>
+                    
+                    <small class="text-muted d-block mt-3">
+                        Oferta válida apenas hoje. Não perca!
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Estado da aplicação
+        let leadCapturado = false;
+        let exitIntentShown = false;
+        let timeOnPage = 0;
+
+        // Inicializar quando página carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            // Scroll animations
+            observarElementos();
+            
+            // Timer para tracking
+            setInterval(() => {
+                timeOnPage++;
+                
+                // Mostrar modal após 30 segundos se não capturou lead
+                if (timeOnPage === 30 && !leadCapturado) {
+                    mostrarModalCaptura();
+                }
+            }, 1000);
+
+            // Exit intent detection
+            document.addEventListener('mouseleave', function(e) {
+                if (e.clientY <= 0 && !exitIntentShown && !leadCapturado) {
+                    mostrarModalExitIntent();
+                }
+            });
+
+            // Scroll tracking para mostrar modal
+            window.addEventListener('scroll', function() {
+                const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+                
+                if (scrollPercent > 70 && !leadCapturado) {
+                    setTimeout(() => {
+                        if (!leadCapturado) {
+                            mostrarModalCaptura();
+                        }
+                    }, 2000);
+                }
+            });
+        });
+
+        // Função principal para iniciar análise
+        function iniciarAnalise() {
+            mostrarModalCaptura();
+        }
+
+        // Mostrar modal de captura
+        function mostrarModalCaptura() {
+            if (!leadCapturado) {
+                const modal = new bootstrap.Modal(document.getElementById('modalCapturarLead'));
+                modal.show();
+                
+                // Analytics
+                trackEvent('modal_captura_shown', 'lead', 'principal');
+            }
+        }
+
+        // Mostrar modal de exit intent
+        function mostrarModalExitIntent() {
+            if (!exitIntentShown && !leadCapturado) {
+                const modal = new bootstrap.Modal(document.getElementById('modalExitIntent'));
+                modal.show();
+                exitIntentShown = true;
+                
+                // Analytics
+                trackEvent('exit_intent_shown', 'lead', 'exit');
+            }
+        }
+
+        // Processar formulário de captura principal
+        document.getElementById('formCapturarLead').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('emailLead').value;
+            const nome = document.getElementById('nomeLead').value;
+            const objetivo = document.getElementById('objetivoLead').value;
+            
+            if (!email) {
+                alert('Por favor, digite seu email!');
+                return;
+            }
+
+            try {
+                await capturarLead({
+                    email: email,
+                    nome: nome,
+                    objetivo: objetivo,
+                    fonte: 'modal_captura'
+                });
+                
+                // Fechar modal e redirecionar
+                const modal = bootstrap.Modal.getInstance(document.getElementById('modalCapturarLead'));
+                modal.hide();
+                
+                // Mostrar sucesso e redirecionar
+                mostrarNotificacao('✅ Perfeito! Redirecionando para sua análise...', 'success');
+                
+                setTimeout(() => {
+                    window.location.href = '/cadastro?email=' + encodeURIComponent(email) + '&objetivo=' + objetivo;
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Erro ao capturar lead:', error);
+                mostrarNotificacao('❌ Erro ao processar. Tente novamente.', 'error');
+            }
+        });
+
+        // Processar formulário de exit intent
+        document.getElementById('formExitIntent').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = e.target.querySelector('input[type="email"]').value;
+            
+            try {
+                await capturarLead({
+                    email: email,
+                    fonte: 'exit_intent'
+                });
+                
+                // Fechar modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('modalExitIntent'));
+                modal.hide();
+                
+                mostrarNotificacao('🎁 Desconto garantido! Verifique seu email.', 'success');
+                
+            } catch (error) {
+                console.error('Erro ao capturar lead:', error);
+                mostrarNotificacao('❌ Erro ao processar. Tente novamente.', 'error');
+            }
+        });
+
+        // Função para capturar lead via API
+        async function capturarLead(dados) {
+            const response = await fetch('/api/leads/capturar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    ...dados,
+                    utm_source: new URLSearchParams(window.location.search).get('utm_source'),
+                    utm_medium: new URLSearchParams(window.location.search).get('utm_medium'),
+                    utm_campaign: new URLSearchParams(window.location.search).get('utm_campaign')
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Erro na API');
+            }
+
+            const resultado = await response.json();
+            leadCapturado = true;
+            
+            // Analytics
+            trackEvent('lead_captured', 'conversion', dados.fonte);
+            
+            return resultado;
+        }
+
+        // Função para observar elementos e animar
+        function observarElementos() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            });
+
+            document.querySelectorAll('.fade-in').forEach(el => {
+                observer.observe(el);
+            });
+        }
+
+        // Função para mostrar notificações
+        function mostrarNotificacao(mensagem, tipo = 'info') {
+            const notificacao = document.createElement('div');
+            notificacao.className = `alert alert-${tipo === 'success' ? 'success' : 'danger'} position-fixed`;
+            notificacao.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            notificacao.innerHTML = `
+                ${mensagem}
+                <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+            `;
+            
+            document.body.appendChild(notificacao);
+            
+            setTimeout(() => {
+                if (notificacao.parentElement) {
+                    notificacao.remove();
+                }
+            }, 5000);
+        }
+
+        // Analytics tracking
+        function trackEvent(action, category, label) {
+            console.log(`Analytics: ${action} - ${category} - ${label}`);
+            
+            // Aqui você pode integrar com Google Analytics, Facebook Pixel, etc.
+            if (typeof gtag !== 'undefined') {
+                gtag('event', action, {
+                    'event_category': category,
+                    'event_label': label
+                });
+            }
+        }
+    </script>
+</body>
+</html>

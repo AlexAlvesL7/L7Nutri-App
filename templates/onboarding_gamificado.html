@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onboarding Gamificado - L7Nutri</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --l7-primary: #e74c3c;
+            --l7-secondary: #2c3e50;
+            --l7-success: #27ae60;
+            --l7-warning: #f39c12;
+            --l7-info: #3498db;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .onboarding-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            margin: 20px auto;
+            padding: 40px;
+            max-width: 800px;
+            position: relative;
+        }
+
+        .progress-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .step-progress {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .step-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #ddd;
+            color: #999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            border: 3px solid #ddd;
+        }
+
+        .step-circle.active {
+            background: var(--l7-primary);
+            color: white;
+            border-color: var(--l7-primary);
+            transform: scale(1.1);
+        }
+
+        .step-circle.completed {
+            background: var(--l7-success);
+            color: white;
+            border-color: var(--l7-success);
+        }
+
+        .step-label {
+            margin-top: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            color: #666;
+        }
+
+        .step-label.active {
+            color: var(--l7-primary);
+        }
+
+        .step-label.completed {
+            color: var(--l7-success);
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 25px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #ddd;
+            z-index: 1;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--l7-success);
+            transition: width 0.5s ease;
+            border-radius: 2px;
+        }
+
+        .step-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            min-height: 400px;
+        }
+
+        .achievements {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .achievement-badge {
+            background: var(--l7-success);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 25px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+            animation: slideInRight 0.5s ease;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .gamification-stats {
+            background: linear-gradient(135deg, var(--l7-info), #5dade2);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .stat-item {
+            display: inline-block;
+            margin: 0 20px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, var(--l7-primary), #c0392b);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-next:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.3);
+            color: white;
+        }
+
+        .btn-prev {
+            background: #6c757d;
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+        }
+
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--l7-primary);
+            box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.25);
+        }
+
+        .motivation-message {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-left: 4px solid var(--l7-primary);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .checklist-item {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .checklist-item:hover {
+            border-color: var(--l7-primary);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.1);
+        }
+
+        .checklist-item.completed {
+            border-color: var(--l7-success);
+            background: #f8fff8;
+        }
+
+        .checklist-checkbox {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .onboarding-container {
+                margin: 10px;
+                padding: 20px;
+            }
+            
+            .step-progress {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .stat-item {
+                margin: 0 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Achievements Display -->
+    <div class="achievements" id="achievementsContainer"></div>
+
+    <div class="container-fluid">
+        <div class="onboarding-container">
+            <!-- Header com Progresso -->
+            <div class="progress-header">
+                <h1 class="mb-3">
+                    <i class="fas fa-rocket text-primary"></i>
+                    Vamos Criar Seu Plano Perfeito!
+                </h1>
+                
+                <!-- Gamification Stats -->
+                <div class="gamification-stats">
+                    <div class="stat-item">
+                        <span class="stat-number" id="xpPoints">0</span>
+                        <span class="stat-label">XP Pontos</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="completedSteps">0</span>
+                        <span class="stat-label">Etapas</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="achievements">0</span>
+                        <span class="stat-label">Conquistas</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step Progress Bar -->
+            <div class="step-progress">
+                <div class="progress-line">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+                
+                <div class="step-item">
+                    <div class="step-circle active" id="step1">1</div>
+                    <div class="step-label active">Perfil Básico</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-circle" id="step2">2</div>
+                    <div class="step-label">Objetivos</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-circle" id="step3">3</div>
+                    <div class="step-label">Atividade</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-circle" id="step4">4</div>
+                    <div class="step-label">Preferências</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-circle" id="step5">5</div>
+                    <div class="step-label">Finalizar</div>
+                </div>
+            </div>
+
+            <!-- Step Content -->
+            <div class="step-content" id="stepContent">
+                <!-- Conteúdo será carregado dinamicamente -->
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="d-flex justify-content-between">
+                <button class="btn btn-prev" id="btnPrev" onclick="voltarEtapa()" style="display: none;">
+                    <i class="fas fa-chevron-left"></i> Voltar
+                </button>
+                <div></div>
+                <button class="btn btn-next" id="btnNext" onclick="proximaEtapa()">
+                    Continuar <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Estado do onboarding
+        let currentStep = 1;
+        let totalSteps = 5;
+        let userDatat = {};
+        let xpPoints = 0;
+        let completedSteps = 0;
+        let achievementCount = 0;
+
+        // Dados das etapas
+        const stepData = {
+            1: {
+                title: "Vamos nos conhecer melhor! 👋",
+                content: `
+                    <div class="motivation-message">
+                        <i class="fas fa-star text-warning"></i>
+                        <strong>Primeira etapa!</strong> Conte-nos sobre você para criarmos seu plano personalizado.
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nome completo</label>
+                            <input type="text" class="form-control" id="nome" placeholder="Como podemos te chamar?">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Idade</label>
+                            <input type="number" class="form-control" id="idade" placeholder="Sua idade" min="15" max="100">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Peso atual (kg)</label>
+                            <input type="number" class="form-control" id="peso" placeholder="Seu peso atual" step="0.1">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Altura (cm)</label>
+                            <input type="number" class="form-control" id="altura" placeholder="Sua altura" min="140" max="220">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Sexo</label>
+                        <select class="form-select" id="sexo">
+                            <option value="">Selecione...</option>
+                            <option value="masculino">👨 Masculino</option>
+                            <option value="feminino">👩 Feminino</option>
+                        </select>
+                    </div>
+                `,
+                validation: () => {
+                    const nome = document.getElementById('nome').value;
+                    const idade = document.getElementById('idade').value;
+                    const peso = document.getElementById('peso').value;
+                    const altura = document.getElementById('altura').value;
+                    const sexo = document.getElementById('sexo').value;
+                    
+                    if (!nome || !idade || !peso || !altura || !sexo) {
+                        alert('Por favor, preencha todos os campos!');
+                        return false;
+                    }
+                    
+                    userDatat = { nome, idade: parseInt(idade), peso: parseFloat(peso), altura: parseFloat(altura), sexo };
+                    return true;
+                }
+            },
+            2: {
+                title: "Qual é seu principal objetivo? 🎯",
+                content: `
+                    <div class="motivation-message">
+                        <i class="fas fa-bullseye text-danger"></i>
+                        <strong>Definindo seu foco!</strong> Seu objetivo vai moldar todo seu plano personalizado.
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="checklist-item" onclick="selecionarObjetivo('emagrecer')">
+                                <input type="radio" name="objetivo" value="emagrecer" class="checklist-checkbox">
+                                <strong>🎯 Emagrecer</strong><br>
+                                <small class="text-muted">Perder gordura e definir o corpo</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="checklist-item" onclick="selecionarObjetivo('ganhar_massa')">
+                                <input type="radio" name="objetivo" value="ganhar_massa" class="checklist-checkbox">
+                                <strong>💪 Ganhar Massa</strong><br>
+                                <small class="text-muted">Aumentar músculos e peso</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="checklist-item" onclick="selecionarObjetivo('manter_peso')">
+                                <input type="radio" name="objetivo" value="manter_peso" class="checklist-checkbox">
+                                <strong>⚖️ Manter Peso</strong><br>
+                                <small class="text-muted">Manter peso e melhorar saúde</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="checklist-item" onclick="selecionarObjetivo('definir')">
+                                <input type="radio" name="objetivo" value="definir" class="checklist-checkbox">
+                                <strong>✨ Definir Músculos</strong><br>
+                                <small class="text-muted">Reduzir gordura e definir</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Prazo para alcançar seu objetivo</label>
+                        <select class="form-select" id="prazo">
+                            <option value="">Selecione o prazo...</option>
+                            <option value="1_mes">📅 1 mês</option>
+                            <option value="3_meses">📅 3 meses</option>
+                            <option value="6_meses">📅 6 meses</option>
+                            <option value="1_ano">📅 1 ano</option>
+                        </select>
+                    </div>
+                `,
+                validation: () => {
+                    const objetivo = document.querySelector('input[name="objetivo"]:checked')?.value;
+                    const prazo = document.getElementById('prazo').value;
+                    
+                    if (!objetivo || !prazo) {
+                        alert('Por favor, selecione seu objetivo e prazo!');
+                        return false;
+                    }
+                    
+                    userDatat.objetivo = objetivo;
+                    userDatat.prazo = prazo;
+                    return true;
+                }
+            },
+            3: {
+                title: "Seu nível de atividade física 🏃‍♂️",
+                content: `
+                    <div class="motivation-message">
+                        <i class="fas fa-dumbbell text-success"></i>
+                        <strong>Atividade física!</strong> Isso nos ajuda a calcular suas necessidades calóricas.
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="checklist-item" onclick="selecionarAtividade('1.2')">
+                                <input type="radio" name="atividade" value="1.2" class="checklist-checkbox">
+                                <strong>🛋️ Sedentário</strong><br>
+                                <small class="text-muted">Pouco ou nenhum exercício</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="checklist-item" onclick="selecionarAtividade('1.375')">
+                                <input type="radio" name="atividade" value="1.375" class="checklist-checkbox">
+                                <strong>🚶 Leve</strong><br>
+                                <small class="text-muted">Exercício leve 1-3x/semana</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="checklist-item" onclick="selecionarAtividade('1.55')">
+                                <input type="radio" name="atividade" value="1.55" class="checklist-checkbox">
+                                <strong>🏃 Moderado</strong><br>
+                                <small class="text-muted">Exercício moderado 3-5x/semana</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="checklist-item" onclick="selecionarAtividade('1.725')">
+                                <input type="radio" name="atividade" value="1.725" class="checklist-checkbox">
+                                <strong>🏋️ Intenso</strong><br>
+                                <small class="text-muted">Exercício intenso 6-7x/semana</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Experiência com treino</label>
+                        <select class="form-select" id="experiencia_treino">
+                            <option value="">Selecione...</option>
+                            <option value="0">🆕 Iniciante (nunca treinei)</option>
+                            <option value="3">🌱 Básico (até 6 meses)</option>
+                            <option value="12">💪 Intermediário (6 meses - 2 anos)</option>
+                            <option value="36">🏆 Avançado (mais de 2 anos)</option>
+                        </select>
+                    </div>
+                `,
+                validation: () => {
+                    const atividade = document.querySelector('input[name="atividade"]:checked')?.value;
+                    const experiencia = document.getElementById('experiencia_treino').value;
+                    
+                    if (!atividade || !experiencia) {
+                        alert('Por favor, selecione seu nível de atividade e experiência!');
+                        return false;
+                    }
+                    
+                    userDatat.fator_atividade = parseFloat(atividade);
+                    userDatat.tempo_treino_meses = parseInt(experiencia);
+                    return true;
+                }
+            },
+            4: {
+                title: "Suas preferências alimentares 🥗",
+                content: `
+                    <div class="motivation-message">
+                        <i class="fas fa-heart text-danger"></i>
+                        <strong>Quase lá!</strong> Vamos personalizar ainda mais seu plano com suas preferências.
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Estilo alimentar</label>
+                        <select class="form-select" id="estilo_alimentar">
+                            <option value="">Selecione...</option>
+                            <option value="tradicional">🍽️ Tradicional</option>
+                            <option value="vegetariano">🥗 Vegetariano</option>
+                            <option value="vegano">🌱 Vegano</option>
+                            <option value="low_carb">🥩 Low Carb</option>
+                            <option value="cetogenica">🧈 Cetogênica</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Restrições alimentares</label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="lactose" id="restricao_lactose">
+                                    <label class="form-check-label" for="restricao_lactose">🥛 Intolerância à lactose</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="gluten" id="restricao_gluten">
+                                    <label class="form-check-label" for="restricao_gluten">🌾 Intolerância ao glúten</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="diabetes" id="restricao_diabetes">
+                                    <label class="form-check-label" for="restricao_diabetes">🩺 Diabetes</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="hipertensao" id="restricao_hipertensao">
+                                    <label class="form-check-label" for="restricao_hipertensao">❤️ Hipertensão</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Experiência com suplementos</label>
+                        <select class="form-select" id="experiencia_suplementos">
+                            <option value="">Selecione...</option>
+                            <option value="iniciante">🆕 Iniciante (nunca usei)</option>
+                            <option value="basico">🌱 Básico (já usei alguns)</option>
+                            <option value="intermediario">💪 Intermediário (uso regularmente)</option>
+                            <option value="avancado">🏆 Avançado (conheço bem)</option>
+                        </select>
+                    </div>
+                `,
+                validation: () => {
+                    const estilo = document.getElementById('estilo_alimentar').value;
+                    const experiencia_supl = document.getElementById('experiencia_suplementos').value;
+                    
+                    if (!estilo || !experiencia_supl) {
+                        alert('Por favor, preencha os campos obrigatórios!');
+                        return false;
+                    }
+                    
+                    // Coletar restrições
+                    const restricoes = [];
+                    document.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
+                        restricoes.push(checkbox.value);
+                    });
+                    
+                    userDatat.estilo_alimentar = estilo;
+                    userDatat.experiencia_suplementos = experiencia_supl;
+                    userDatat.restricoes_alimentares = restricoes;
+                    return true;
+                }
+            },
+            5: {
+                title: "Finalizando seu plano personalizado! 🎉",
+                content: `
+                    <div class="motivation-message">
+                        <i class="fas fa-trophy text-warning"></i>
+                        <strong>Parabéns!</strong> Você completou todas as etapas. Agora vamos gerar seu plano com IA!
+                    </div>
+                    <div class="text-center">
+                        <div class="mb-4">
+                            <i class="fas fa-brain fa-3x text-primary mb-3"></i>
+                            <h4>Sua Análise Personalizada está sendo criada!</h4>
+                            <p class="text-muted">Nossa IA está processando todas as suas informações para criar o plano perfeito para você.</p>
+                        </div>
+                        
+                        <div class="row text-center mb-4">
+                            <div class="col-md-3">
+                                <i class="fas fa-chart-pie fa-2x text-success mb-2"></i>
+                                <h6>Plano Nutricional</h6>
+                                <small class="text-muted">Metas personalizadas</small>
+                            </div>
+                            <div class="col-md-3">
+                                <i class="fas fa-dumbbell fa-2x text-warning mb-2"></i>
+                                <h6>Treino L7Personal</h6>
+                                <small class="text-muted">Exercícios para casa</small>
+                            </div>
+                            <div class="col-md-3">
+                                <i class="fas fa-chef-hat fa-2x text-info mb-2"></i>
+                                <h6>Receitas L7Chef</h6>
+                                <small class="text-muted">Receitas saudáveis</small>
+                            </div>
+                            <div class="col-md-3">
+                                <i class="fas fa-pills fa-2x text-danger mb-2"></i>
+                                <h6>Suplementos L7</h6>
+                                <small class="text-muted">Recomendações</small>
+                            </div>
+                        </div>
+                        
+                        <div id="loadingIndicator" style="display: none;">
+                            <div class="spinner-border text-primary mb-3" role="status">
+                                <span class="visually-hidden">Carregando...</span>
+                            </div>
+                            <p>Gerando análise com IA...</p>
+                        </div>
+                    </div>
+                `,
+                validation: () => true
+            }
+        };
+
+        // Inicializar onboarding
+        function iniciarOnboarding() {
+            carregarEtapa(1);
+        }
+
+        // Carregar etapa específica
+        function carregarEtapa(step) {
+            currentStep = step;
+            const stepInfo = stepData[step];
+            
+            // Atualizar conteúdo
+            document.getElementById('stepContent').innerHTML = `
+                <h3 class="mb-4">${stepInfo.title}</h3>
+                ${stepInfo.content}
+            `;
+            
+            // Atualizar progress bar
+            atualizarProgresso();
+            
+            // Atualizar botões
+            atualizarBotoes();
+            
+            // Adicionar XP
+            if (step > completedSteps) {
+                adicionarXP(100);
+                completedSteps = step - 1;
+                atualizarStats();
+                
+                // Verificar conquistas
+                verificarConquistas();
+            }
+        }
+
+        // Próxima etapa
+        function proximaEtapa() {
+            const stepInfo = stepData[currentStep];
+            
+            if (stepInfo.validation && !stepInfo.validation()) {
+                return;
+            }
+            
+            if (currentStep < totalSteps) {
+                carregarEtapa(currentStep + 1);
+            } else {
+                finalizarOnboarding();
+            }
+        }
+
+        // Voltar etapa
+        function voltarEtapa() {
+            if (currentStep > 1) {
+                carregarEtapa(currentStep - 1);
+            }
+        }
+
+        // Atualizar progresso visual
+        function atualizarProgresso() {
+            const progressPercent = ((currentStep - 1) / (totalSteps - 1)) * 100;
+            document.getElementById('progressFill').style.width = progressPercent + '%';
+            
+            // Atualizar círculos
+            for (let i = 1; i <= totalSteps; i++) {
+                const circle = document.getElementById(`step${i}`);
+                const label = circle.nextElementSibling;
+                
+                circle.className = 'step-circle';
+                label.className = 'step-label';
+                
+                if (i < currentStep) {
+                    circle.classList.add('completed');
+                    label.classList.add('completed');
+                    circle.innerHTML = '<i class="fas fa-check"></i>';
+                } else if (i === currentStep) {
+                    circle.classList.add('active');
+                    label.classList.add('active');
+                    circle.innerHTML = i;
+                } else {
+                    circle.innerHTML = i;
+                }
+            }
+        }
+
+        // Atualizar botões
+        function atualizarBotoes() {
+            const btnPrev = document.getElementById('btnPrev');
+            const btnNext = document.getElementById('btnNext');
+            
+            btnPrev.style.display = currentStep > 1 ? 'inline-block' : 'none';
+            
+            if (currentStep === totalSteps) {
+                btnNext.innerHTML = '<i class="fas fa-magic"></i> Gerar Meu Plano!';
+            } else {
+                btnNext.innerHTML = 'Continuar <i class="fas fa-chevron-right"></i>';
+            }
+        }
+
+        // Seleção de objetivo
+        function selecionarObjetivo(objetivo) {
+            document.querySelectorAll('input[name="objetivo"]').forEach(radio => {
+                radio.checked = radio.value === objetivo;
+                radio.closest('.checklist-item').classList.toggle('completed', radio.checked);
+            });
+        }
+
+        // Seleção de atividade
+        function selecionarAtividade(atividade) {
+            document.querySelectorAll('input[name="atividade"]').forEach(radio => {
+                radio.checked = radio.value === atividade;
+                radio.closest('.checklist-item').classList.toggle('completed', radio.checked);
+            });
+        }
+
+        // Sistema de gamificação
+        function adicionarXP(pontos) {
+            xpPoints += pontos;
+            atualizarStats();
+            
+            // Animação de XP
+            mostrarConquista(`+${pontos} XP`, 'info');
+        }
+
+        function atualizarStats() {
+            document.getElementById('xpPoints').textContent = xpPoints;
+            document.getElementById('completedSteps').textContent = completedSteps;
+            document.getElementById('achievements').textContent = achievementCount;
+        }
+
+        function verificarConquistas() {
+            if (completedSteps === 1 && !document.querySelector('[data-achievement="primeiro_passo"]')) {
+                mostrarConquista('🎯 Primeiro Passo!', 'success', 'primeiro_passo');
+                achievementCount++;
+            }
+            
+            if (completedSteps === 3 && !document.querySelector('[data-achievement="meio_caminho"]')) {
+                mostrarConquista('🔥 Meio do Caminho!', 'warning', 'meio_caminho');
+                achievementCount++;
+            }
+            
+            if (xpPoints >= 500 && !document.querySelector('[data-achievement="expert"]')) {
+                mostrarConquista('👑 Expert em Onboarding!', 'primary', 'expert');
+                achievementCount++;
+            }
+            
+            atualizarStats();
+        }
+
+        function mostrarConquista(texto, tipo = 'success', id = null) {
+            const container = document.getElementById('achievementsContainer');
+            const achievement = document.createElement('div');
+            achievement.className = `achievement-badge alert-${tipo}`;
+            if (id) achievement.setAttribute('data-achievement', id);
+            achievement.innerHTML = `
+                <i class="fas fa-trophy me-2"></i>
+                ${texto}
+            `;
+            
+            container.appendChild(achievement);
+            
+            // Remover após 5 segundos
+            setTimeout(() => {
+                achievement.remove();
+            }, 5000);
+        }
+
+        // Finalizar onboarding
+        async function finalizarOnboarding() {
+            try {
+                // Mostrar loading
+                document.getElementById('loadingIndicator').style.display = 'block';
+                document.getElementById('btnNext').disabled = true;
+                
+                // Enviar dados para API
+                const response = await fetch('/api/finalizar-onboarding', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(userDatat)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erro ao finalizar onboarding');
+                }
+
+                const resultado = await response.json();
+                
+                // Conquista final
+                mostrarConquista('🏆 Onboarding Completo!', 'success', 'completo');
+                adicionarXP(500);
+                
+                // Redirecionar para análise
+                setTimeout(() => {
+                    window.location.href = '/analise-nutricional';
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao finalizar onboarding. Tente novamente.');
+                document.getElementById('loadingIndicator').style.display = 'none';
+                document.getElementById('btnNext').disabled = false;
+            }
+        }
+
+        // Inicializar ao carregar página
+        document.addEventListener('DOMContentLoaded', function() {
+            iniciarOnboarding();
+        });
+    </script>
+</body>
+</html>

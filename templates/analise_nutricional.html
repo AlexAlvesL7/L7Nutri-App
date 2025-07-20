@@ -296,8 +296,13 @@
         <div class="container-custom fade-in">
             <!-- Header da Análise -->
             <div class="header-analise">
-                <h1><i class="fas fa-brain"></i> Sua Análise Nutricional Personalizada</h1>
-                <p class="mb-0">Criado pela IA do L7Nutri especialmente para você!</p>
+                <div style="position: relative; z-index: 1;">
+                    <h1><i class="fas fa-brain"></i> Sua Análise Nutricional Personalizada</h1>
+                    <p class="mb-3" id="resumoObjetivo">Criado pela IA do L7Nutri especialmente para você!</p>
+                    <button class="btn btn-light btn-lg" onclick="abrirModalRegenerarAnalise()" id="btnRegenerarAnalise" style="display: none;">
+                        <i class="fas fa-sync-alt"></i> Regenerar Análise
+                    </button>
+                </div>
             </div>
 
             <!-- Loading Spinner -->
@@ -438,6 +443,9 @@
                 // Mostrar conteúdo
                 loadingSpinner.style.display = 'none';
                 analiseContent.style.display = 'block';
+                
+                // Mostrar botão regenerar após carregar análise
+                document.getElementById('btnRegenerarAnalise').style.display = 'inline-block';
                 
                 // Adicionar animações
                 setTimeout(() => {
@@ -611,6 +619,210 @@
                 trackEvent('click', 'suplemento', 'l7shop');
             }
         });
+    </script>
+
+    <!-- Modal para Regenerar Análise -->
+    <div class="modal fade" id="modalRegenerarAnalise" tabindex="-1" aria-labelledby="modalRegenerarAnaliseLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="modalRegenerarAnaliseLabel">
+                        <i class="fas fa-sync-alt"></i> Regenerar Análise Nutricional
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Quer atualizar sua análise?</strong> Revise seus dados abaixo e nossa IA criará um novo plano personalizado para você!
+                    </div>
+                    
+                    <form id="formRegenerarAnalise">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="novoObjetivo" class="form-label">Objetivo</label>
+                                    <select class="form-select" id="novoObjetivo" name="objetivo">
+                                        <option value="emagrecer">🎯 Emagrecer</option>
+                                        <option value="ganhar_massa">💪 Ganhar Massa Muscular</option>
+                                        <option value="manter_peso">⚖️ Manter Peso</option>
+                                        <option value="definir">✨ Definir Músculos</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="novaAtividade" class="form-label">Nível de Atividade</label>
+                                    <select class="form-select" id="novaAtividade" name="fator_atividade">
+                                        <option value="1.2">🛋️ Sedentário</option>
+                                        <option value="1.375">🚶 Leve (1-3x/semana)</option>
+                                        <option value="1.55">🏃 Moderado (3-5x/semana)</option>
+                                        <option value="1.725">🏋️ Intenso (5-7x/semana)</option>
+                                        <option value="1.9">🔥 Muito Intenso (2x/dia)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="novoEstiloAlimentar" class="form-label">Estilo Alimentar</label>
+                                    <select class="form-select" id="novoEstiloAlimentar" name="estilo_alimentar">
+                                        <option value="tradicional">🍽️ Tradicional</option>
+                                        <option value="vegetariano">🥗 Vegetariano</option>
+                                        <option value="vegano">🌱 Vegano</option>
+                                        <option value="low_carb">🥩 Low Carb</option>
+                                        <option value="cetogenica">🧈 Cetogênica</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="novaTempo" class="form-label">Experiência com Treino</label>
+                                    <select class="form-select" id="novaTempo" name="tempo_treino_meses">
+                                        <option value="0">🆕 Iniciante (0 meses)</option>
+                                        <option value="3">🌱 Básico (1-6 meses)</option>
+                                        <option value="12">💪 Intermediário (6-24 meses)</option>
+                                        <option value="36">🏆 Avançado (2+ anos)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="novasRestricoes" class="form-label">Restrições Alimentares</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="lactose" id="restricaoLactose">
+                                        <label class="form-check-label" for="restricaoLactose">🥛 Lactose</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="gluten" id="restricaoGluten">
+                                        <label class="form-check-label" for="restricaoGluten">🌾 Glúten</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="diabetes" id="restricaoDiabetes">
+                                        <label class="form-check-label" for="restricaoDiabetes">🩺 Diabetes</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="hipertensao" id="restricaoHipertensao">
+                                        <label class="form-check-label" for="restricaoHipertensao">❤️ Hipertensão</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="regenerarAnalise()">
+                        <i class="fas fa-magic"></i> Regenerar com IA
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Função para abrir modal de regenerar análise
+        function abrirModalRegenerarAnalise() {
+            const modal = new bootstrap.Modal(document.getElementById('modalRegenerarAnalise'));
+            modal.show();
+        }
+
+        // Função para regenerar análise
+        async function regenerarAnalise() {
+            const form = document.getElementById('formRegenerarAnalise');
+            const formData = new FormData(form);
+            
+            // Coletar restrições selecionadas
+            const restricoes = [];
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
+                restricoes.push(checkbox.value);
+            });
+            
+            // Preparar dados para envio
+            const dadosAtualizados = {
+                objetivo: formData.get('objetivo'),
+                fator_atividade: parseFloat(formData.get('fator_atividade')),
+                estilo_alimentar: formData.get('estilo_alimentar'),
+                tempo_treino_meses: parseInt(formData.get('tempo_treino_meses')),
+                restricoes_alimentares: restricoes
+            };
+            
+            try {
+                // Mostrar loading no botão
+                const btnRegenerar = document.querySelector('button[onclick="regenerarAnalise()"]');
+                const textoOriginal = btnRegenerar.innerHTML;
+                btnRegenerar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Regenerando...';
+                btnRegenerar.disabled = true;
+                
+                // Fazer requisição para regenerar
+                const response = await fetch('/api/regenerar-analise', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dadosAtualizados)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erro ao regenerar análise');
+                }
+
+                const novaAnalise = await response.json();
+                
+                // Fechar modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('modalRegenerarAnalise'));
+                modal.hide();
+                
+                // Recarregar análise na tela
+                preencherAnalise(novaAnalise);
+                
+                // Mostrar notificação de sucesso
+                mostrarNotificacao('✅ Análise regenerada com sucesso!', 'success');
+                
+                // Restaurar botão
+                btnRegenerar.innerHTML = textoOriginal;
+                btnRegenerar.disabled = false;
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                mostrarNotificacao('❌ Erro ao regenerar análise. Tente novamente.', 'error');
+                
+                // Restaurar botão
+                btnRegenerar.innerHTML = textoOriginal;
+                btnRegenerar.disabled = false;
+            }
+        }
+
+        // Função para mostrar notificações
+        function mostrarNotificacao(mensagem, tipo = 'info') {
+            // Criar elemento de notificação
+            const notificacao = document.createElement('div');
+            notificacao.className = `alert alert-${tipo === 'success' ? 'success' : 'danger'} position-fixed`;
+            notificacao.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            notificacao.innerHTML = `
+                ${mensagem}
+                <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+            `;
+            
+            document.body.appendChild(notificacao);
+            
+            // Remover após 5 segundos
+            setTimeout(() => {
+                if (notificacao.parentElement) {
+                    notificacao.remove();
+                }
+            }, 5000);
+        }
     </script>
 </body>
 </html>
