@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧠 Análise Nutricional Inteligente - Teste Completo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container-teste {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            padding: 30px;
+            max-width: 1400px;
+        }
+        .header-teste {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border-radius: 15px;
+        }
+        .modulo-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+            transition: transform 0.3s ease;
+        }
+        .modulo-card:hover {
+            transform: translateY(-5px);
+        }
+        .card-header-modulo {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 20px;
+            border: none;
+            font-weight: 600;
+        }
+        .resultado-container {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 15px;
+            border-left: 4px solid #e74c3c;
+        }
+        .btn-testar {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 5px;
+        }
+        .btn-testar:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .dados-usuario {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        .metrica {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 5px;
+            text-align: center;
+        }
+        .ia-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #27ae60;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 25px;
+            font-weight: bold;
+            z-index: 1000;
+        }
+        .ia-status.offline {
+            background: #e74c3c;
+        }
+        pre {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .badge-modulo {
+            background: #e74c3c;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="ia-status" id="iaStatus">🧠 IA Conectada</div>
+    
+    <div class="container-fluid">
+        <div class="container-teste">
+            <!-- Header -->
+            <div class="header-teste">
+                <h1><i class="fas fa-brain"></i> Sistema de Análise Nutricional Inteligente</h1>
+                <p class="mb-0">Teste completo da nova classe modular com prompts específicos</p>
+            </div>
+
+            <!-- Dados do Usuário de Teste -->
+            <div class="dados-usuario">
+                <h3><i class="fas fa-user"></i> Dados do Usuário de Teste</h3>
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="metrica">
+                            <strong>Nome</strong><br>
+                            <span id="nomeUsuario">João Silva</span>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="metrica">
+                            <strong>Idade</strong><br>
+                            <span id="idadeUsuario">28 anos</span>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="metrica">
+                            <strong>Peso</strong><br>
+                            <span id="pesoUsuario">80kg</span>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="metrica">
+                            <strong>Altura</strong><br>
+                            <span id="alturaUsuario">175cm</span>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="metrica">
+                            <strong>Objetivo</strong><br>
+                            <span id="objetivoUsuario">Emagrecer</span>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="metrica">
+                            <strong>Experiência</strong><br>
+                            <span id="experienciaUsuario">Iniciante</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-light mt-3" onclick="alterarDadosUsuario()">
+                    <i class="fas fa-edit"></i> Alterar Dados
+                </button>
+            </div>
+
+            <!-- Módulos de Teste -->
+            <div class="row">
+                <!-- 1. Plano Nutricional -->
+                <div class="col-md-6">
+                    <div class="modulo-card">
+                        <div class="card-header-modulo">
+                            <i class="fas fa-chart-pie"></i> 1. Plano Nutricional Personalizado
+                            <span class="badge-modulo">PROMPT ESPECÍFICO</span>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Funcionalidade:</strong> Gera metas nutricionais completas com divisão de refeições</p>
+                            <button class="btn btn-testar" onclick="testarPlanoNutricional()">
+                                <i class="fas fa-play"></i> Testar Plano
+                            </button>
+                            <div class="loading" id="loadingPlano">
+                                <div class="spinner-border text-primary" role="status"></div>
+                                <p>IA analisando perfil...</p>
+                            </div>
+                            <div class="resultado-container" id="resultadoPlano" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Recomendação de Treino -->
+                <div class="col-md-6">
+                    <div class="modulo-card">
+                        <div class="card-header-modulo">
+                            <i class="fas fa-dumbbell"></i> 2. Treino L7Personal
+                            <span class="badge-modulo">PROMPT ESPECÍFICO</span>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Funcionalidade:</strong> Sugere treino personalizado para casa em 30 minutos</p>
+                            <button class="btn btn-testar" onclick="testarTreino()">
+                                <i class="fas fa-play"></i> Testar Treino
+                            </button>
+                            <div class="loading" id="loadingTreino">
+                                <div class="spinner-border text-success" role="status"></div>
+                                <p>IA criando treino...</p>
+                            </div>
+                            <div class="resultado-container" id="resultadoTreino" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Receita L7Chef -->
+                <div class="col-md-6">
+                    <div class="modulo-card">
+                        <div class="card-header-modulo">
+                            <i class="fas fa-chef-hat"></i> 3. Receita L7Chef
+                            <span class="badge-modulo">PROMPT ESPECÍFICO</span>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Funcionalidade:</strong> Receita saudável e prática adequada ao objetivo</p>
+                            <button class="btn btn-testar" onclick="testarReceita()">
+                                <i class="fas fa-play"></i> Testar Receita
+                            </button>
+                            <div class="loading" id="loadingReceita">
+                                <div class="spinner-border text-warning" role="status"></div>
+                                <p>IA criando receita...</p>
+                            </div>
+                            <div class="resultado-container" id="resultadoReceita" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Suplemento L7 -->
+                <div class="col-md-6">
+                    <div class="modulo-card">
+                        <div class="card-header-modulo">
+                            <i class="fas fa-pills"></i> 4. Suplemento L7Shop
+                            <span class="badge-modulo">PROMPT ESPECÍFICO</span>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Funcionalidade:</strong> Recomenda L7Ultra/Turbo/Nitro com justificativa</p>
+                            <button class="btn btn-testar" onclick="testarSuplemento()">
+                                <i class="fas fa-play"></i> Testar Suplemento
+                            </button>
+                            <div class="loading" id="loadingSuplemento">
+                                <div class="spinner-border text-danger" role="status"></div>
+                                <p>IA analisando experiência...</p>
+                            </div>
+                            <div class="resultado-container" id="resultadoSuplemento" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Mensagem Motivacional -->
+                <div class="col-md-6">
+                    <div class="modulo-card">
+                        <div class="card-header-modulo">
+                            <i class="fas fa-heart"></i> 5. Mensagem Motivacional
+                            <span class="badge-modulo">PROMPT ESPECÍFICO</span>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Funcionalidade:</strong> Mensagem personalizada e humanizada</p>
+                            <button class="btn btn-testar" onclick="testarMensagem()">
+                                <i class="fas fa-play"></i> Testar Mensagem
+                            </button>
+                            <div class="loading" id="loadingMensagem">
+                                <div class="spinner-border text-info" role="status"></div>
+                                <p>IA gerando motivação...</p>
+                            </div>
+                            <div class="resultado-container" id="resultadoMensagem" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Análise Completa -->
+                <div class="col-md-6">
+                    <div class="modulo-card">
+                        <div class="card-header-modulo">
+                            <i class="fas fa-magic"></i> 6. Análise Completa
+                            <span class="badge-modulo">TODOS OS MÓDULOS</span>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Funcionalidade:</strong> Gera resultado completo pronto para dashboard</p>
+                            <button class="btn btn-testar" onclick="testarAnaliseCompleta()">
+                                <i class="fas fa-rocket"></i> Gerar Análise Completa
+                            </button>
+                            <div class="loading" id="loadingCompleta">
+                                <div class="spinner-border text-purple" role="status"></div>
+                                <p>IA processando análise completa...</p>
+                            </div>
+                            <div class="resultado-container" id="resultadoCompleta" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ações Globais -->
+            <div class="text-center mt-4">
+                <button class="btn btn-primary btn-lg" onclick="testarTodosModulos()">
+                    <i class="fas fa-cogs"></i> Testar Todos os Módulos
+                </button>
+                <button class="btn btn-secondary btn-lg" onclick="limparResultados()">
+                    <i class="fas fa-eraser"></i> Limpar Resultados
+                </button>
+                <button class="btn btn-info btn-lg" onclick="exportarResultados()">
+                    <i class="fas fa-download"></i> Exportar JSON
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Dados do usuário de teste (podem ser alterados)
+        let dadosUsuario = {
+            nome: 'João Silva',
+            idade: 28,
+            peso: 80,
+            altura: 175,
+            sexo: 'masculino',
+            objetivo: 'emagrecer',
+            fator_atividade: 1.4,
+            estilo_alimentar: 'tradicional',
+            experiencia_suplementos: 'iniciante',
+            tempo_treino_meses: 3,
+            ja_usou_termogenico: false,
+            horario_treino: 'manha',
+            disponibilidade_cozinhar: 'media'
+        };
+
+        // Verificar status da IA
+        async function verificarStatusIA() {
+            try {
+                const response = await fetch('/api/analise-nutricional');
+                const iaStatus = document.getElementById('iaStatus');
+                if (response.ok) {
+                    iaStatus.textContent = '🧠 IA Conectada';
+                    iaStatus.className = 'ia-status';
+                } else {
+                    iaStatus.textContent = '⚠️ IA Offline';
+                    iaStatus.className = 'ia-status offline';
+                }
+            } catch (error) {
+                const iaStatus = document.getElementById('iaStatus');
+                iaStatus.textContent = '❌ IA Erro';
+                iaStatus.className = 'ia-status offline';
+            }
+        }
+
+        // Funções de teste para cada módulo
+        async function testarPlanoNutricional() {
+            mostrarLoading('loadingPlano');
+            try {
+                const analise = await criarAnalisePersonalizada();
+                const plano = analise.gerar_plano();
+                mostrarResultado('resultadoPlano', plano, 'Plano Nutricional');
+            } catch (error) {
+                mostrarErro('resultadoPlano', error);
+            }
+            esconderLoading('loadingPlano');
+        }
+
+        async function testarTreino() {
+            mostrarLoading('loadingTreino');
+            try {
+                const analise = await criarAnalisePersonalizada();
+                const treino = analise.recomendar_treino();
+                mostrarResultado('resultadoTreino', treino, 'Treino L7Personal');
+            } catch (error) {
+                mostrarErro('resultadoTreino', error);
+            }
+            esconderLoading('loadingTreino');
+        }
+
+        async function testarReceita() {
+            mostrarLoading('loadingReceita');
+            try {
+                const analise = await criarAnalisePersonalizada();
+                const receita = analise.recomendar_receita();
+                mostrarResultado('resultadoReceita', receita, 'Receita L7Chef');
+            } catch (error) {
+                mostrarErro('resultadoReceita', error);
+            }
+            esconderLoading('loadingReceita');
+        }
+
+        async function testarSuplemento() {
+            mostrarLoading('loadingSuplemento');
+            try {
+                const analise = await criarAnalisePersonalizada();
+                const suplemento = analise.recomendar_suplemento();
+                mostrarResultado('resultadoSuplemento', suplemento, 'Suplemento L7');
+            } catch (error) {
+                mostrarErro('resultadoSuplemento', error);
+            }
+            esconderLoading('loadingSuplemento');
+        }
+
+        async function testarMensagem() {
+            mostrarLoading('loadingMensagem');
+            try {
+                const analise = await criarAnalisePersonalizada();
+                const mensagem = analise.mensagem_motivacional();
+                mostrarResultado('resultadoMensagem', {mensagem}, 'Mensagem Motivacional');
+            } catch (error) {
+                mostrarErro('resultadoMensagem', error);
+            }
+            esconderLoading('loadingMensagem');
+        }
+
+        async function testarAnaliseCompleta() {
+            mostrarLoading('loadingCompleta');
+            try {
+                const response = await fetch('/api/regenerar-analise', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(dadosUsuario)
+                });
+                
+                const resultado = await response.json();
+                mostrarResultado('resultadoCompleta', resultado, 'Análise Completa');
+            } catch (error) {
+                mostrarErro('resultadoCompleta', error);
+            }
+            esconderLoading('loadingCompleta');
+        }
+
+        // Função para criar análise personalizada (simulação)
+        async function criarAnalisePersonalizada() {
+            // Simulação da classe AnaliseNutricionalIA
+            return {
+                gerar_plano: () => ({
+                    metas: {
+                        calorias: 1800,
+                        proteina: 144,
+                        carboidratos: 180,
+                        gorduras: 60,
+                        fibras: 25,
+                        agua: 2.8
+                    },
+                    refeicoes: {
+                        cafe_manha: '07:00 - Ovos mexidos, aveia com frutas, café',
+                        almoco: '12:30 - Frango grelhado, arroz integral, salada',
+                        jantar: '19:00 - Peixe assado, legumes refogados'
+                    }
+                }),
+                recomendar_treino: () => ({
+                    tipo: 'Treino HIIT',
+                    duracao: '30 minutos',
+                    frequencia: '4x por semana',
+                    exercicios: ['Burpees', 'Jumping Jacks', 'Mountain Climbers', 'Squat Jumps'],
+                    link: 'https://l7personal.com/treinos/hiit-emagrecimento'
+                }),
+                recomendar_receita: () => ({
+                    nome: 'Salmão Grelhado com Quinoa',
+                    tempo_preparo: '25 minutos',
+                    calorias_porcao: 420,
+                    ingredientes: ['Salmão', 'Quinoa', 'Brócolis', 'Limão'],
+                    link: 'https://l7chef.com/receitas/salmao-quinoa'
+                }),
+                recomendar_suplemento: () => ({
+                    produto: 'L7Ultra',
+                    justificativa: 'Ideal para iniciantes, foco em energia e disposição',
+                    como_usar: '1 dose 30 minutos antes do treino',
+                    link: 'https://l7shop.com/l7ultra',
+                    preco_promocional: '25% OFF primeiro suplemento'
+                }),
+                mensagem_motivacional: () => 
+                    `Olá ${dadosUsuario.nome}! Seu plano foi criado 100% para você. O L7Nutri vai te acompanhar em cada passo. Vamos pra cima! 💪`
+            };
+        }
+
+        // Funções auxiliares
+        function mostrarLoading(id) {
+            document.getElementById(id).style.display = 'block';
+        }
+
+        function esconderLoading(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function mostrarResultado(containerId, data, titulo) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `
+                <h5><i class="fas fa-check-circle text-success"></i> ${titulo}</h5>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+            `;
+            container.style.display = 'block';
+        }
+
+        function mostrarErro(containerId, error) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `
+                <h5><i class="fas fa-exclamation-circle text-danger"></i> Erro</h5>
+                <div class="alert alert-danger">${error.message}</div>
+            `;
+            container.style.display = 'block';
+        }
+
+        async function testarTodosModulos() {
+            console.log('🚀 Iniciando teste completo de todos os módulos...');
+            await testarPlanoNutricional();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await testarTreino();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await testarReceita();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await testarSuplemento();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await testarMensagem();
+            console.log('✅ Todos os módulos testados!');
+        }
+
+        function limparResultados() {
+            const containers = ['resultadoPlano', 'resultadoTreino', 'resultadoReceita', 'resultadoSuplemento', 'resultadoMensagem', 'resultadoCompleta'];
+            containers.forEach(id => {
+                document.getElementById(id).style.display = 'none';
+            });
+        }
+
+        function exportarResultados() {
+            const resultados = {};
+            const containers = ['resultadoPlano', 'resultadoTreino', 'resultadoReceita', 'resultadoSuplemento', 'resultadoMensagem', 'resultadoCompleta'];
+            
+            containers.forEach(id => {
+                const container = document.getElementById(id);
+                if (container.style.display !== 'none' && container.innerHTML) {
+                    resultados[id] = container.innerHTML;
+                }
+            });
+
+            const dataStr = JSON.stringify(resultados, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'analise_nutricional_teste.json';
+            link.click();
+        }
+
+        function alterarDadosUsuario() {
+            const novoNome = prompt('Nome:', dadosUsuario.nome);
+            const novaIdade = prompt('Idade:', dadosUsuario.idade);
+            const novoPeso = prompt('Peso (kg):', dadosUsuario.peso);
+            const novaAltura = prompt('Altura (cm):', dadosUsuario.altura);
+            const novoObjetivo = prompt('Objetivo (emagrecer/ganhar massa/manter):', dadosUsuario.objetivo);
+            
+            if (novoNome) {
+                dadosUsuario.nome = novoNome;
+                document.getElementById('nomeUsuario').textContent = novoNome;
+            }
+            if (novaIdade) {
+                dadosUsuario.idade = parseInt(novaIdade);
+                document.getElementById('idadeUsuario').textContent = novaIdade + ' anos';
+            }
+            if (novoPeso) {
+                dadosUsuario.peso = parseFloat(novoPeso);
+                document.getElementById('pesoUsuario').textContent = novoPeso + 'kg';
+            }
+            if (novaAltura) {
+                dadosUsuario.altura = parseFloat(novaAltura);
+                document.getElementById('alturaUsuario').textContent = novaAltura + 'cm';
+            }
+            if (novoObjetivo) {
+                dadosUsuario.objetivo = novoObjetivo;
+                document.getElementById('objetivoUsuario').textContent = novoObjetivo;
+            }
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            verificarStatusIA();
+            console.log('🧠 Sistema de Análise Nutricional Inteligente - Teste Completo');
+            console.log('📊 Nova classe modular com prompts específicos implementada!');
+        });
+    </script>
+</body>
+</html>

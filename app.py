@@ -1366,20 +1366,25 @@ def finalizar_onboarding():
         # Obter dados do questionário da requisição
         dados_questionario = request.get_json() or {}
         
-        # Preparar dados do usuário para análise
-        dados_usuario = {
+        # Preparar dados completos do usuário para análise
+        dados_usuario_completos = {
             'nome': usuario.nome,
             'idade': usuario.idade,
             'peso': usuario.peso,
             'altura': usuario.altura,
             'sexo': usuario.sexo,
             'objetivo': usuario.objetivo,
-            'fator_atividade': usuario.fator_atividade
+            'fator_atividade': usuario.fator_atividade,
+            # Adicionar dados do questionário
+            **dados_questionario
         }
         
-        # Gerar análise nutricional personalizada com IA
-        print(f"Gerando análise para usuário: {usuario.nome}")
-        analise_resultado = analise_ia.gerar_analise_completa(dados_usuario, dados_questionario)
+        # Criar instância personalizada da análise IA
+        print(f"Criando análise personalizada para usuário: {usuario.nome}")
+        analise_personalizada = criar_analise_personalizada(dados_usuario_completos, modelo_ia)
+        
+        # Gerar análise completa usando a nova classe modular
+        analise_resultado = analise_personalizada.gerar_resultado_completo()
         
         # Salvar dados do questionário no usuário
         if dados_questionario:
@@ -1432,8 +1437,8 @@ def api_analise_nutricional():
         
         # Verificar se tem análise salva
         if not usuario.analise_nutricional:
-            # Se não tem análise, gerar uma nova
-            dados_usuario = {
+            # Se não tem análise, gerar uma nova usando a classe modular
+            dados_usuario_completos = {
                 'nome': usuario.nome,
                 'idade': usuario.idade,
                 'peso': usuario.peso,
@@ -1443,11 +1448,14 @@ def api_analise_nutricional():
                 'fator_atividade': usuario.fator_atividade
             }
             
-            dados_questionario = {}
+            # Adicionar dados do questionário se existir
             if usuario.dados_questionario:
                 dados_questionario = json.loads(usuario.dados_questionario)
+                dados_usuario_completos.update(dados_questionario)
             
-            analise_resultado = analise_ia.gerar_analise_completa(dados_usuario, dados_questionario)
+            # Criar análise personalizada
+            analise_personalizada = criar_analise_personalizada(dados_usuario_completos, modelo_ia)
+            analise_resultado = analise_personalizada.gerar_resultado_completo()
             
             # Salvar nova análise
             usuario.analise_nutricional = json.dumps(analise_resultado)
@@ -1489,8 +1497,8 @@ def regenerar_analise_nutricional():
             dados_atuais.update(novos_dados)
             usuario.dados_questionario = json.dumps(dados_atuais)
         
-        # Preparar dados para nova análise
-        dados_usuario = {
+        # Preparar dados completos para nova análise
+        dados_usuario_completos = {
             'nome': usuario.nome,
             'idade': usuario.idade,
             'peso': usuario.peso,
@@ -1500,12 +1508,14 @@ def regenerar_analise_nutricional():
             'fator_atividade': usuario.fator_atividade
         }
         
-        dados_questionario = {}
+        # Adicionar dados do questionário atualizado
         if usuario.dados_questionario:
             dados_questionario = json.loads(usuario.dados_questionario)
+            dados_usuario_completos.update(dados_questionario)
         
-        # Gerar nova análise
-        nova_analise = analise_ia.gerar_analise_completa(dados_usuario, dados_questionario)
+        # Criar nova análise personalizada
+        analise_personalizada = criar_analise_personalizada(dados_usuario_completos, modelo_ia)
+        nova_analise = analise_personalizada.gerar_resultado_completo()
         
         # Salvar nova análise
         usuario.analise_nutricional = json.dumps(nova_analise)
@@ -3088,6 +3098,14 @@ def dashboard_principal():
     Dashboard principal do sistema (redirecionamento)
     """
     return render_template('dashboard_insights.html')
+
+@app.route('/teste-analise-modular')
+def teste_analise_modular():
+    """
+    🧠 Página de teste para a nova classe de análise nutricional modular
+    Permite testar cada módulo individualmente com prompts específicos
+    """
+    return render_template('teste_analise_modular.html')
 
 # === DASHBOARD DE INSIGHTS ===
 
