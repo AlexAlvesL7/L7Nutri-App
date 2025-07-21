@@ -657,21 +657,7 @@ class Badge(db.Model):
     def __repr__(self):
         return f'<Badge {self.nome}>'
 
-# class ConquistaUsuario(db.Model):
-#     """Modelo para conquistas dos usuários - TEMPORARIAMENTE DESABILITADO"""
-#     __tablename__ = 'conquistas_usuarios'
-#     
-#     id = db.Column(db.Integer, primary_key=True)
-#     usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
-#     badge_id = db.Column(db.Integer, db.ForeignKey('badges.id'), nullable=False)
-#     data_conquista = db.Column(db.DateTime, default=datetime.utcnow)
-#     visualizada = db.Column(db.Boolean, default=False)  # Se o usuário já viu a notificação
-#     
-#     # Relacionamentos - removendo backref que estava causando conflito
-#     badge = db.relationship('Badge')
-#     
-#     def __repr__(self):
-#         return f'<ConquistaUsuario {self.usuario_id}:{self.badge_id}>'
+# ConquistaUsuario modelo removido temporariamente para correção de bugs
 
 class StreakUsuario(db.Model):
     """Modelo para tracking de sequências de usuários"""
