@@ -3044,25 +3044,6 @@ def badges_usuario():
         'badges': [],
         'mensagem': 'Sistema de badges temporariamente em manutenção'
     }), 200
-        
-        # Buscar streaks atuais
-        streaks = StreakUsuario.query.filter_by(usuario_id=user_id).all()
-        streaks_info = {}
-        for streak in streaks:
-            streaks_info[streak.tipo_streak] = {
-                'atual': streak.streak_atual,
-                'melhor': streak.melhor_streak,
-                'ultima_atividade': streak.ultima_atividade.isoformat() if streak.ultima_atividade else None
-            }
-        
-        return jsonify({
-            'badges': badges_usuario,
-            'total_badges': len(badges_usuario),
-            'streaks': streaks_info
-        }), 200
-        
-    except Exception as e:
-        return jsonify({'erro': f'Erro interno do servidor: {str(e)}'}), 500
 
 @app.route('/api/badges/marcar-visualizada/<int:conquista_id>', methods=['PUT'])
 @jwt_required()
@@ -3082,6 +3063,8 @@ def marcar_badge_visualizada(conquista_id):
 # def verificar_badges_metas(user_id, data_acao):
 #     """Verifica badges relacionadas ao cumprimento de metas"""
 #     return []
+
+def verificar_streak_diario(user_id, data_acao):
     """Verifica e atualiza streak de diário preenchido"""
     badges_conquistadas = []
     
