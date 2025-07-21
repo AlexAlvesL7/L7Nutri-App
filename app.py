@@ -2407,6 +2407,42 @@ def listar_registros_alimentares(usuario_id):
 def teste():
     return jsonify({'status': 'ok', 'mensagem': 'API está rodando!', 'arquivo': __file__}), 200
 
+@app.route('/api/diagnostico-db', methods=['GET'])
+def diagnostico_banco():
+    """Diagnóstico do banco de dados"""
+    try:
+        # Testa conexão com banco
+        total_usuarios = Usuario.query.count()
+        
+        # Verifica se as tabelas existem
+        tabelas_info = {}
+        try:
+            tabelas_info['usuarios'] = Usuario.query.count()
+        except Exception as e:
+            tabelas_info['usuarios'] = f"Erro: {str(e)}"
+            
+        try:
+            from app import Lead
+            tabelas_info['leads'] = Lead.query.count()
+        except Exception as e:
+            tabelas_info['leads'] = f"Erro: {str(e)}"
+        
+        return jsonify({
+            'status': 'ok',
+            'banco_conectado': True,
+            'total_usuarios': total_usuarios,
+            'tabelas': tabelas_info,
+            'database_url': 'PostgreSQL' if os.getenv('DATABASE_URL') else 'SQLite Local'
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'status': 'erro',
+            'banco_conectado': False,
+            'erro': str(e),
+            'database_url': 'PostgreSQL' if os.getenv('DATABASE_URL') else 'SQLite Local'
+        }), 500
+
 # === DEMO SISTEMA DE USUÁRIOS ===
 
 @app.route('/demo-usuarios')
