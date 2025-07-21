@@ -3100,14 +3100,14 @@ def verificar_streak_diario_novo(user_id, data_acao):
             #     )
             #     db.session.add(nova_conquista)
             #     db.session.commit()
-                
+            
             badges_conquistadas.append({
                 'id': badge_existente.id,
                 'nome': badge_existente.nome,
-                    'descricao': badge_existente.descricao,
-                    'icone': badge_existente.icone,
-                    'cor': badge_existente.cor
-                })
+                'descricao': badge_existente.descricao,
+                'icone': badge_existente.icone,
+                'cor': badge_existente.cor
+            })
     
     return badges_conquistadas
 
