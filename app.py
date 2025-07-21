@@ -441,7 +441,7 @@ class Usuario(db.Model):
     preferencias = db.relationship('PreferenciaUsuario', backref='usuario', lazy=True)
     registros_alimentares = db.relationship('RegistroAlimentar', backref='usuario', lazy=True)
     planos_sugeridos = db.relationship('PlanoSugestao', backref='usuario', lazy=True)
-    conquistas = db.relationship('ConquistaUsuario', foreign_keys='ConquistaUsuario.usuario_id', lazy=True)
+    # conquistas = db.relationship('ConquistaUsuario', foreign_keys='ConquistaUsuario.usuario_id', lazy=True)  # Temporariamente desabilitado
 
     def __repr__(self):
         return f'<Usuario {self.username}>'
@@ -657,21 +657,21 @@ class Badge(db.Model):
     def __repr__(self):
         return f'<Badge {self.nome}>'
 
-class ConquistaUsuario(db.Model):
-    """Modelo para conquistas dos usuários"""
-    __tablename__ = 'conquistas_usuarios'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
-    badge_id = db.Column(db.Integer, db.ForeignKey('badges.id'), nullable=False)
-    data_conquista = db.Column(db.DateTime, default=datetime.utcnow)
-    visualizada = db.Column(db.Boolean, default=False)  # Se o usuário já viu a notificação
-    
-    # Relacionamentos - removendo backref que estava causando conflito
-    badge = db.relationship('Badge')
-    
-    def __repr__(self):
-        return f'<ConquistaUsuario {self.usuario_id}:{self.badge_id}>'
+# class ConquistaUsuario(db.Model):
+#     """Modelo para conquistas dos usuários - TEMPORARIAMENTE DESABILITADO"""
+#     __tablename__ = 'conquistas_usuarios'
+#     
+#     id = db.Column(db.Integer, primary_key=True)
+#     usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
+#     badge_id = db.Column(db.Integer, db.ForeignKey('badges.id'), nullable=False)
+#     data_conquista = db.Column(db.DateTime, default=datetime.utcnow)
+#     visualizada = db.Column(db.Boolean, default=False)  # Se o usuário já viu a notificação
+#     
+#     # Relacionamentos - removendo backref que estava causando conflito
+#     badge = db.relationship('Badge')
+#     
+#     def __repr__(self):
+#         return f'<ConquistaUsuario {self.usuario_id}:{self.badge_id}>'
 
 class StreakUsuario(db.Model):
     """Modelo para tracking de sequências de usuários"""
@@ -3050,24 +3050,13 @@ def verificar_badges():
 @jwt_required()
 def badges_usuario():
     """
-    Retorna todas as badges do usuário
+    Retorna todas as badges do usuário - TEMPORARIAMENTE DESABILITADO
     """
-    try:
-        user_id = get_jwt_identity()
-        
-        conquistas = ConquistaUsuario.query.filter_by(usuario_id=user_id).all()
-        
-        badges_usuario = []
-        for conquista in conquistas:
-            badges_usuario.append({
-                'id': conquista.badge.id,
-                'nome': conquista.badge.nome,
-                'descricao': conquista.badge.descricao,
-                'icone': conquista.badge.icone,
-                'cor': conquista.badge.cor,
-                'data_conquista': conquista.data_conquista.isoformat(),
-                'visualizada': conquista.visualizada
-            })
+    return jsonify({
+        'sucesso': True,
+        'badges': [],
+        'mensagem': 'Sistema de badges temporariamente em manutenção'
+    }), 200
         
         # Buscar streaks atuais
         streaks = StreakUsuario.query.filter_by(usuario_id=user_id).all()
@@ -3092,30 +3081,20 @@ def badges_usuario():
 @jwt_required()
 def marcar_badge_visualizada(conquista_id):
     """
-    Marca uma badge como visualizada pelo usuário
+    Marca uma badge como visualizada - TEMPORARIAMENTE DESABILITADO
     """
-    try:
-        user_id = get_jwt_identity()
-        
-        conquista = ConquistaUsuario.query.filter_by(
-            id=conquista_id,
-            usuario_id=user_id
-        ).first()
-        
-        if not conquista:
-            return jsonify({'erro': 'Conquista não encontrada'}), 404
-        
-        conquista.visualizada = True
-        db.session.commit()
-        
-        return jsonify({'mensagem': 'Badge marcada como visualizada'}), 200
-        
-    except Exception as e:
-        return jsonify({'erro': f'Erro interno do servidor: {str(e)}'}), 500
+    return jsonify({'mensagem': 'Sistema de badges temporariamente em manutenção'}), 200
 
-# === FUNÇÕES AUXILIARES PARA BADGES ===
+# === FUNÇÕES AUXILIARES PARA BADGES === 
+# TEMPORARIAMENTE DESABILITADAS PARA CORREÇÃO DE BUGS
 
-def verificar_streak_diario(user_id, data_acao):
+# def verificar_streak_diario(user_id, data_acao):
+#     """Verifica e atualiza streak de diário preenchido"""
+#     return []
+
+# def verificar_badges_metas(user_id, data_acao):
+#     """Verifica badges relacionadas ao cumprimento de metas"""
+#     return []
     """Verifica e atualiza streak de diário preenchido"""
     badges_conquistadas = []
     
@@ -3172,23 +3151,22 @@ def verificar_streak_diario(user_id, data_acao):
                 db.session.add(badge_existente)
                 db.session.commit()
             
-            # Verificar se usuário já conquistou
-            conquista_existente = ConquistaUsuario.query.filter_by(
-                usuario_id=user_id,
-                badge_id=badge_existente.id
-            ).first()
+            # conquista_existente = ConquistaUsuario.query.filter_by(
+            #     usuario_id=user_id,
+            #     badge_id=badge_existente.id
+            # ).first()
             
-            if not conquista_existente:
-                nova_conquista = ConquistaUsuario(
-                    usuario_id=user_id,
-                    badge_id=badge_existente.id
-                )
-                db.session.add(nova_conquista)
-                db.session.commit()
+            # if not conquista_existente:
+            #     nova_conquista = ConquistaUsuario(
+            #         usuario_id=user_id,
+            #         badge_id=badge_existente.id
+            #     )
+            #     db.session.add(nova_conquista)
+            #     db.session.commit()
                 
-                badges_conquistadas.append({
-                    'id': badge_existente.id,
-                    'nome': badge_existente.nome,
+            badges_conquistadas.append({
+                'id': badge_existente.id,
+                'nome': badge_existente.nome,
                     'descricao': badge_existente.descricao,
                     'icone': badge_existente.icone,
                     'cor': badge_existente.cor
