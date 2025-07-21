@@ -661,18 +661,12 @@ class Badge(db.Model):
 # ConquistaUsuario modelo removido temporariamente para correção de bugs
 
 class StreakUsuario(db.Model):
-    """Modelo para tracking de sequências de usuários"""
     __tablename__ = 'streaks_usuarios'
-    
     id = db.Column(db.Integer, primary_key=True)
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
-    tipo_streak = db.Column(db.String(50), nullable=False)  # diario_preenchido, meta_proteina, etc.
-    streak_atual = db.Column(db.Integer, default=0)
-    melhor_streak = db.Column(db.Integer, default=0)
-    ultima_atividade = db.Column(db.Date)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
-    # Relacionamento
+    streak = db.Column(db.Integer, default=0)
+    data_ultimo_registro = db.Column(db.Date, nullable=True)
+
     usuario = db.relationship('Usuario', backref='streaks')
 
 # === MODELO PARA SISTEMA DE LEADS ===
@@ -708,7 +702,7 @@ class Lead(db.Model):
         }
 
     def __repr__(self):
-        return f'<StreakUsuario {self.usuario_id}:{self.tipo_streak}>'
+        return f'<StreakUsuario {self.usuario_id}>'
 
 # --- ROTAS DA APLICAÇÃO ---
 
@@ -3064,62 +3058,35 @@ def marcar_badge_visualizada(conquista_id):
 #     """Verifica badges relacionadas ao cumprimento de metas"""
 #     return []
 
-def verificar_streak_diario(user_id, data_acao):
-    """Verifica e atualiza streak de diário preenchido"""
+# def verificar_streak_diario(user_id, data_acao):
+#     """Verifica e atualiza streak de diário preenchido - TEMPORARIAMENTE DESABILITADO"""
+#     return []
+
+def verificar_streak_diario_novo(user_id, data_acao):
+    """Nova versão da verificação de streak adaptada ao modelo simplificado"""
     badges_conquistadas = []
     
-    # Buscar ou criar streak
-    streak = StreakUsuario.query.filter_by(
-        usuario_id=user_id,
-        tipo_streak='diario_preenchido'
-    ).first()
+    # Buscar streak do usuário
+    streak = StreakUsuario.query.filter_by(usuario_id=user_id).first()
     
     if not streak:
         streak = StreakUsuario(
             usuario_id=user_id,
-            tipo_streak='diario_preenchido',
-            streak_atual=1,
-            melhor_streak=1,
-            ultima_atividade=data_acao
+            streak=1,
+            data_ultimo_registro=data_acao
         )
         db.session.add(streak)
     else:
         # Verificar se é consecutivo
-        if streak.ultima_atividade and (data_acao - streak.ultima_atividade).days == 1:
-            streak.streak_atual += 1
-        elif streak.ultima_atividade != data_acao:
-            streak.streak_atual = 1
+        if streak.data_ultimo_registro and (data_acao - streak.data_ultimo_registro).days == 1:
+            streak.streak += 1
+        elif streak.data_ultimo_registro != data_acao:
+            streak.streak = 1
         
-        streak.ultima_atividade = data_acao
-        if streak.streak_atual > streak.melhor_streak:
-            streak.melhor_streak = streak.streak_atual
+        streak.data_ultimo_registro = data_acao
     
     db.session.commit()
-    
-    # Verificar badges de streak
-    badges_streak = [
-        (3, 'Iniciante Consistente', '🔥 3 dias seguidos registrando!', '🔥'),
-        (7, 'Uma Semana Forte', '💪 7 dias seguidos! Você está no caminho certo!', '💪'),
-        (14, 'Duas Semanas de Foco', '🎯 14 dias seguidos! Incrível dedicação!', '🎯'),
-        (30, 'Um Mês de Excelência', '👑 30 dias seguidos! Você é um campeão!', '👑'),
-        (60, 'Mestre da Consistência', '🏆 60 dias seguidos! Lendário!', '🏆'),
-        (100, 'Centurião Nutricional', '⭐ 100 dias seguidos! Extraordinário!', '⭐')
-    ]
-    
-    for dias, nome, descricao, icone in badges_streak:
-        if streak.streak_atual == dias:
-            # Verificar se já tem essa badge
-            badge_existente = Badge.query.filter_by(nome=nome).first()
-            if not badge_existente:
-                badge_existente = Badge(
-                    nome=nome,
-                    descricao=descricao,
-                    icone=icone,
-                    tipo='streak',
-                    criterio=dias
-                )
-                db.session.add(badge_existente)
-                db.session.commit()
+    return badges_conquistadas
             
             # conquista_existente = ConquistaUsuario.query.filter_by(
             #     usuario_id=user_id,

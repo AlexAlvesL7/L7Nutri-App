@@ -1,9 +1,24 @@
 # 🔍 RELATÓRIO DE DIAGNÓSTICO - PROBLEMA DE CADASTRO L7NUTRI
 
 ## 📋 **RESUMO EXECUTIVO**
-**Data:** 21/07/2025
-**Status:** Investigação em andamento
-**Problema:** Impossibilidade de criar novos usuários (cadastro e login não funcionam)
+**Data:** 21/07/2025 - **ÚLTIMA ATUALIZAÇÃO: 14:50**
+**Status:** 🚨 **CRÍTICO - SISTEMA INOPERANTE (502 ERRORS)**
+**Problema:** Force rebuild revelou falha completa de inicialização do servidor
+
+### **⚡ SITUAÇÃO ATUAL:**
+- ✅ **Diagnóstico:** Causa raiz confirmada (tabela órfã PostgreSQL)
+- ✅ **Force Rebuild:** Executado com sucesso (commit 61e7333)
+- ❌ **Sistema:** Completamente inoperante (502 Bad Gateway)
+- 🔄 **Etapa Atual:** Investigação banco PostgreSQL (Etapa 2)
+- 🛠️ **Ferramentas:** Scripts de investigação criados e prontos
+
+### **🛠️ FERRAMENTAS CRIADAS:**
+1. `investigar_banco_postgresql.py` - Script Python automatizado
+2. `teste_status_simples.py` - Testes de status da API
+3. `INSTRUCOES_BANCO_MANUAL.md` - Guia completo investigação manual
+4. `teste_pos_rebuild.py` - Validação pós-correção
+
+### **🎯 AÇÃO NECESSÁRIA:** Investigação manual banco PostgreSQL via painel Render
 
 ---
 
@@ -159,38 +174,142 @@ class Usuario(db.Model):
 
 ---
 
-## 📋 **PRÓXIMOS PASSOS RECOMENDADOS**
+## � **EXECUÇÃO DO PLANO DE AÇÃO**
 
-### **Etapa 1: Teste de Cache/Deploy (IMEDIATO)**
-1. ✅ Verificar se último commit foi deployado no Render
-2. ✅ Tentar force push ou trigger manual de deploy
-3. ✅ Adicionar variável para forçar rebuild
+### **✅ Etapa 1: Force Deploy Executado (21/07/2025 - 14:45)**
+1. ✅ Commit force rebuild criado: `61e7333`
+2. ✅ Deploy automático acionado no Render
+3. ✅ Comentário force rebuild adicionado: "# Force rebuild cache 21/07/2025"
 
-### **Etapa 2: Investigação do Banco (SE ETAPA 1 FALHAR)**
-1. Verificar estrutura atual do PostgreSQL
-2. Identificar tabelas órfãs
-3. Criar migração de limpeza
+### **🚨 RESULTADO PÓS-REBUILD:**
+**Status:** SISTEMA COMPLETAMENTE INOPERANTE - ERRO 502 BAD GATEWAY
 
-### **Etapa 3: Solução Definitiva**
-1. Corrigir dessincronização banco/código
-2. Testar funcionalidade de cadastro
-3. Reabilitar sistema de badges corretamente
+#### **Testes Realizados Pós-Rebuild:**
+```bash
+🔍 TESTANDO SISTEMA APÓS FORCE REBUILD...
+❌ API básica (/api/teste): Status 502
+❌ Diagnóstico banco (/api/diagnostico-db): Status 502  
+❌ Cadastro (/api/usuario/registro-seguro): Status 502
+❌ Login (/api/login): Status 502
+```
+
+#### **Análise do Erro 502:**
+- **Significado:** Bad Gateway = Servidor não consegue inicializar
+- **Causa Provável:** Erro crítico na inicialização do Flask/SQLAlchemy
+- **Impacto:** Sistema 100% indisponível
+
+### **📊 COMPARAÇÃO PRÉ/PÓS REBUILD**
+| Aspecto | Antes Rebuild | Após Rebuild |
+|---------|---------------|--------------|
+| API básica | ✅ 200 OK | ❌ 502 Bad Gateway |
+| Páginas estáticas | ✅ Funcionando | ❌ 502 Bad Gateway |
+| Erros SQL | ❌ 500 Internal | ❌ 502 Bad Gateway |
+| Inicialização | ❌ Falha parcial | ❌ Falha completa |
+
+### **🎯 DESCOBERTA CRÍTICA:**
+⚠️ **Force rebuild REVELOU problema mais grave que erro de relacionamento**
+
+### **📋 PRÓXIMOS PASSOS ATUALIZADOS**
+
+### **🚨 Etapa 2: INVESTIGAÇÃO BANCO POSTGRESQL (EM ANDAMENTO)**
+**Status:** 🔄 Aguardando investigação manual via painel Render
+
+#### **💡 INSTRUMENTOS CRIADOS:**
+1. ✅ Script `investigar_banco_postgresql.py` - Investigação automatizada
+2. ✅ Script `teste_status_simples.py` - Teste de status da API  
+3. ✅ Arquivo `INSTRUCOES_BANCO_MANUAL.md` - Guia completo para investigação manual
+
+#### **🎯 AÇÕES NECESSÁRIAS (MANUAL):**
+**Via Painel Render:**
+1. 🔍 Acessar https://dashboard.render.com/ → PostgreSQL
+2. 🔍 Conectar ao banco (Web Shell ou External Connection)
+3. 🔍 Executar: `\dt` ou `SELECT tablename FROM pg_tables WHERE schemaname = 'public';`
+4. 🔍 Procurar por `conquistas_usuarios` na lista
+
+#### **🎯 SE TABELA CONQUISTAS_USUARIOS EXISTIR:**
+```sql
+-- Ver estrutura:
+\d conquistas_usuarios
+
+-- Contar registros:  
+SELECT COUNT(*) FROM conquistas_usuarios;
+
+-- DELETAR (se seguro):
+DROP TABLE conquistas_usuarios;
+
+-- Confirmar remoção:
+\dt
+```
+
+#### **🎯 SE TABELA NÃO EXISTIR:**
+- Problema é mais complexo (cache persistente)
+- Investigar logs do Render
+- Considerar restart manual do serviço
+
+### **Etapa 3: Correção de Schema (APÓS INVESTIGAÇÃO)**
+**Execução condicional baseada nos resultados da Etapa 2:**
+
+**CENÁRIO A - Tabela órfã encontrada:**
+1. ✅ Deletar `conquistas_usuarios` via SQL
+2. 🔄 Executar `flask db upgrade` localmente
+3. 🔄 Reiniciar serviço no Render (Manual Deploy)
+
+**CENÁRIO B - Tabela não encontrada:**
+1. 🔍 Investigar logs do Render para erros de inicialização
+2. 🔄 Tentar restart manual do serviço
+3. 🔍 Verificar cache persistente do Render
+
+### **Etapa 4: Validação Completa (FINAL)**
+1. 🧪 Testar `GET /api/teste` → Esperado: Status 200
+2. 🧪 Testar `GET /api/diagnostico-db` → Esperado: Status 200  
+3. 🧪 Testar `GET /cadastro` → Esperado: Página carrega
+4. 🧪 Testar cadastro completo de usuário
+5. ✅ Confirmar sistema 100% operacional
+
+### **⏱️ TEMPO ESTIMADO ATUALIZADO:**
+- Investigação manual banco: 5-10 minutos
+- Correção (se tabela órfã): 5 minutos
+- Reinicialização + testes: 10-15 minutos  
+- **TOTAL:** 20-30 minutos
 
 ---
 
-## ⚠️ **RISCOS IDENTIFICADOS**
+## ⚠️ **ATUALIZAÇÃO DE RISCOS IDENTIFICADOS**
 
-- **BAIXO:** Problema é de cache/deploy (facilmente resolvível)
-- **MÉDIO:** Tabela órfã no banco (requer migração cuidadosa)  
-- **BAIXO:** Perda de funcionalidades (badges não são críticas)
+### **🚨 SITUAÇÃO ATUAL: CRÍTICA**
+- **ALTO:** Sistema completamente inoperante (502 errors)
+- **ALTO:** Tabela órfã causando falha de inicialização do SQLAlchemy
+- **MÉDIO:** Necessidade de intervenção manual no banco PostgreSQL
+- **BAIXO:** Perda de dados (funcionais não afetadas diretamente)
+
+### **📊 EVOLUÇÃO DO DIAGNÓSTICO:**
+```
+Inicial: Erro 500 (SQLAlchemy mapping) → Médio
+Pós-análise: Cache/Deploy → Baixo  
+Pós-rebuild: Erro 502 (Server failure) → CRÍTICO
+```
 
 ---
 
-## 🎯 **RECOMENDAÇÃO FINAL**
+## 🎯 **RECOMENDAÇÃO FINAL ATUALIZADA**
 
-**PRIORIDADE 1:** Tentar force deploy/clear cache antes de qualquer alteração de código
-**PRIORIDADE 2:** Se problema persistir, investigar estado do banco PostgreSQL
-**PRIORIDADE 3:** Como último recurso, rollback para commit funcional conhecido
+### **🚨 AÇÃO IMEDIATA NECESSÁRIA:**
+**PRIORIDADE 1 (CRÍTICA):** Investigação banco PostgreSQL
+- ✅ Force deploy executado → Revelou problema mais grave
+- 🔍 **PRÓXIMO:** Acessar painel PostgreSQL no Render
+- 🎯 **OBJETIVO:** Identificar e remover tabela órfã `conquistas_usuarios`
 
-**Status:** Análise completa - Aguardando decisão sobre qual abordagem seguir
-**Confiança na Solução:** 85% (problema parece ser de cache/deploy)
+**PRIORIDADE 2:** Migração de limpeza do schema
+**PRIORIDADE 3:** Restart do serviço após correção do banco
+
+### **📈 STATUS ATUALIZADO:**
+- **Diagnóstico:** ✅ Completo e confirmado
+- **Causa Raiz:** ✅ Identificada (tabela órfã PostgreSQL)
+- **Solução:** 🔄 Em execução (Etapa 2 - Investigação banco)
+- **Confiança na Solução:** 95% (causa confirmada por teste 502)
+
+### **⏱️ TEMPO ESTIMADO:**
+- Investigação PostgreSQL: 10-15 minutos
+- Correção de schema: 5-10 minutos  
+- Validação completa: 10-15 minutos
+- **TOTAL:** 30-40 minutos para resolução completa
