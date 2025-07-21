@@ -441,6 +441,7 @@ class Usuario(db.Model):
     preferencias = db.relationship('PreferenciaUsuario', backref='usuario', lazy=True)
     registros_alimentares = db.relationship('RegistroAlimentar', backref='usuario', lazy=True)
     planos_sugeridos = db.relationship('PlanoSugestao', backref='usuario', lazy=True)
+    conquistas = db.relationship('ConquistaUsuario', foreign_keys='ConquistaUsuario.usuario_id', lazy=True)
 
     def __repr__(self):
         return f'<Usuario {self.username}>'
@@ -666,8 +667,7 @@ class ConquistaUsuario(db.Model):
     data_conquista = db.Column(db.DateTime, default=datetime.utcnow)
     visualizada = db.Column(db.Boolean, default=False)  # Se o usuário já viu a notificação
     
-    # Relacionamentos
-    usuario = db.relationship('Usuario', backref='conquistas')
+    # Relacionamentos - removendo backref que estava causando conflito
     badge = db.relationship('Badge')
     
     def __repr__(self):
