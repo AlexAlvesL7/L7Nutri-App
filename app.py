@@ -165,6 +165,7 @@ executar_backup_agendado()
 
 # === CONFIGURAÇÃO DE AMBIENTE ===
 # Detecta se estamos em produção ou desenvolvimento
+# Force rebuild cache 21/07/2025 - Fix tabela órfã ConquistaUsuario
 is_production = os.getenv('FLASK_ENV') == 'production'
 
 # Configuração do JWT
@@ -441,7 +442,7 @@ class Usuario(db.Model):
     preferencias = db.relationship('PreferenciaUsuario', backref='usuario', lazy=True)
     registros_alimentares = db.relationship('RegistroAlimentar', backref='usuario', lazy=True)
     planos_sugeridos = db.relationship('PlanoSugestao', backref='usuario', lazy=True)
-    # conquistas = db.relationship('ConquistaUsuario', foreign_keys='ConquistaUsuario.usuario_id', lazy=True)  # Temporariamente desabilitado
+    # Relacionamento conquistas removido temporariamente para correção de bugs
 
     def __repr__(self):
         return f'<Usuario {self.username}>'
