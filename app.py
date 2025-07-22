@@ -417,7 +417,7 @@ class Usuario(db.Model):
     peso = db.Column(db.Float)
     altura = db.Column(db.Float)
     nivel_atividade = db.Column(db.String(50))
-    fator_atividade = db.Column(db.Float)
+    # fator_atividade = db.Column(db.Float)  # TEMPORARIAMENTE REMOVIDO - Coluna não existe na tabela
     objetivo = db.Column(db.String(100))
 
     # Campos de verificação de email
@@ -1395,7 +1395,7 @@ def obter_perfil_usuario():
             'sexo': usuario.sexo,
             'peso': usuario.peso,
             'altura': usuario.altura,
-            'fator_atividade': usuario.fator_atividade,
+            'fator_atividade': getattr(usuario, 'fator_atividade', None),  # Compatibilidade
             'objetivo': usuario.objetivo
         }
         
@@ -1463,52 +1463,42 @@ def salvar_atividade_fisica():
 def salvar_fator_atividade():
     """
     Endpoint POST para salvar o fator de atividade física do usuário
-    Aceita: fator_atividade (float)
-    Retorna: JSON com mensagem de sucesso ou erro
+    TEMPORARIAMENTE DESABILITADO - Coluna fator_atividade não existe na tabela
     """
-    try:
-        # Obter ID do usuário do token JWT
-        user_id = get_jwt_identity()
-        
-        # Buscar usuário no banco de dados
-        usuario = Usuario.query.get(user_id)
-        if not usuario:
-            return jsonify({'erro': 'Usuário não encontrado'}), 404
-        
-        # Obter dados da requisição
-        data = request.get_json()
-        if not data:
-            return jsonify({'erro': 'Dados não fornecidos'}), 400
-        
-        fator_atividade = data.get('fator_atividade')
-        
-        # Validar fator de atividade
-        if fator_atividade is None:
-            return jsonify({'erro': 'Fator de atividade é obrigatório'}), 400
-        
-        # Converter para float e validar valores permitidos
-        try:
-            fator_atividade = float(fator_atividade)
-        except (ValueError, TypeError):
-            return jsonify({'erro': 'Fator de atividade deve ser um número'}), 400
-        
-        # Validar se é um dos valores permitidos
-        valores_permitidos = [1.2, 1.375, 1.55, 1.725, 1.9]
-        if fator_atividade not in valores_permitidos:
-            return jsonify({'erro': 'Fator de atividade inválido'}), 400
-        
-        # Salvar ou atualizar fator de atividade do usuário
-        usuario.fator_atividade = fator_atividade
-        
-        # Persistir alterações no banco de dados
-        db.session.commit()
-        
-        return jsonify({'mensagem': 'Atividade salva com sucesso'}), 200
-        
-    except Exception as e:
-        # Em caso de erro, desfaz a transação
-        db.session.rollback()
-        return jsonify({'erro': f'Erro ao salvar fator de atividade: {str(e)}'}), 500
+    return jsonify({'erro': 'Funcionalidade temporariamente indisponível - coluna fator_atividade não existe na tabela'}), 501
+
+    # TODO: Quando a coluna fator_atividade for adicionada à tabela, descomentar o código abaixo:
+    # try:
+    #     user_id = get_jwt_identity()
+    #     usuario = Usuario.query.get(user_id)
+    #     if not usuario:
+    #         return jsonify({'erro': 'Usuário não encontrado'}), 404
+    #     
+    #     data = request.get_json()
+    #     if not data:
+    #         return jsonify({'erro': 'Dados não fornecidos'}), 400
+    #     
+    #     fator_atividade = data.get('fator_atividade')
+    #     if fator_atividade is None:
+    #         return jsonify({'erro': 'Fator de atividade é obrigatório'}), 400
+    #     
+    #     try:
+    #         fator_atividade = float(fator_atividade)
+    #     except (ValueError, TypeError):
+    #         return jsonify({'erro': 'Fator de atividade deve ser um número'}), 400
+    #     
+    #     valores_permitidos = [1.2, 1.375, 1.55, 1.725, 1.9]
+    #     if fator_atividade not in valores_permitidos:
+    #         return jsonify({'erro': 'Fator de atividade inválido'}), 400
+    #     
+    #     usuario.fator_atividade = fator_atividade
+    #     db.session.commit()
+    #     
+    #     return jsonify({'mensagem': 'Atividade salva com sucesso'}), 200
+    #     
+    # except Exception as e:
+    #     db.session.rollback()
+    #     return jsonify({'erro': f'Erro ao salvar fator de atividade: {str(e)}'}), 500
 
 # === ROTAS DO SISTEMA DE ANÁLISE NUTRICIONAL INTELIGENTE ===
 
@@ -1544,7 +1534,7 @@ def finalizar_onboarding():
             'altura': usuario.altura,
             'sexo': usuario.sexo,
             'objetivo': usuario.objetivo,
-            'fator_atividade': usuario.fator_atividade,
+            'fator_atividade': getattr(usuario, 'fator_atividade', None),  # Compatibilidade
             # Adicionar dados do questionário
             **dados_questionario
         }
@@ -1615,7 +1605,7 @@ def api_analise_nutricional():
                 'altura': usuario.altura,
                 'sexo': usuario.sexo,
                 'objetivo': usuario.objetivo,
-                'fator_atividade': usuario.fator_atividade
+                'fator_atividade': getattr(usuario, 'fator_atividade', None)  # Compatibilidade
             }
             
             # Adicionar dados do questionário se existir
@@ -1675,7 +1665,7 @@ def regenerar_analise_nutricional():
             'altura': usuario.altura,
             'sexo': usuario.sexo,
             'objetivo': usuario.objetivo,
-            'fator_atividade': usuario.fator_atividade
+            'fator_atividade': getattr(usuario, 'fator_atividade', None)  # Compatibilidade
         }
         
         # Adicionar dados do questionário atualizado
