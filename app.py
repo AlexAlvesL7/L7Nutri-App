@@ -1,11 +1,4 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for, session
-
-# === DOCUMENTAÇÃO DE TODOs E FUNCIONALIDADES REMOVIDAS ===
-# TODO: Adicionar coluna 'fator_atividade' na tabela Usuario (temporariamente removida)
-# TODO: Reativar relacionamento 'conquistas' na tabela Usuario (removido para correção de bugs)
-# TODO: Implementar integração real com IA para análise nutricional
-# TODO: Implementar onboarding completo e verificação de email com feedback detalhado
-# TODO: Corrigir cadastro de alergias/preferências para criar caso não exista
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
