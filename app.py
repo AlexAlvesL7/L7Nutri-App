@@ -264,6 +264,22 @@ class Usuario(db.Model):
 
     def __repr__(self):
         return f'<Usuario {self.username}>'
+
+    # Adicionado pass para garantir corpo válido em métodos vazios
+    def esta_verificado(self):
+        pass
+
+    def esta_onboarding_completo(self):
+        pass
+
+    def pode_acessar_diario(self):
+        pass
+
+    def token_valido(self):
+        pass
+
+    def esta_bloqueado(self):
+        pass
         return f'<Usuario {self.username}>'
 
 class Alimento(db.Model):
@@ -282,6 +298,7 @@ class Alimento(db.Model):
     fonte_dados = db.Column(db.String(50), default='TACO')  # TACO, ANVISA, etc
 
     def __repr__(self):
+        pass
         return f'<Alimento {self.nome}>'
 
 class Receita(db.Model):
