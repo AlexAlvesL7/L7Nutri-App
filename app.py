@@ -243,6 +243,8 @@ def obter_ip_cliente(request):
 # --- Modelos do Banco de Dados (Tabelas) ---
 class Usuario(db.Model):
     __tablename__ = 'usuario'
+    # === COLUNAS REMOVIDAS DO MODELO USUARIO ===
+    # Removidos: fator_atividade, email_verificado, token_verificacao, token_expiracao, data_criacao, ultimo_login, onboarding_completo, dados_questionario, plano_personalizado, dicas_l7chef, analise_nutricional, tentativas_login, bloqueado_ate, ip_cadastro
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(150), nullable=False)
     email = db.Column(db.String(150), unique=True, nullable=False)
@@ -253,60 +255,15 @@ class Usuario(db.Model):
     peso = db.Column(db.Float)
     altura = db.Column(db.Float)
     nivel_atividade = db.Column(db.String(50))
-    # fator_atividade = db.Column(db.Float)  # TEMPORARIAMENTE REMOVIDO - Coluna não existe na tabela
     objetivo = db.Column(db.String(100))
-
-    # CAMPOS AVANÇADOS TEMPORARIAMENTE COMENTADOS - NÃO EXISTEM NA TABELA ATUAL
-    # CAMPOS AVANÇADOS - AGORA EXISTEM NA TABELA
-    email_verificado = db.Column(db.Boolean, default=False, nullable=False)
-    token_verificacao = db.Column(db.String(255), nullable=True)
-    token_expiracao = db.Column(db.DateTime, nullable=True)
-    data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
-    ultimo_login = db.Column(db.DateTime, nullable=True)
-    onboarding_completo = db.Column(db.Boolean, default=False, nullable=False)
-    dados_questionario = db.Column(db.JSON, nullable=True)
-    plano_personalizado = db.Column(db.JSON, nullable=True)
-    dicas_l7chef = db.Column(db.JSON, nullable=True)
-    analise_nutricional = db.Column(db.JSON, nullable=True)
-    tentativas_login = db.Column(db.Integer, default=0)
-    bloqueado_ate = db.Column(db.DateTime, nullable=True)
-    ip_cadastro = db.Column(db.String(45), nullable=True)
 
     alergias = db.relationship('AlergiaUsuario', backref='usuario', lazy=True)
     preferencias = db.relationship('PreferenciaUsuario', backref='usuario', lazy=True)
     registros_alimentares = db.relationship('RegistroAlimentar', backref='usuario', lazy=True)
     planos_sugeridos = db.relationship('PlanoSugestao', backref='usuario', lazy=True)
-    # Relacionamento conquistas removido temporariamente para correção de bugs
 
     def __repr__(self):
         return f'<Usuario {self.username}>'
-        return f'<Usuario {self.username}>'
-
-    def esta_verificado(self):
-        """Verifica se o email foi confirmado - TEMPORÁRIO: sempre True"""
-        return getattr(self, 'email_verificado', True)  # Default: True (temporário)
-
-    def esta_onboarding_completo(self):
-        """Verifica se o onboarding foi completado - TEMPORÁRIO: sempre True"""
-        return getattr(self, 'onboarding_completo', True)  # Default: True (temporário)
-
-    def pode_acessar_diario(self):
-        """Verifica se pode acessar o diário alimentar - TEMPORÁRIO: sempre True"""
-        return True  # Temporário: permite acesso direto
-
-    def token_valido(self):
-        """Verifica se o token de verificação ainda é válido"""
-        token_expiracao = getattr(self, 'token_expiracao', None)
-        if not token_expiracao:
-            return False
-        return datetime.utcnow() < token_expiracao
-
-    def esta_bloqueado(self):
-        """Verifica se o usuário está temporariamente bloqueado"""
-        bloqueado_ate = getattr(self, 'bloqueado_ate', None)
-        if not bloqueado_ate:
-            return False
-        return datetime.utcnow() < bloqueado_ate
 
 class Alimento(db.Model):
     id = db.Column(db.Integer, primary_key=True)
