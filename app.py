@@ -742,7 +742,24 @@ def diagnostico_publico():
         altura_cm = float(data['altura'])
         idade = int(data['idade'])
         sexo = data['sexo'].lower()
-        fator_atividade = float(data['nivel_atividade']) # Supondo que o valor já vem (ex: 1.2, 1.375)
+        # CORREÇÃO TEMPORÁRIA: usar nivel_atividade como fator numérico
+        nivel_atividade = data.get('nivel_atividade', 'sedentario')
+        
+        # Mapeamento de nível para fator (compatibilidade)
+        fatores_atividade = {
+            'sedentario': 1.2,
+            'levemente_ativo': 1.375,
+            'moderadamente_ativo': 1.55,
+            'muito_ativo': 1.725,
+            'extremamente_ativo': 1.9
+        }
+        
+        # Se vier número direto, usa; senão, mapeia do texto
+        try:
+            fator_atividade = float(nivel_atividade)
+        except (ValueError, TypeError):
+            fator_atividade = fatores_atividade.get(nivel_atividade, 1.375)  # Default: levemente ativo
+        
         objetivo = data['objetivo'].lower().replace(' ', '_')  # Normaliza objetivo: "Ganho de Massa" -> "ganho_de_massa"
 
         # 3. Realizar os Cálculos (A INTELIGÊNCIA)
