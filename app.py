@@ -519,7 +519,7 @@ class Alergia(db.Model):
 
 class AlergiaUsuario(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
     alergia_id = db.Column(db.Integer, db.ForeignKey('alergia.id'), nullable=False)
 
     def __repr__(self):
@@ -534,7 +534,7 @@ class Preferencia(db.Model):
 
 class PreferenciaUsuario(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
     preferencia_id = db.Column(db.Integer, db.ForeignKey('preferencia.id'), nullable=False)
 
     def __repr__(self):
@@ -542,7 +542,7 @@ class PreferenciaUsuario(db.Model):
 
 class RegistroAlimentar(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
     data = db.Column(db.Date, nullable=False, default=date.today)
     tipo_refeicao = db.Column(db.String(50), nullable=False)
     alimento_id = db.Column(db.Integer, db.ForeignKey('alimento.id'), nullable=True)
@@ -582,7 +582,7 @@ class RegistroAlimentar(db.Model):
 
 class PlanoSugestao(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
     data_sugestao = db.Column(db.Date, nullable=False)
     cafe_manha_receita_id = db.Column(db.Integer, db.ForeignKey('receita.id'), nullable=True)
     almoco_receita_id = db.Column(db.Integer, db.ForeignKey('receita.id'), nullable=True)
@@ -620,14 +620,14 @@ class PerfisNutricionais(db.Model):
     nivel_atividade = db.Column(db.String(30))
     objetivo = db.Column(db.String(30))
     aceita_suplementos = db.Column(db.Boolean)
-    user_id = db.Column(db.Integer, db.ForeignKey('usuario.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'))
     created_at = db.Column(db.DateTime, default=date.today)
 
 # --- Modelo PreferenciasUsuario ---
 class PreferenciasUsuario(db.Model):
     __tablename__ = 'preferencias_usuario'
     id = db.Column(db.Integer, primary_key=True)
-    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
     alimentos_evitar = db.Column(db.Text)  # Lista de alimentos separados por vírgula
     restricoes = db.Column(db.JSON)  # Array JSON com restrições
     estilo_alimentar = db.Column(db.String(50))  # Estilo alimentar escolhido
