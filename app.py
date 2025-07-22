@@ -985,6 +985,35 @@ def cadastro_usuario():
         return jsonify({'message': f'Erro ao cadastrar usuário: {str(e)}'}), 500
 
 # --- Rota para Cadastro de Usuário ---
+@app.route('/api/teste-tabelas')
+def teste_tabelas():
+    """Endpoint para testar se as tabelas estão acessíveis"""
+    try:
+        # Testa se consegue acessar a tabela usuario
+        usuarios_count = Usuario.query.count()
+        
+        # Testa se consegue criar um usuário de teste (sem salvar)
+        usuario_teste = Usuario(
+            nome="Teste",
+            email="teste@teste.com",
+            username="teste123",
+            password="123456"
+        )
+        
+        return jsonify({
+            'status': 'success',
+            'usuarios_cadastrados': usuarios_count,
+            'tabela_acessivel': True,
+            'modelo_funcional': True,
+            'tablename_atual': Usuario.__tablename__
+        })
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'erro': str(e),
+            'tablename_atual': Usuario.__tablename__
+        }), 500
+
 @app.route('/api/cadastro', methods=['POST'])
 def cadastro_novo_usuario():
     """
