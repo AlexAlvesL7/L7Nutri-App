@@ -9,3 +9,4 @@ requests
 python-dotenv
 google-generativeai
 schedule
+pytest-html

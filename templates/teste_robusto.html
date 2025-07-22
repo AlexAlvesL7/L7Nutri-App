@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🛡️ Teste de Cadastro Robusto - L7Nutri</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        .header p {
+            color: #718096;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #2d3748;
+            font-weight: 600;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            transform: none;
+            cursor: not-allowed;
+        }
+        .log-area {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        .log-success { color: #48bb78; }
+        .log-error { color: #f56565; }
+        .log-warning { color: #ed8936; }
+        .log-info { color: #4299e1; }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            text-align: center;
+            font-weight: 600;
+        }
+        .status-success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #48bb78;
+        }
+        .status-error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #f56565;
+        }
+        .status-info {
+            background: #bee3f8;
+            color: #2a4365;
+            border: 1px solid #4299e1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛡️ Teste de Cadastro Robusto</h1>
+            <p>Sistema de prevenção e detecção de erros de API</p>
+        </div>
+
+        <form id="cadastroForm">
+            <div class="form-group">
+                <label for="nome">Nome Completo:</label>
+                <input type="text" id="nome" name="nome" value="Usuário Teste Sistema" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">E-mail:</label>
+                <input type="email" id="email" name="email" value="teste.sistema@exemplo.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" value="testesistema2025" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Senha:</label>
+                <input type="password" id="password" name="password" value="senha123456" required>
+            </div>
+
+            <button type="submit" class="btn-primary" id="btnCadastrar">
+                🚀 Testar Cadastro Robusto
+            </button>
+        </form>
+
+        <div id="status" class="status" style="display: none;"></div>
+        
+        <div class="log-area" id="logArea">
+            <div class="log-info">📋 Sistema pronto para teste. Clique em "Testar Cadastro Robusto" para começar.</div>
+        </div>
+
+        <div style="margin-top: 20px; text-align: center;">
+            <button onclick="testarConectividade()" class="btn-primary" style="width: auto; margin-right: 10px;">
+                🧪 Testar Conectividade
+            </button>
+            <button onclick="limparLogs()" class="btn-primary" style="width: auto; background: #718096;">
+                🧹 Limpar Logs
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Incluir o ApiHandler robusto
+        /**
+         * 🛡️ API HANDLER ROBUSTO - L7NUTRI
+         * Previne e detecta erros de API com tratamento completo
+         */
+        class ApiHandler {
+            constructor(baseUrl = '') {
+                this.baseUrl = baseUrl;
+            }
+
+            async request(endpoint, options = {}) {
+                const url = this.baseUrl + endpoint;
+                
+                const config = {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                };
+
+                this.log(`🚀 API Request: ${config.method} ${url}`, 'info');
+                
+                try {
+                    const response = await fetch(url, config);
+                    
+                    // Verificação 1: Status HTTP
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        this.log(`❌ HTTP Error ${response.status}: ${errorText.substring(0, 200)}`, 'error');
+                        
+                        // Detecta se retornou HTML em vez de JSON
+                        if (errorText.includes('<!DOCTYPE') || errorText.includes('<html')) {
+                            this.log('🚨 ERRO CRÍTICO: Servidor retornou HTML em vez de JSON!', 'error');
+                            this.log('💡 Possíveis causas: Erro 500, 502, ou problema de inicialização', 'warning');
+                            throw new Error(`Erro do servidor (${response.status}): Sistema pode estar com problemas de banco de dados ou modelos`);
+                        }
+                        
+                        throw new Error(`Erro HTTP ${response.status}: ${errorText}`);
+                    }
+
+                    // Verificação 2: Content-Type
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        const responseText = await response.text();
+                        this.log(`🚨 ERRO: Esperado JSON mas recebeu: ${contentType}`, 'error');
+                        this.log(`📄 Conteúdo: ${responseText.substring(0, 200)}...`, 'warning');
+                        
+                        if (responseText.includes('<!DOCTYPE') || responseText.includes('<html')) {
+                            this.log('💥 ERRO CRÍTICO: Página HTML retornada em resposta JSON!', 'error');
+                            throw new Error('Erro crítico do servidor: Sistema retornou página de erro em vez de dados JSON');
+                        }
+                        
+                        throw new Error(`Resposta inválida: esperado JSON, recebido ${contentType}`);
+                    }
+
+                    // Sucesso: Parse JSON
+                    const data = await response.json();
+                    this.log(`✅ API Success: ${config.method} ${url}`, 'success');
+                    this.log(`📦 Dados recebidos: ${JSON.stringify(data).substring(0, 200)}...`, 'success');
+                    return data;
+
+                } catch (error) {
+                    this.log(`💥 API Error: ${config.method} ${url} - ${error.message}`, 'error');
+                    
+                    // Diagnóstico avançado
+                    if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                        this.log('🌐 ERRO DE REDE: Servidor pode estar offline ou com problemas de conectividade', 'error');
+                        throw new Error('Erro de conectividade: Verifique sua internet ou se o servidor está online');
+                    }
+                    
+                    if (error.message.includes('SyntaxError') && error.message.includes('JSON')) {
+                        this.log('📝 ERRO DE PARSING JSON: Resposta do servidor não é JSON válido', 'error');
+                        throw new Error('Erro de dados: Servidor retornou dados corrompidos');
+                    }
+                    
+                    throw error;
+                }
+            }
+
+            async post(endpoint, data) {
+                return this.request(endpoint, {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+            }
+
+            async get(endpoint) {
+                return this.request(endpoint, { method: 'GET' });
+            }
+
+            log(message, type = 'info') {
+                const logArea = document.getElementById('logArea');
+                const timestamp = new Date().toLocaleTimeString();
+                const logClass = `log-${type}`;
+                const logEntry = `<div class="${logClass}">[${timestamp}] ${message}</div>`;
+                logArea.innerHTML += logEntry;
+                logArea.scrollTop = logArea.scrollHeight;
+                console.log(`[${type.toUpperCase()}] ${message}`);
+            }
+        }
+
+        // Instância global
+        const api = new ApiHandler();
+
+        // Função de cadastro com diagnóstico
+        async function cadastrarUsuarioSeguro(dadosUsuario) {
+            try {
+                api.log('📝 Iniciando cadastro seguro...', 'info');
+                api.log(`📋 Dados: ${JSON.stringify(dadosUsuario)}`, 'info');
+                
+                // Validação prévia
+                if (!dadosUsuario.nome || !dadosUsuario.email || !dadosUsuario.username || !dadosUsuario.password) {
+                    throw new Error('Dados obrigatórios não fornecidos: nome, email, username, password');
+                }
+                
+                const resultado = await api.post('/api/cadastro', dadosUsuario);
+                
+                api.log('🎉 Cadastro realizado com sucesso!', 'success');
+                api.log(`✅ Resultado: ${JSON.stringify(resultado)}`, 'success');
+                return resultado;
+                
+            } catch (error) {
+                api.log(`💥 Erro no cadastro: ${error.message}`, 'error');
+                
+                // Diagnóstico específico
+                if (error.message.includes('500')) {
+                    api.log('🔍 DIAGNÓSTICO: Erro 500 pode indicar:', 'warning');
+                    api.log('   1. Problema de banco de dados (coluna inexistente)', 'warning');
+                    api.log('   2. Erro nos modelos SQLAlchemy', 'warning');
+                    api.log('   3. Problema de relacionamentos (Foreign Key)', 'warning');
+                    api.log('💡 Sugestão: Verificar logs do servidor para detalhes específicos', 'info');
+                }
+                
+                if (error.message.includes('400')) {
+                    api.log('🔍 DIAGNÓSTICO: Erro 400 pode indicar:', 'warning');
+                    api.log('   1. Dados obrigatórios faltando', 'warning');
+                    api.log('   2. Formato de dados incorreto', 'warning');
+                    api.log('   3. Validação falhou no backend', 'warning');
+                }
+                
+                throw error;
+            }
+        }
+
+        // Função de teste de conectividade
+        async function testarConectividade() {
+            try {
+                api.log('🧪 Testando conectividade da API...', 'info');
+                
+                // Teste básico
+                const resultado = await api.get('/api/teste');
+                api.log('✅ API básica funcionando!', 'success');
+                
+                // Teste de diagnóstico
+                try {
+                    const diagnostico = await api.get('/api/teste-tabelas');
+                    api.log('✅ Diagnóstico de tabelas funcionando!', 'success');
+                } catch (diagError) {
+                    api.log(`⚠️ Endpoint de diagnóstico indisponível: ${diagError.message}`, 'warning');
+                }
+                
+                showStatus('Conectividade testada com sucesso!', 'success');
+                return true;
+                
+            } catch (error) {
+                api.log(`❌ Falha na conectividade: ${error.message}`, 'error');
+                showStatus('Falha na conectividade!', 'error');
+                return false;
+            }
+        }
+
+        // Manipulação do formulário
+        document.getElementById('cadastroForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const btnCadastrar = document.getElementById('btnCadastrar');
+            btnCadastrar.disabled = true;
+            btnCadastrar.textContent = '⏳ Testando...';
+            
+            try {
+                const formData = new FormData(this);
+                const dadosUsuario = {
+                    nome: formData.get('nome'),
+                    email: formData.get('email'),
+                    username: formData.get('username'),
+                    password: formData.get('password')
+                };
+                
+                const resultado = await cadastrarUsuarioSeguro(dadosUsuario);
+                showStatus('Cadastro realizado com sucesso!', 'success');
+                
+            } catch (error) {
+                api.log(`🚨 Erro final: ${error.message}`, 'error');
+                showStatus(`Erro no cadastro: ${error.message}`, 'error');
+            } finally {
+                btnCadastrar.disabled = false;
+                btnCadastrar.textContent = '🚀 Testar Cadastro Robusto';
+            }
+        });
+
+        // Utilitários
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status status-${type}`;
+            statusDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function limparLogs() {
+            document.getElementById('logArea').innerHTML = '<div class="log-info">📋 Logs limpos. Sistema pronto para novo teste.</div>';
+        }
+
+        // Log inicial
+        api.log('🛡️ Sistema de teste robusto carregado!', 'success');
+        api.log('💡 Este sistema detecta e diagnóstica automaticamente problemas de API', 'info');
+    </script>
+</body>
+</html>

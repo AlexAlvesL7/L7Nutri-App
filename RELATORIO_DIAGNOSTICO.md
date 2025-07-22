@@ -471,6 +471,71 @@ sqlalchemy.exc.NoForeignKeysError: Could not determine join condition between pa
 
 ### **🏆 CONFIRMAÇÃO FINAL:**
 **O sistema L7Nutri está com todos os relacionamentos corretos e alinhados com a tabela `usuario` do banco de dados PostgreSQL no Render.**
+
+### **🛡️ SISTEMA DE PREVENÇÃO IMPLEMENTADO (22/07/2025 - 04:00)**
+**Commit:** `e42cb65`
+
+#### **🔧 IMPLEMENTAÇÕES PREVENTIVAS CRIADAS:**
+
+✅ **1. JavaScript Robusto para Frontend** (`static/js/api-handler.js`)
+- Classe `ApiHandler` com detecção automática de erros
+- Verificação de Content-Type (JSON vs HTML)
+- Diagnóstico avançado de problemas comuns (500, 400, network)
+- Logs detalhados para debugging
+
+✅ **2. Correção Temporária `fator_atividade`**
+- Removida coluna inexistente do modelo Usuario
+- Função `salvar_fator_atividade()` desabilitada temporariamente  
+- Compatibilidade com `getattr()` em todas as referências
+- Mapeamento inteligente de nível de atividade para fator numérico
+
+✅ **3. Scripts de Diagnóstico**
+- `diagnostico_colunas.py` - Compara modelo vs banco
+- `templates/teste_robusto.html` - Interface completa de teste
+- Instruções claras para adicionar coluna faltante
+
+✅ **4. Detecção Automática de Problemas**
+- Identifica quando servidor retorna HTML em vez de JSON
+- Diagnóstico específico para erros 500 (banco) vs 400 (validação)
+- Sistema de logs em tempo real para debugging
+
+#### **🎯 COMO USAR O SISTEMA PREVENTIVO:**
+
+**Frontend (JavaScript):**
+```javascript
+// Importar o ApiHandler robusto
+<script src="/static/js/api-handler.js"></script>
+
+// Usar para qualquer requisição
+const api = new ApiHandler();
+const resultado = await api.post('/api/cadastro', dados);
+```
+
+**Teste Completo:**
+- Acesse: `/templates/teste_robusto.html` (página de teste)
+- Sistema detecta automaticamente todos os tipos de erro
+- Logs detalhados em tempo real
+
+#### **📋 PRÓXIMOS PASSOS PARA RESOLUÇÃO DEFINITIVA:**
+
+**1. Adicionar Coluna no Banco:**
+```sql
+ALTER TABLE usuario ADD COLUMN fator_atividade REAL;
+```
+
+**2. Reativar no Código:**
+- Descomentar: `fator_atividade = db.Column(db.Float)`
+- Reativar função `salvar_fator_atividade()`
+- Remover `getattr()` e voltar para `usuario.fator_atividade`
+
+#### **🔍 STATUS ATUAL:**
+- ✅ **Sistema Preventivo:** 100% implementado
+- ⚠️ **Cadastro:** Ainda com erro 500 (coluna faltante)
+- ✅ **Diagnóstico:** Automático e completo
+- 🎯 **Resolução:** Aguarda adição da coluna `fator_atividade` no banco
+
+### **💡 VALOR AGREGADO:**
+**Este sistema de prevenção garante que problemas similares sejam detectados e diagnosticados automaticamente no futuro, facilitando manutenção e debugging.**
 | Commit | Descrição | Escopo |
 |--------|-----------|---------|
 | `61e7333` | Force rebuild inicial | Cache/Deploy |

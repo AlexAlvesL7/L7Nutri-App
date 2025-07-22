@@ -1,0 +1,8 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.3, pytest-8.4.1, pluggy-1.6.0
+rootdir: C:\Users\ALEX\OneDrive\Área de Trabalho\L7Nutri\app_nutricional
+plugins: html-4.1.1, metadata-3.1.1
+collected 0 items
+
+- Generated html report: file:///C:/Users/ALEX/OneDrive/%C3%81rea%20de%20Trabalho/L7Nutri/app_nutricional/tests/relatorio_testes.html -
+============================ no tests ran in 0.15s ============================
