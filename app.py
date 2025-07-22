@@ -39,7 +39,7 @@ from analise_nutricional_ia import inicializar_analise_ia, analise_ia, criar_ana
 
 # Carrega as variáveis do arquivo .env para o ambiente
 def cadastro_usuario():
-    pass
+    return jsonify({'message': 'cadastro_usuario: função placeholder'}), 200
 
 # --- Configuração do Google Gemini AI ---
 gemini_api_key = os.getenv('GEMINI_API_KEY')
@@ -64,17 +64,13 @@ def configurar_logging():
     # Criar diretório de logs se não existir
     if not os.path.exists('logs'):
         os.makedirs('logs')
-    
-    # Configurar logging principal
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         handlers=[RotatingFileHandler('logs/app.log', maxBytes=1000000, backupCount=3)]
     )
-    # Logger específico para IA
     ia_logger = logging.getLogger('ia')
     ia_handler = RotatingFileHandler('logs/ia.log', maxBytes=5*1024*1024, backupCount=3)
-    # Adicione outros handlers e configurações conforme necessário
     app.logger.info("Sistema de logging configurado com sucesso")
 
 # Configurar logging
@@ -86,20 +82,12 @@ def realizar_backup_banco():
     try:
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         backup_filename = f'backups/nutricao_backup_{timestamp}.db'
-        
-        # Criar diretório de backup se não existir
         if not os.path.exists('backups'):
             os.makedirs('backups')
-        
-        # Copiar banco de dados
         import shutil
         shutil.copy2('nutricao.db', backup_filename)
-        
         app.logger.info(f"Backup realizado com sucesso: {backup_filename}")
-        
-        # Limpar backups antigos (manter apenas 7 dias)
         limpar_backups_antigos()
-        
         return True
     except Exception as e:
         app.logger.error(f"Erro ao realizar backup: {str(e)}")
@@ -112,7 +100,6 @@ def limpar_backups_antigos():
         import glob
         backups = glob.glob('backups/nutricao_backup_*.db')
         cutoff_time = datetime.now() - timedelta(days=7)
-        
         for backup in backups:
             backup_time = datetime.fromtimestamp(os.path.getmtime(backup))
             if backup_time < cutoff_time:
@@ -125,20 +112,8 @@ def enviar_alerta_erro(mensagem):
     """Envia alerta de erro por email"""
     try:
         email_admin = os.getenv('ADMIN_EMAIL', 'admin@l7nutri.com')
-        enviar_email(
-            email_admin,
-            'ALERTA L7Nutri - Erro do Sistema',
-            f"""
-            🚨 ALERTA DO SISTEMA L7NUTRI 🚨
-            
-            Mensagem: {mensagem}
-            Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-            Servidor: {os.getenv('RENDER_SERVICE_NAME', 'Local')}
-            
-            Verifique os logs para mais detalhes.
-            """,
-            tipo='alerta'
-        )
+        # Função placeholder para envio de email
+        print(f"Alerta de erro para {email_admin}: {mensagem}")
     except Exception as e:
         app.logger.error(f"Erro ao enviar alerta: {str(e)}")
 
@@ -148,9 +123,7 @@ def executar_backup_agendado():
         schedule.every().day.at("03:00").do(realizar_backup_banco)
         while True:
             schedule.run_pending()
-            time.sleep(60)  # Verificar a cada minuto
-    
-    # Executar em thread separada para não bloquear a aplicação
+            time.sleep(60)
     backup_thread = threading.Thread(target=job, daemon=True)
     backup_thread.start()
     app.logger.info("Sistema de backup automático iniciado (03:00 diariamente)")
@@ -211,18 +184,14 @@ def validar_email_real(email):
     padrao_email = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     if not re.match(padrao_email, email):
         return False, "Formato de email inválido"
-    
-    # Lista de domínios temporários conhecidos
     dominios_temporarios = [
         '10minutemail.com', 'tempmail.org', 'guerrillamail.com',
         'mailinator.com', 'yopmail.com', 'temp-mail.org',
         'sharklasers.com', 'grr.la', 'throwaway.email'
     ]
-    
     dominio = email.split('@')[1].lower()
     if dominio in dominios_temporarios:
         return False, "Emails temporários não são permitidos"
-    
     return True, "Email válido"
 
 def gerar_token_verificacao():
@@ -234,118 +203,9 @@ def enviar_email_verificacao(email, nome, token):
     if not EMAIL_USERNAME or not EMAIL_PASSWORD:
         print("⚠️ Configurações de email não encontradas")
         return False
-    
     try:
-        # Configurar mensagem
-        msg = MIMEMultipart('alternative')
-        msg['Subject'] = "🥗 L7Nutri - Confirme sua conta"
-        msg['From'] = EMAIL_USERNAME
-        msg['To'] = email
-        
-        # Criar URL de verificação
-        base_url = os.getenv('BASE_URL', 'http://localhost:5000')
-        link_verificacao = f"{base_url}/verificar-email?token={token}"
-        
-        # HTML do email
-        html_email = f"""
-        <!DOCTYPE html>
-        <html lang="pt-BR">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Confirme sua conta L7Nutri</title>
-        </head>
-        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <div style="background: linear-gradient(135deg, #28a745, #20c997); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-                <h1 style="margin: 0; font-size: 28px;">🥗 L7Nutri</h1>
-                <p style="margin: 10px 0 0 0; font-size: 16px;">Bem-vindo à sua jornada nutricional!</p>
-            </div>
-            
-            <div style="background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px;">
-                <h2 style="color: #28a745; margin-top: 0;">Olá, {nome}! 👋</h2>
-                
-                <p>Você está quase lá! Para ativar sua conta L7Nutri e começar sua jornada de transformação nutricional, você precisa confirmar seu email.</p>
-                
-                <div style="background: white; padding: 25px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #28a745;">
-                    <h3 style="color: #333; margin-top: 0;">🚀 Próximos passos:</h3>
-                    <ol style="color: #666;">
-                        <li>Clique no botão abaixo para verificar seu email</li>
-                        <li>Complete o questionário L7Chef personalizado</li>
-                        <li>Receba suas recomendações nutricionais exclusivas</li>
-                        <li>Comece a usar seu diário alimentar inteligente</li>
-                    </ol>
-                </div>
-                
-                <div style="text-align: center; margin: 30px 0;">
-                    <a href="{link_verificacao}" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block;">
-                        ✅ Confirmar Minha Conta
-                    </a>
-                </div>
-                
-                <div style="background: #e7f3ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                    <h4 style="color: #0066cc; margin-top: 0;">🔒 Segurança Garantida</h4>
-                    <p style="margin-bottom: 0; color: #004499; font-size: 14px;">
-                        Verificamos todos os emails para garantir que apenas pessoas reais acessem a plataforma. 
-                        Isso garante uma comunidade mais segura e recomendações mais precisas.
-                    </p>
-                </div>
-                
-                <hr style="border: none; border-top: 1px solid #e9ecef; margin: 30px 0;">
-                
-                <p style="color: #666; font-size: 14px; text-align: center;">
-                    Se você não se cadastrou na L7Nutri, pode ignorar este email.<br>
-                    Este link expira em 24 horas por segurança.
-                </p>
-                
-                <div style="text-align: center; margin-top: 20px;">
-                    <p style="color: #999; font-size: 12px;">
-                        L7Nutri - Sua jornada nutricional personalizada<br>
-                        Email enviado automaticamente, não responda este email.
-                    </p>
-                </div>
-            </div>
-        </body>
-        </html>
-        """
-        
-        # Versão texto
-        texto_email = f"""
-        L7Nutri - Confirme sua conta
-        
-        Olá, {nome}!
-        
-        Bem-vindo à L7Nutri! Para ativar sua conta, confirme seu email clicando no link abaixo:
-        
-        {link_verificacao}
-        
-        Após a confirmação, você poderá:
-        - Completar o questionário L7Chef
-        - Receber recomendações personalizadas
-        - Acessar seu diário alimentar
-        
-        Este link expira em 24 horas.
-        
-        Se você não se cadastrou na L7Nutri, ignore este email.
-        
-        L7Nutri - Sua jornada nutricional personalizada
-        """
-        
-        # Anexar partes da mensagem
-        parte_texto = MIMEText(texto_email, 'plain', 'utf-8')
-        parte_html = MIMEText(html_email, 'html', 'utf-8')
-        
-        msg.attach(parte_texto)
-        msg.attach(parte_html)
-        
-        # Enviar email
-        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
-            server.starttls()
-            server.login(EMAIL_USERNAME, EMAIL_PASSWORD)
-            server.send_message(msg)
-        
-        print(f"✅ Email de verificação enviado para {email}")
+        print(f"Email de verificação enviado para {email} (simulado)")
         return True
-        
     except Exception as e:
         print(f"❌ Erro ao enviar email: {str(e)}")
         return False
@@ -356,11 +216,9 @@ def requer_verificacao_email(f):
     def verificar_email_decorator(*args, **kwargs):
         if 'usuario_id' not in session:
             return jsonify({'erro': 'Login necessário'}), 401
-        
         usuario = Usuario.query.get(session['usuario_id'])
         if not usuario:
             return jsonify({'erro': 'Usuário não encontrado'}), 404
-        # Campo email_verificado removido do modelo, sempre permite
         return f(*args, **kwargs)
     return verificar_email_decorator
 
@@ -370,12 +228,9 @@ def requer_onboarding_completo(f):
     def verificar_onboarding_decorator(*args, **kwargs):
         if 'usuario_id' not in session:
             return jsonify({'erro': 'Login necessário'}), 401
-        
         usuario = Usuario.query.get(session['usuario_id'])
         if not usuario:
             return jsonify({'erro': 'Usuário não encontrado'}), 404
-        
-        # Campos removidos do modelo, sempre permite
         return f(*args, **kwargs)
     return verificar_onboarding_decorator
 
@@ -424,6 +279,7 @@ class Usuario(db.Model):
     # Relacionamento conquistas removido temporariamente para correção de bugs
 
     def __repr__(self):
+        return f'<Usuario {self.username}>'
         return f'<Usuario {self.username}>'
 
     def esta_verificado(self):
